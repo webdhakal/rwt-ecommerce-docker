@@ -1,0 +1,13 @@
+resources/js/components/ui/*
+resources/views/mail/*
+build/
+node_modules/
+vendors/
+internals/generators/
+internals/scripts/
+package-lock.json
+yarn.lock
+npm.lock
+composer.lock
+package.json
+coverage

@@ -1,0 +1,18 @@
+{
+    "default": {
+      "primaryColor": "#3BB77E",
+      "secondaryColor": "#6B7280",
+      "primaryFont": "Arial, sans-serif"
+    },
+    "dark": {
+      "primaryColor": "#3BB77E",
+      "secondaryColor": "#374151",
+      "primaryFont": "Roboto, sans-serif"
+    },
+    "light": {
+      "primaryColor": "#3BB77E",
+      "secondaryColor": "#F08626",
+      "secondaryLightColor": "#FFA451",
+      "primaryFont": "Helvetica, sans-serif"
+    }
+  }

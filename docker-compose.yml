@@ -1,0 +1,27 @@
+services:
+  webapp:
+    container_name: rwt
+    build:
+      context: ./setup/rwt-apache-php-8.3
+      dockerfile: Dockerfile
+    restart: always
+    expose:
+      - 80
+    ports:
+      - "9000:80"
+      - "5179:5179"
+    volumes:
+      - ./laravel:/var/www/html:cached
+      - ./setup/config/php.ini:/usr/local/etc/php/conf.d/99-local.ini
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  db:
+    driver: local
+  vendor:
+  node_modules:
