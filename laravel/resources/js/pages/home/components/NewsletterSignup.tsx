@@ -53,21 +53,21 @@ const NewsletterSignup = () => {
 
   if (isSubscribed) {
     return (
-      <section className="py-12 lg:py-16 bg-gradient-to-r from-accent to-accent/80">
+      <section className="py-12 lg:py-16 bg-gradient-to-r from-primary to-accent">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="bg-white/10 backdrop-blur-sm rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
-            <Icon name="CheckCircle" size={40} className="text-primary" />
+          <div className="bg-background/20 backdrop-blur-sm rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
+            <Icon name="CheckCircle" size={40} className="text-primary-foreground" />
           </div>
-          <h2 className="text-2xl lg:text-3xl font-bold text-primary mb-4">
+          <h2 className="text-2xl lg:text-3xl font-bold text-primary-foreground mb-4">
             Welcome to EcommerceHub!
           </h2>
-          <p className="text-primary/90 text-lg mb-6">
+          <p className="text-primary-foreground/90 text-lg mb-6">
             Thank you for subscribing! You'll receive our latest updates and exclusive offers.
           </p>
           <Button
             variant="outline"
             onClick={() => setIsSubscribed(false)}
-            className='w-full'
+            className='w-full border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10'
           >
             Subscribe Another Email
           </Button>
@@ -77,15 +77,15 @@ const NewsletterSignup = () => {
   }
 
   return (
-    <section className="py-12 lg:py-16 bg-gradient-to-r from-accent to-accent/80">
+    <section className="py-12 lg:py-16 bg-gradient-to-r from-primary to-accent">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           {/* Content */}
           <div className="text-center lg:text-left">
-            <h2 className="text-2xl lg:text-3xl font-bold text-primary mb-4">
+            <h2 className="text-2xl lg:text-3xl font-bold text-primary-foreground mb-4">
               Stay in the Loop
             </h2>
-            <p className="text-primary/90 text-lg mb-6">
+            <p className="text-primary-foreground/90 text-lg mb-6">
               Subscribe to our newsletter and never miss out on the latest deals, new arrivals, and exclusive member benefits.
             </p>
 
@@ -93,14 +93,14 @@ const NewsletterSignup = () => {
             <div className="space-y-4 mb-8">
               {benefits?.map((benefit) => (
                 <div key={benefit?.title} className="flex items-start space-x-3 text-left">
-                  <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                    <Icon name={benefit?.icon} size={16} className="text-primary" />
+                  <div className="w-8 h-8 bg-primary-foreground/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                    <Icon name={benefit?.icon} size={16} className="text-primary-foreground" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-primary mb-1">
+                    <h3 className="font-semibold text-primary-foreground mb-1">
                       {benefit?.title}
                     </h3>
-                    <p className="text-primary/80 text-sm">
+                    <p className="text-primary-foreground/80 text-sm">
                       {benefit?.description}
                     </p>
                   </div>
@@ -110,7 +110,7 @@ const NewsletterSignup = () => {
           </div>
 
           {/* Signup Form */}
-          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 lg:p-8">
+          <div className="bg-card/20 backdrop-blur-sm rounded-lg p-6 lg:p-8 border border-border/30">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <Input
@@ -120,7 +120,7 @@ const NewsletterSignup = () => {
                   value={email}
                   onChange={(e) => setEmail(e?.target?.value)}
                   error={error}
-                  className="bg-primary/20 border-primary/30 text-primary placeholder:muted-foreground/70"
+                  className="bg-background/50 border-border text-foreground placeholder:text-muted-foreground"
                   required
                 />
               </div>
@@ -132,31 +132,31 @@ const NewsletterSignup = () => {
                 size="lg"
                 iconName="Mail"
                 iconPosition="left"
-                className="w-full bg-foreground text-accent hover:bg-primary/90 font-semibold"
+                className="w-full bg-background text-foreground hover:bg-background/90 font-semibold border border-border"
               >
                 {isLoading ? 'Subscribing...' : 'Subscribe Now'}
               </Button>
 
-              <p className="text-primary/70 text-xs text-center">
+              <p className="text-primary-foreground/70 text-xs text-center">
                 By subscribing, you agree to our{' '}
-                <a href="#" className="underline hover:text-muted-foreground transition-colors duration-200">
+                <a href="#" className="underline hover:text-primary-foreground transition-colors duration-200">
                   Privacy Policy
                 </a>{' '}
                 and{' '}
-                <a href="#" className="underline hover:text-muted-foreground transition-colors duration-200">
+                <a href="#" className="underline hover:text-primary-foreground transition-colors duration-200">
                   Terms of Service
                 </a>
               </p>
             </form>
 
             {/* Social Proof */}
-            <div className="mt-6 pt-6 border-t border-primary/20">
-              <div className="flex items-center justify-center space-x-4 text-primary/80">
+            <div className="mt-6 pt-6 border-t border-primary-foreground/20">
+              <div className="flex items-center justify-center space-x-4 text-primary-foreground/80">
                 <div className="flex items-center space-x-2">
                   <Icon name="Users" size={16} />
                   <span className="text-sm">50K+ subscribers</span>
                 </div>
-                <div className="w-1 h-1 bg-primary/40 rounded-full"></div>
+                <div className="w-1 h-1 bg-primary-foreground/40 rounded-full"></div>
                 <div className="flex items-center space-x-2">
                   <Icon name="Star" size={16} className="fill-current" />
                   <span className="text-sm">4.8/5 rating</span>
