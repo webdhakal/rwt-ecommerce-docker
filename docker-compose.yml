@@ -8,13 +8,32 @@ services:
     expose:
       - 80
     ports:
-      - "9000:80"
-      - "5179:5179"
+      - "7000:80"
+      - "5200:5173"
     volumes:
       - ./laravel:/var/www/html:cached
       - ./setup/config/php.ini:/usr/local/etc/php/conf.d/99-local.ini
+    environment:
+      MYSQL_HOST: database
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+
     networks:
       - app-network
+
+  database:
+      container_name: mysql8-rwt
+      restart: always
+      image: mysql:8
+      volumes:
+        - db:/var/lib/mysql
+      ports:
+        - "3300:3306"
+      environment:
+        MYSQL_ROOT_PASSWORD: root
+        MYSQL_DATABASE: rwt
+      networks:
+        - app-network
 
 networks:
   app-network:

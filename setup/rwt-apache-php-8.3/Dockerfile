@@ -96,6 +96,6 @@ WORKDIR /var/www/html
 # Set correct user
 USER www-data
 
-EXPOSE 80 5179
+EXPOSE 80 5173
 
 CMD ["apachectl", "-D", "FOREGROUND"]

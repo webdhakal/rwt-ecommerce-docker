@@ -17,12 +17,12 @@ export default defineConfig({
     //   cssCodeSplit: true,
     // },
     server: {
-        host: '0.0.0.0',      // Listen on all network interfaces
-        port: 5179,            // Match your exposed port
-        strictPort: true,      // Fail if port is already in use
+        host: "172.20.0.3",  // Required for Docker
+        port: 5173,       // INTERNAL container port
+        strictPort: true,
         hmr: {
-            host: 'localhost',   // Use localhost for hot module reload
-            port: 5179,
+            host: "172.20.0.3", // Your host machine
+            port: 5200,        // EXTERNAL mapped port
         },
     },
     plugins: [
