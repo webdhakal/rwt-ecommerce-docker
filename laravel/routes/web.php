@@ -88,9 +88,6 @@ Route::get('/verify-otp', [AuthController::class, 'verifyOtp'])->name('verify-ot
 Route::get('/resend-otp', [AuthController::class, 'resendOtp'])->name('resend-otp');
 Route::get('/set-password', [AuthController::class, 'setPassword'])->name('set-password');
 Route::get('/reset-password', [AuthController::class, 'resetPassword'])->name('reset-password');
-Route::get('/change-password', [AuthController::class, 'changePassword'])->name('change-password');
-Route::get('/update-profile', [AuthController::class, 'updateProfile'])->name('update-profile');
-
 
 /*--------------------------------------------------------------------------------------------------------------------
 |||||||||||||||||||||||||||||||||||||||||||||||| DELIVERY PARTNER HUB |||||||||||||||||||||||||||||||||||||||||||||||||
