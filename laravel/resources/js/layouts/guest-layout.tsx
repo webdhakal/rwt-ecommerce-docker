@@ -3,6 +3,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import FloatingContactButton from "@/components/Common/FloatingContactButton";
 import ScrollToTop from "@/components/ScrollToTop";
+import { cn } from "@/shadcn/lib/utils";
 
 interface GuestLayoutProps {
     children: ReactNode;
@@ -25,11 +26,10 @@ export default function GuestLayout({ children, ...props }: GuestLayoutProps) {
     }, []);
 
     return (
-        <div className="min-h-screen" {...props}>
+        <div {...props}>
             <Header ref={headerRef} />
 
             <main
-                className="min-h-screen"
                 style={{ marginTop: headerHeight }}
             >
                 {children}
