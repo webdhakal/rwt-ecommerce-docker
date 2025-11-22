@@ -61,4 +61,9 @@ class FrontController extends Controller
     {
         return Inertia::render('user-dashboard/index');
     }
+
+    public function deliveryPartnerHub()
+    {
+        return Inertia::render('delivery-partner-hub/index');
+    }
 }
