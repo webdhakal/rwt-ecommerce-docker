@@ -1,0 +1,8 @@
+{
+  "inertia.defaultExtension": ".tsx",
+  "inertia.pages": "laravel/resources/js/pages/**/*.tsx",
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true
+  }
+}

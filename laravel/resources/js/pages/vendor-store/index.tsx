@@ -7,7 +7,7 @@ import ProductsTab from './components/ProductsTab';
 import AboutTab from './components/AboutTab';
 import ReviewsTab from './components/ReviewsTab';
 import PoliciesTab from './components/PoliciesTab';
-import FloatingContactButton from './components/FloatingContactButton';
+import FloatingContactButton from '@/components/Common/FloatingContactButton';
 import GuestLayout from '@/layouts/guest-layout';
 
 const VendorStoreProfile = () => {
