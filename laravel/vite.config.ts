@@ -17,18 +17,20 @@ export default defineConfig({
     //   cssCodeSplit: true,
     // },
     server: {
-        host: "172.20.0.3",  // Required for Docker
+        host: "0.0.0.0",  // Required for Docker
         port: 5173,       // INTERNAL container port
         strictPort: true,
         hmr: {
-            host: "172.20.0.3", // Your host machine
-            port: 5200,        // EXTERNAL mapped port
+            host: "localhost", // Use 'localhost' for the host (where the browser connects)
+            port: 5173,        // Internal port
+            clientPort: 5200,  // Tell the client to connect to the HOST's port 5200
         },
     },
     plugins: [
         laravel({
             input: ['resources/css/app.css', 'resources/js/app.tsx'],
             ssr: 'resources/js/ssr.tsx',
+            host: 'localhost', // Ensure client URLs use localhost (Crucial for Laravel integration)
             refresh: true,
         }),
         react(),
