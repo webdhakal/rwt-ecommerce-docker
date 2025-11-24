@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import Icon from '@/components/AppIcon';
 import { Input } from '@/shadcn/ui/input';
-import Select from '@/components/Select';
-import Button from '@/components/Button';
+import { Select } from '@/shadcn/ui/select';
+import { Button } from '@/shadcn/ui/button';
+import { Checkbox } from '@/shadcn/ui/checkbox';
+import Icon from '@/components/AppIcon';
 
 const PaymentForm = ({ onNext, onBack, paymentData, setPaymentData }) => {
   const [errors, setErrors] = useState({});
