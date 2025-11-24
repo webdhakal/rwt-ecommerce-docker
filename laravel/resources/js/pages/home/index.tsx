@@ -9,6 +9,8 @@ import GuestLayout from '@/layouts/guest-layout';
 import { Button } from '@/shadcn/ui/button';
 import { useCategories } from '@/api/hooks/useCategories';
 import { logger } from '@/logger';
+import ServiceBlock from '@/components/Homepage/ServiceBlock';
+import DealOfTheDay from '@/components/Homepage/DealOfDayBlock';
 
 const Homepage = () => {
   // Mock product data
@@ -281,7 +283,11 @@ const Homepage = () => {
         </div>
       </section>
 
+      <DealOfTheDay />
+
       <VendorSpotlight />
+
+      <ServiceBlock />
 
       <section className="px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
