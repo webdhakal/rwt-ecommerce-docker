@@ -1,7 +1,7 @@
 import React from 'react';
+import { Link } from '@inertiajs/react';
 import { Button } from '@/shadcn/ui/button';
 import Icon from '@/components/AppIcon';
-import { Link } from '@inertiajs/react';
 
 const OrderConfirmation = ({ orderData }) => {
   const orderNumber = "ORD-2025-001234";
@@ -131,7 +131,7 @@ const OrderConfirmation = ({ orderData }) => {
           </div>
 
           <div className="text-center">
-            <Link href={route('homepage')}>
+            <Link href={route('home')}>
               <Button
                 variant="ghost"
                 iconName="ArrowLeft"
