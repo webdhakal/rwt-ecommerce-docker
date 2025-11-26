@@ -10,62 +10,169 @@ import {
     FieldSeparator,
 } from "@/shadcn/ui/field"
 import { Input } from "@/shadcn/ui/input"
+// 👇 Import the necessary Inertia and React hooks
+import { Link, useForm, usePage } from "@inertiajs/react"
+import { FormEventHandler, useEffect } from "react"
 
-export default function RegisterPage({
-    className,
-    ...props
-}: React.ComponentProps<"div">) {
+// Import the Eye icons for password visibility (optional but good practice)
+import { Eye, EyeOff } from "lucide-react"
+import { useRegister } from "@/api/hooks/useAuth"
+
+// Define the component with the Inertia logic
+export default function RegisterPage() { 
+    // Get appName (assuming you might need it for dynamic text)
+    const { appName } = usePage().props as { appName: string };
+
+    // 1. Integrate useForm and state management
+    const { data, setData, post, processing, errors, reset } = useForm({
+        name: '', // Added name field
+        email: '',
+        password: '',
+        confirm_password: '', // Added confirmation field for Laravel
+        showPassword: false, // For password visibility toggle
+    })
+
+    // Reset password fields on component mount/unmount for security
+    useEffect(() => {
+        return () => {
+            reset('password', 'confirm_password')
+        }
+    }, [])
+
+    const registerMutation = useRegister({
+        onSuccess: (response) => {
+            localStorage.setItem('authToken', response.payload?.access_token);
+            localStorage.setItem('refreshToken', response.payload?.refreshToken);
+            localStorage.setItem('auth', JSON.stringify(response.payload?.auth));
+
+            toast({ title: response.message, description: 'Redirecting to dashboard...' });
+
+            window.location.href = '/dashboard';
+        },
+        onError: (err: any) => {
+            toast({
+                title: 'Signup failed',
+                description: err.response?.data?.message || err.message,
+            });
+        },
+    });
+    
+
+    // 3. Handle Form Submission
+    const handleSubmit: FormEventHandler = (e) => {
+        e.preventDefault();
+        registerMutation.mutate({
+            name: data.name,
+            email: data.email,
+            password: data.password,
+            confirm_password: data.confirm_password,
+        });
+    }
+    
+    // Toggle password visibility function
+    const togglePasswordVisibility = () => {
+        setData('showPassword', !data.showPassword);
+    }
+
     return (
         <GuestLayout>
             <section className="px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
                 <div className="container mx-auto">
-                    <div className={cn("flex flex-col gap-6", className)} {...props}>
+                    <div className={cn("flex flex-col gap-6")}>
                         <Card className="overflow-hidden p-0">
                             <CardContent className="grid p-0 md:grid-cols-2">
-                                <form className="p-6 md:p-8">
+                                {/* 👇 Attach the handleSubmit handler to the form */}
+                                <form onSubmit={handleSubmit} className="p-6 md:p-8">
                                     <FieldGroup>
                                         <div className="flex flex-col items-center gap-2 text-center">
                                             <h1 className="text-2xl font-bold">Create your account</h1>
                                             <p className="text-muted-foreground text-sm text-balance">
-                                                Enter your email below to create your account
+                                                Enter your details below to create your {appName} account
                                             </p>
                                         </div>
+
+                                        {/* Name Field */}
+                                        <Field>
+                                            <FieldLabel htmlFor="name">Name</FieldLabel>
+                                            <Input
+                                                id="name"
+                                                type="text"
+                                                placeholder="John Doe"
+                                                value={data.name} // Connect value
+                                                onChange={(e) => setData('name', e.target.value)} // Connect onChange
+                                                required
+                                                autoFocus
+                                            />
+                                            {errors.name && <p className="text-sm text-destructive mt-1">{errors.name}</p>}
+                                        </Field>
+
+                                        {/* Email Field */}
                                         <Field>
                                             <FieldLabel htmlFor="email">Email</FieldLabel>
                                             <Input
                                                 id="email"
                                                 type="email"
                                                 placeholder="m@example.com"
+                                                value={data.email}
+                                                onChange={(e) => setData('email', e.target.value)}
                                                 required
                                             />
-                                            <FieldDescription>
-                                                We&apos;ll use this to contact you. We will not share your
-                                                email with anyone else.
-                                            </FieldDescription>
+                                            {errors.email && <p className="text-sm text-destructive mt-1">{errors.email}</p>}
                                         </Field>
+
+                                        {/* Password Fields */}
                                         <Field>
-                                            <Field className="grid grid-cols-2 gap-4">
+                                            <div className="grid grid-cols-2 gap-4">
+                                                {/* Password */}
                                                 <Field>
                                                     <FieldLabel htmlFor="password">Password</FieldLabel>
-                                                    <Input id="password" type="password" required />
+                                                    <div className="relative">
+                                                        <Input 
+                                                            id="password" 
+                                                            type={data.showPassword ? "text" : "password"}
+                                                            value={data.password}
+                                                            onChange={(e) => setData('password', e.target.value)}
+                                                            required 
+                                                            className="pr-10"
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            onClick={togglePasswordVisibility}
+                                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                                                            aria-label={data.showPassword ? "Hide password" : "Show password"}
+                                                        >
+                                                            {data.showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                                        </button>
+                                                    </div>
+                                                    {errors.password && <p className="text-sm text-destructive mt-1 col-span-2">{errors.password}</p>}
                                                 </Field>
+
+                                                {/* Confirm Password */}
                                                 <Field>
-                                                    <FieldLabel htmlFor="confirm-password">
-                                                        Confirm Password
-                                                    </FieldLabel>
-                                                    <Input id="confirm-password" type="password" required />
+                                                    <FieldLabel htmlFor="confirm_password">Confirm Password</FieldLabel>
+                                                    <Input 
+                                                        id="confirm_password" 
+                                                        type={data.showPassword ? "text" : "password"}
+                                                        value={data.password_confirmation}
+                                                        onChange={(e) => setData('confirm_password', e.target.value)}
+                                                        required 
+                                                    />
                                                 </Field>
-                                            </Field>
-                                            <FieldDescription>
-                                                Must be at least 8 characters long.
-                                            </FieldDescription>
+                                            </div>
                                         </Field>
+                                        
+                                        {/* Submit Button */}
                                         <Field>
-                                            <Button type="submit">Create Account</Button>
+                                            <Button type="submit" disabled={processing}>
+                                                {processing ? 'Registering...' : 'Create Account'}
+                                            </Button>
                                         </Field>
+
                                         <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
                                             Or continue with
                                         </FieldSeparator>
+                                        
+                                        {/* Social Login Buttons */}
                                         <Field className="grid grid-cols-3 gap-4">
                                             <Button variant="outline" type="button">
                                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -95,9 +202,15 @@ export default function RegisterPage({
                                                 <span className="sr-only">Sign up with Meta</span>
                                             </Button>
                                         </Field>
-                                        <FieldDescription className="text-center">
-                                            Already have an account? <a href="#">Sign in</a>
-                                        </FieldDescription>
+                                        
+                                        {/* Sign In Link */}
+                                        <p className="text-center text-sm mt-4">
+                                            Already have an account?{" "}
+                                            <Link href={route('login')} className="underline underline-offset-4 hover:text-primary">
+                                                Sign in
+                                            </Link>
+                                        </p>
+
                                     </FieldGroup>
                                 </form>
                                 <div className="bg-muted relative hidden md:block">

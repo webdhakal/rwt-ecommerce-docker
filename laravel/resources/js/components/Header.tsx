@@ -4,11 +4,14 @@ import { Button } from '@/shadcn/ui/button';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandList } from '@/shadcn/ui/command';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/shadcn/ui/dropdown-menu';
 import { Menu as CategoryMenu } from '@/types/Menu';
-import { Link, router } from '@inertiajs/react';
+import { usePage, Link, router } from '@inertiajs/react';
 import { ChevronDown, Heart, MapPin, Menu, MoveUpRight, Search, ShoppingCart, Store, User, X } from 'lucide-react';
 import React, { forwardRef, useEffect, useRef, useState } from 'react';
 import NavigationSkeleton from './skeletons/NavigationSkeleton';
 import ToggleThemeButton from './Button/ToggleThemeButton';
+import { getUsers } from '@/api/endpoints/users.api';
+import api from '@/api/clients/axiosClient'
+import { useLogout } from '@/api/hooks/useAuth';
 
 // Use forwardRef so GuestLayout can measure the <header>
 const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...props }, ref) => {
@@ -30,6 +33,9 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
     const [query, setQuery] = useState('');
     const [open, setOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
+
+    const auth = JSON.parse(localStorage.getItem('auth') || 'null');
+    const isUser = !!auth;
 
     // Mock data
     const trendingItems = [
@@ -71,6 +77,23 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
         return () => window.removeEventListener('scroll', controlNavbar);
     }, [lastScrollY]);
 
+    const logoutMutation = useLogout({
+        onSuccess: (response) => {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('auth');
+        },
+        onError: (err: any) => {
+            toast({
+                title: 'Logout Failed',
+                description: err.response?.data?.message || err.message,
+            });
+        },
+    });
+
+
+    const handleLogout = async (e) => {
+        logoutMutation.mutate();
+    }
     const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
         e.stopPropagation();
         const container = e.currentTarget;
@@ -81,16 +104,13 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
         <header
             ref={ref}
             {...props}
-            className={`fixed top-0 right-0 left-0 z-50 transition-all duration-700 ease-out ${
-                isVisible ? 'translate-y-0' : '-translate-y-full'
-            } ${
-                isScrolled ? 'bg-background/95 backdrop-blur-sm shadow-lg' : 'bg-background'
-            }`}
+            className={`fixed top-0 right-0 left-0 z-50 transition-all duration-700 ease-out ${isVisible ? 'translate-y-0' : '-translate-y-full'
+                } ${isScrolled ? 'bg-background/95 backdrop-blur-sm shadow-lg' : 'bg-background'
+                }`}
         >
             {/* Top Bar */}
-            <div className={`hidden border-b border-border md:block transition-all duration-700 ease-out ${
-                isAtTop ? 'max-h-20 opacity-100' : 'max-h-0 opacity-0 overflow-hidden'
-            }`}>
+            <div className={`hidden border-b border-border md:block transition-all duration-700 ease-out ${isAtTop ? 'max-h-20 opacity-100' : 'max-h-0 opacity-0 overflow-hidden'
+                }`}>
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between py-2 text-sm">
                         <div className="flex items-center space-x-4">
@@ -199,59 +219,75 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
                         <div className="flex items-center space-x-4">
                             {/* Wishlist, Cart, User - Hidden on mobile */}
                             <div className="space-x-4 flex items-center invisible lg:visible">
-                            <Button
-                                href={route('wishlist')}
-                                className="group relative bg-background p-2 text-muted-foreground transition hover:bg-secondary hover:text-primary"
-                            >
-                                <Heart className="h-6 w-6" />
-                                <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-xs text-destructive-foreground">
-                                    3
-                                </span>
-                                <div className="absolute bottom-0 left-1/2 mt-2 -translate-x-1/2 translate-y-full transform rounded bg-popover px-2 py-1 text-xs text-popover-foreground opacity-0 transition-opacity group-hover:opacity-100 border border-border">
-                                    Wishlist
-                                </div>
-                            </Button>
+                                <Button
+                                    href={route('wishlist')}
+                                    className="group relative bg-background p-2 text-muted-foreground transition hover:bg-secondary hover:text-primary"
+                                >
+                                    <Heart className="h-6 w-6" />
+                                    <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-xs text-destructive-foreground">
+                                        3
+                                    </span>
+                                    <div className="absolute bottom-0 left-1/2 mt-2 -translate-x-1/2 translate-y-full transform rounded bg-popover px-2 py-1 text-xs text-popover-foreground opacity-0 transition-opacity group-hover:opacity-100 border border-border">
+                                        Wishlist
+                                    </div>
+                                </Button>
 
-                            {/* Cart */}
-                            <Button
-                                href={route('shopping-cart')}
-                                className="group relative bg-background p-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-primary"
-                            >
-                                <ShoppingCart className="h-6 w-6" />
-                                <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
-                                    2
-                                </span>
-                                <div className="absolute bottom-0 left-1/2 mt-2 -translate-x-1/2 translate-y-full transform rounded bg-popover px-2 py-1 text-xs text-popover-foreground opacity-0 transition-opacity group-hover:opacity-100 border border-border">
-                                    Cart
-                                </div>
-                            </Button>
+                                {/* Cart */}
+                                <Button
+                                    href={route('shopping-cart')}
+                                    className="group relative bg-background p-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-primary"
+                                >
+                                    <ShoppingCart className="h-6 w-6" />
+                                    <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
+                                        2
+                                    </span>
+                                    <div className="absolute bottom-0 left-1/2 mt-2 -translate-x-1/2 translate-y-full transform rounded bg-popover px-2 py-1 text-xs text-popover-foreground opacity-0 transition-opacity group-hover:opacity-100 border border-border">
+                                        Cart
+                                    </div>
+                                </Button>
 
-                            {/* User Account */}
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button className="group relative bg-background p-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-primary">
-                                        <User className="h-6 w-6" />
-                                        <div className="absolute bottom-0 left-1/2 mt-2 -translate-x-1/2 translate-y-full transform rounded bg-popover px-2 py-1 text-xs text-popover-foreground opacity-0 transition-opacity group-hover:opacity-100 border border-border">
-                                            Account
-                                        </div>
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent className="w-56">
-                                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem>My Orders</DropdownMenuItem>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem>My Wishlist</DropdownMenuItem>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem>My Profile</DropdownMenuItem>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem>Logout</DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
+                                {/* User Account */}
+                                {isUser ? (
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button className="group relative bg-background p-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-primary">
+                                                <User className="h-6 w-6" />
+                                                <div className="absolute bottom-0 left-1/2 mt-2 -translate-x-1/2 translate-y-full transform rounded bg-popover px-2 py-1 text-xs text-popover-foreground opacity-0 transition-opacity group-hover:opacity-100 border border-border">
+                                                    Account
+                                                </div>
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent className="w-56">
+                                            <DropdownMenuItem asChild>
+                                                <Link href={route('dashboard', { tab: 'profile' })}>My Account</Link>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuItem asChild>
+                                                <Link href={route('dashboard', { tab: 'orders' })}>My Orders</Link>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuItem asChild>
+                                                <Link href={route('dashboard', { tab: 'wishlist' })}>My Wishlist</Link>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuItem asChild>
+                                                <Button className="bg-black w-full text-start" onClick={handleLogout}>
+                                                    Logout
+                                                </Button>
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                ) : (
+                                    <Link href={route('login')}>
+                                        <Button className="rounded-full bg-gradient-to-r from-primary to-accent px-8 py-5 text-base text-primary-foreground transition-all duration-200 hover:opacity-90 lg:text-lg">
+                                            Login
+                                        </Button>
+                                    </Link>
+                                )}
 
-                            <ToggleThemeButton/>
+                                <ToggleThemeButton />
                             </div>
-                            
+
                             {/* Mobile Menu Button */}
                             <button
                                 className="p-2 text-muted-foreground transition-colors hover:text-primary lg:hidden"
@@ -266,9 +302,8 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
 
             {/* Navigation */}
             {!isLoading ? (
-                <div className={`hidden border-b border-border lg:block transition-all duration-700 ease-out ${
-                    isAtTop ? 'max-h-20 opacity-100' : 'max-h-0 opacity-0 overflow-hidden'
-                }`}>
+                <div className={`hidden border-b border-border lg:block transition-all duration-700 ease-out ${isAtTop ? 'max-h-20 opacity-100' : 'max-h-0 opacity-0 overflow-hidden'
+                    }`}>
                     <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                         <nav className="flex items-center justify-between py-3">
                             <div className="flex items-center space-x-8">
@@ -284,7 +319,7 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
                                             <DropdownMenuContent className="w-48">
                                                 {categories.map((category) => (
                                                     <DropdownMenuItem key={category.id} onClick={() => console.log('Selected:', category.name)}>
-                                                        {category.name}
+                                                        <Link href={route('product-listing', { category: category.slug })}>{category.name}</Link>
                                                     </DropdownMenuItem>
                                                 ))}
                                             </DropdownMenuContent>
@@ -293,9 +328,13 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
                                 </div>
                                 {categories &&
                                     categories.map((category) => (
-                                        <button key={category.id} className="font-medium text-foreground transition-colors hover:text-primary">
+                                        <Link
+                                            key={category.id}
+                                            href={route('product-listing', { category: category.slug })}
+                                            className="font-medium text-foreground transition-colors hover:text-primary"
+                                        >
                                             {category.name}
-                                        </button>
+                                        </Link>
                                     ))}
                             </div>
                             <div className="flex items-center space-x-6">
@@ -308,7 +347,7 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
             ) : (
                 <NavigationSkeleton />
             )}
-            
+
             {/* Mobile Menu */}
             {isMobileMenuOpen && (
                 <div className="border-t border-border shadow-lg lg:hidden bg-background">
@@ -367,26 +406,45 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
                             </Button>
 
                             {/* User Account */}
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button className="group relative bg-background p-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-primary">
-                                        <User className="h-6 w-6" />
+                            {isUser ? (
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button className="group relative bg-background p-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-primary">
+                                            <User className="h-6 w-6" />
+                                            <div className="absolute bottom-0 left-1/2 mt-2 -translate-x-1/2 translate-y-full transform rounded bg-popover px-2 py-1 text-xs text-popover-foreground opacity-0 transition-opacity group-hover:opacity-100 border border-border">
+                                                Account
+                                            </div>
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent className="w-56">
+                                        <DropdownMenuItem asChild>
+                                            <Link href={route('dashboard', { tab: 'profile' })}>My Account</Link>
+                                        </DropdownMenuItem>
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuItem asChild>
+                                            <Link href={route('dashboard', { tab: 'orders' })}>My Orders</Link>
+                                        </DropdownMenuItem>
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuItem asChild>
+                                            <Link href={route('dashboard', { tab: 'wishlist' })}>My Wishlist</Link>
+                                        </DropdownMenuItem>
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuItem asChild>
+                                            <Button className="bg-black w-full text-start" onClick={handleLogout}>
+                                                Logout
+                                            </Button>
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            ) : (
+                                <Link href={route('login')}>
+                                    <Button className="rounded-full bg-gradient-to-r from-primary to-accent px-8 py-5 text-base text-primary-foreground transition-all duration-200 hover:opacity-90 lg:text-lg">
+                                        Login
                                     </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent className="w-56">
-                                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem>My Orders</DropdownMenuItem>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem>My Wishlist</DropdownMenuItem>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem>My Profile</DropdownMenuItem>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem>Logout</DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
+                                </Link>
+                            )}
 
-                            <ToggleThemeButton/>
+                            <ToggleThemeButton />
                         </div>
                     </div>
                 </div>
