@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
     Heart, ShoppingCart, Package, User, MapPin, CreditCard, Star, Store,
     ArrowRight, Trash2, BadgeCheck, TrendingDown, Truck, Clock, CheckCircle,
@@ -17,8 +17,39 @@ import { Alert, AlertDescription } from '@/shadcn/ui/alert';
 import GuestLayout from '@/layouts/guest-layout';
 import { Head } from '@inertiajs/react';
 
+const DEFAULT_TAB = 'profile';
+
 export default function UserDashboard() {
-    const [activeTab, setActiveTab] = useState('wishlist');
+    const getInitialTab = () => {
+        // Check if we are in the browser environment
+        if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            // Read the 'tab' parameter, or fall back to the default
+            const urlTab = params.get('tab');
+            return urlTab || DEFAULT_TAB;
+        }
+        return DEFAULT_TAB;
+    };
+
+    const [activeTab, setActiveTab] = useState(getInitialTab);
+
+    useEffect(() => {
+        // This ensures the URL updates every time you click a sidebar link internally
+        const params = new URLSearchParams(window.location.search);
+        
+        if (activeTab === DEFAULT_TAB) {
+            params.delete('tab');
+        } else {
+            params.set('tab', activeTab);
+        }
+
+        // Use history.replaceState to change the URL without a full page reload
+        window.history.replaceState(
+            null, 
+            '', 
+            `${window.location.pathname}${params.toString() ? '?' + params.toString() : ''}`
+        );
+    }, [activeTab]);
 
     const wishlistItems = [
         { id: 1, name: "Monster Truck Toy Cars Push Cars For Toddlers", price: 133, originalPrice: 240, discount: 45, store: "Deal Den", inStock: true },
@@ -55,10 +86,10 @@ export default function UserDashboard() {
 
     const getStatusIcon = (status: string) => {
         switch (status) {
-            case "Delivered": return <CheckCircle className="h-5 w-5 text-green-600" />;
-            case "Shipped": return <Truck className="h-5 w-5 text-blue-600" />;
-            case "Cancelled": return <XCircle className="h-5 w-5 text-red-600" />;
-            default: return <Clock className="h-5 w-5 text-yellow-600" />;
+            case "Delivered": return <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />;
+            case "Shipped": return <Truck className="h-5 w-5 text-blue-600 dark:text-blue-400" />;
+            case "Cancelled": return <XCircle className="h-5 w-5 text-red-600 dark:text-red-400" />;
+            default: return <Clock className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />;
         }
     };
 
@@ -66,12 +97,12 @@ export default function UserDashboard() {
         <>
             <GuestLayout>
                 <Head title="User Dashboard" />
-                <div className="min-h-screen bg-gray-50">
+                <div className="min-h-screen bg-background">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                             {/* Sidebar */}
                             <aside className="lg:col-span-1">
-                                <Card className="shadow-lg border-0">
+                                <Card className="shadow-lg border">
                                     <CardHeader className="pb-4">
                                         <CardTitle className="text-lg">My Account</CardTitle>
                                     </CardHeader>
@@ -90,8 +121,8 @@ export default function UserDashboard() {
                                                     key={item.label}
                                                     onClick={() => setActiveTab(item.tab)}
                                                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === item.tab
-                                                        ? 'bg-orange-50 text-orange-600 font-medium shadow-sm'
-                                                        : 'hover:bg-gray-100 text-gray-700'
+                                                        ? 'bg-primary/10 text-primary font-medium shadow-sm'
+                                                        : 'hover:bg-secondary text-foreground'
                                                         }`}
                                                 >
                                                     <item.icon className="h-5 w-5" />
@@ -106,7 +137,7 @@ export default function UserDashboard() {
 
                             {/* Main Content */}
                             <main className="lg:col-span-3">
-                                <Card className="shadow-xl border-0">
+                                <Card className="shadow-xl border">
                                     <CardHeader>
                                         <CardTitle className="text-2xl">
                                             {activeTab === 'wishlist' && 'My Wishlist & Followed Stores'}
@@ -131,34 +162,34 @@ export default function UserDashboard() {
                                                 <TabsContent value="wishlist-items" className="space-y-6">
                                                     <div className="flex justify-between items-center mb-6">
                                                         <h3 className="text-lg font-semibold">Your Wishlist</h3>
-                                                        <Button className="bg-orange-500 hover:bg-orange-600">Add All to Cart</Button>
+                                                        <Button className="bg-primary hover:bg-primary/90">Add All to Cart</Button>
                                                     </div>
                                                     {wishlistItems.map((item) => (
-                                                        <div key={item.id} className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-shadow">
+                                                        <div key={item.id} className="bg-card border rounded-xl p-6 hover:shadow-lg transition-shadow">
                                                             <div className="flex items-start gap-6">
-                                                                <div className="bg-gray-200 border-2 border-dashed rounded-xl w-24 h-24 flex-shrink-0" />
+                                                                <div className="bg-muted border-2 border-dashed rounded-xl w-24 h-24 flex-shrink-0" />
                                                                 <div className="flex-1">
                                                                     <div className="flex items-start justify-between">
                                                                         <div>
-                                                                            <h4 className="font-medium text-gray-900 line-clamp-2">{item.name}</h4>
-                                                                            <p className="text-sm text-gray-500 mt-1">{item.store}</p>
+                                                                            <h4 className="font-medium text-foreground line-clamp-2">{item.name}</h4>
+                                                                            <p className="text-sm text-muted-foreground mt-1">{item.store}</p>
                                                                         </div>
-                                                                        <Button variant="ghost" size="icon"><Trash2 className="h-5 w-5 text-gray-400" /></Button>
+                                                                        <Button variant="ghost" size="icon"><Trash2 className="h-5 w-5 text-muted-foreground" /></Button>
                                                                     </div>
                                                                     <div className="mt-4 flex items-center gap-4">
                                                                         <div>
                                                                             <div className="flex items-baseline gap-2">
-                                                                                <span className="text-2xl font-bold text-orange-600">Rs. {item.price}</span>
-                                                                                <span className="text-lg text-gray-400 line-through">Rs. {item.originalPrice}</span>
+                                                                                <span className="text-2xl font-bold text-primary">Rs. {item.price}</span>
+                                                                                <span className="text-lg text-muted-foreground line-through">Rs. {item.originalPrice}</span>
                                                                             </div>
                                                                             <div className="flex items-center gap-2 mt-2">
-                                                                                <Badge variant="secondary" className="bg-green-100 text-green-700">
+                                                                                <Badge variant="secondary" className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400">
                                                                                     <TrendingDown className="h-3 w-3 mr-1" /> -{item.discount}%
                                                                                 </Badge>
-                                                                                <span className="text-sm font-medium text-green-600">Price dropped</span>
+                                                                                <span className="text-sm font-medium text-green-600 dark:text-green-400">Price dropped</span>
                                                                             </div>
                                                                         </div>
-                                                                        <Button className="bg-orange-500 hover:bg-orange-600 ml-auto">
+                                                                        <Button className="bg-primary hover:bg-primary/90 ml-auto">
                                                                             <ShoppingCart className="mr-2 h-4 w-4" /> Add to Cart
                                                                         </Button>
                                                                     </div>
@@ -178,7 +209,7 @@ export default function UserDashboard() {
                                                                         {getStatusIcon(order.status)}
                                                                         <div>
                                                                             <p className="font-medium">Order #{order.id}</p>
-                                                                            <p className="text-sm text-gray-500">{order.date} • {order.items} items</p>
+                                                                            <p className="text-sm text-muted-foreground">{order.date} • {order.items} items</p>
                                                                         </div>
                                                                     </div>
                                                                     <div className="text-right">
@@ -199,13 +230,13 @@ export default function UserDashboard() {
                                                             <Card key={store.id} className="hover:shadow-md transition-shadow">
                                                                 <CardContent className="pt-6">
                                                                     <div className="flex items-center gap-4">
-                                                                        <div className="bg-gray-200 border-2 border-dashed rounded-full w-16 h-16" />
+                                                                        <div className="bg-muted border-2 border-dashed rounded-full w-16 h-16" />
                                                                         <div className="flex-1">
                                                                             <div className="flex items-center gap-2">
                                                                                 <h4 className="font-semibold">{store.name}</h4>
                                                                                 {store.verified && <BadgeCheck className="h-5 w-5 text-blue-500" />}
                                                                             </div>
-                                                                            <p className="text-sm text-gray-500">{store.followers} followers</p>
+                                                                            <p className="text-sm text-muted-foreground">{store.followers} followers</p>
                                                                             <div className="flex items-center gap-1 mt-1">
                                                                                 <Star className="h-4 w-4 text-yellow-500 fill-current" />
                                                                                 <span className="text-sm font-medium">{store.rating}</span>
@@ -224,7 +255,7 @@ export default function UserDashboard() {
                                         {/* My Orders */}
                                         {activeTab === 'orders' && (
                                             <div className="space-y-6">
-                                                <Alert className="border-orange-200 bg-orange-50">
+                                                <Alert className="border-primary/20 bg-primary/5">
                                                     <Package className="h-4 w-4" />
                                                     <AlertDescription>You have 4 orders in the last 30 days</AlertDescription>
                                                 </Alert>
@@ -237,7 +268,7 @@ export default function UserDashboard() {
                                                                         {getStatusIcon(order.status)}
                                                                         <div>
                                                                             <p className="font-semibold text-lg">Order #{order.id}</p>
-                                                                            <p className="text-sm text-gray-500">{order.date} • {order.items} items</p>
+                                                                            <p className="text-sm text-muted-foreground">{order.date} • {order.items} items</p>
                                                                         </div>
                                                                     </div>
                                                                     <div className="text-right">
@@ -250,7 +281,7 @@ export default function UserDashboard() {
                                                                 <Separator className="my-4" />
                                                                 <div className="flex justify-end gap-3">
                                                                     <Button variant="outline">View Details</Button>
-                                                                    <Button className="bg-orange-500 hover:bg-orange-600">Buy Again</Button>
+                                                                    <Button className="bg-primary hover:bg-primary/90">Buy Again</Button>
                                                                 </div>
                                                             </CardContent>
                                                         </Card>
@@ -266,18 +297,18 @@ export default function UserDashboard() {
                                                     <Card key={review.id}>
                                                         <CardContent className="pt-6">
                                                             <div className="flex items-start gap-4">
-                                                                <div className="bg-gray-200 border-2 border-dashed rounded-xl w-20 h-20 flex-shrink-0" />
+                                                                <div className="bg-muted border-2 border-dashed rounded-xl w-20 h-20 flex-shrink-0" />
                                                                 <div className="flex-1">
                                                                     <div className="flex items-center gap-2">
                                                                         <h4 className="font-medium">{review.product}</h4>
-                                                                        <span className="text-sm text-gray-500">• {review.date}</span>
+                                                                        <span className="text-sm text-muted-foreground">• {review.date}</span>
                                                                     </div>
                                                                     <div className="flex items-center gap-1 my-2">
                                                                         {[...Array(5)].map((_, i) => (
-                                                                            <Star key={i} className={`h-5 w-5 ${i < review.rating ? 'text-yellow-500 fill-current' : 'text-gray-300'}`} />
+                                                                            <Star key={i} className={`h-5 w-5 ${i < review.rating ? 'text-yellow-500 fill-current' : 'text-muted-foreground/30'}`} />
                                                                         ))}
                                                                     </div>
-                                                                    <p className="text-gray-700">{review.comment}</p>
+                                                                    <p className="text-foreground">{review.comment}</p>
                                                                 </div>
                                                             </div>
                                                         </CardContent>
@@ -295,16 +326,16 @@ export default function UserDashboard() {
                                                 </div>
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                                     {addresses.map((addr) => (
-                                                        <Card key={addr.id} className={addr.isDefault ? "ring-2 ring-orange-500" : ""}>
+                                                        <Card key={addr.id} className={addr.isDefault ? "ring-2 ring-primary" : ""}>
                                                             <CardContent className="pt-6">
                                                                 <div className="flex items-start justify-between">
                                                                     <div className="flex items-center gap-3">
-                                                                        <Home className="h-6 w-6 text-gray-400" />
+                                                                        <Home className="h-6 w-6 text-muted-foreground" />
                                                                         <div>
                                                                             <p className="font-semibold">{addr.type} {addr.isDefault && <Badge className="ml-2">Default</Badge>}</p>
-                                                                            <p className="text-sm text-gray-700 mt-1">{addr.name}</p>
-                                                                            <p className="text-sm text-gray-600">{addr.address}</p>
-                                                                            <p className="text-sm text-gray-600">{addr.phone}</p>
+                                                                            <p className="text-sm text-foreground mt-1">{addr.name}</p>
+                                                                            <p className="text-sm text-muted-foreground">{addr.address}</p>
+                                                                            <p className="text-sm text-muted-foreground">{addr.phone}</p>
                                                                         </div>
                                                                     </div>
                                                                     <Button variant="ghost" size="icon"><Edit className="h-5 w-5" /></Button>
@@ -325,14 +356,14 @@ export default function UserDashboard() {
                                                 </div>
                                                 <div className="space-y-4">
                                                     {payments.map((payment) => (
-                                                        <Card key={payment.id} className={payment.isDefault ? "ring-2 ring-orange-500" : ""}>
+                                                        <Card key={payment.id} className={payment.isDefault ? "ring-2 ring-primary" : ""}>
                                                             <CardContent className="pt-6">
                                                                 <div className="flex items-center justify-between">
                                                                     <div className="flex items-center gap-4">
-                                                                        {payment.type === "card" ? <CardIcon className="h-8 w-8 text-gray-600" /> : <Banknote className="h-8 w-8 text-gray-600" />}
+                                                                        {payment.type === "card" ? <CardIcon className="h-8 w-8 text-muted-foreground" /> : <Banknote className="h-8 w-8 text-muted-foreground" />}
                                                                         <div>
                                                                             <p className="font-semibold">{payment.type === "card" ? `${payment.brand} •••• ${payment.last4}` : payment.label}</p>
-                                                                            {payment.type === "card" && <p className="text-sm text-gray-600">Expires {payment.expiry}</p>}
+                                                                            {payment.type === "card" && <p className="text-sm text-muted-foreground">Expires {payment.expiry}</p>}
                                                                         </div>
                                                                     </div>
                                                                     {payment.isDefault && <Badge>Default</Badge>}
@@ -347,8 +378,8 @@ export default function UserDashboard() {
                                         {/* Profile */}
                                         {activeTab === 'profile' && (
                                             <div className="text-center py-12">
-                                                <User className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                                                <p className="text-gray-500">Profile management coming soon!</p>
+                                                <User className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                                                <p className="text-muted-foreground">Profile management coming soon!</p>
                                             </div>
                                         )}
                                     </CardContent>
