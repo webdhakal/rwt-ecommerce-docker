@@ -4,13 +4,15 @@ import { useState, useEffect } from 'react';
 import {
     Heart, ShoppingCart, Package, User, MapPin, CreditCard, Star, Store,
     ArrowRight, Trash2, BadgeCheck, TrendingDown, Truck, Clock, CheckCircle,
-    XCircle, Home, Plus, Edit, CreditCard as CardIcon, Banknote
+    XCircle, Home, Plus, Edit, CreditCard as CardIcon, Banknote, Loader2, Lock, Mail, Phone, Calendar, Eye, EyeOff, Menu, X
 } from 'lucide-react';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shadcn/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/shadcn/ui/card';
 import { Button } from '@/shadcn/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/shadcn/ui/avatar';
+// import { Avatar, AvatarFallback, AvatarImage } from '@/shadcn/ui/avatar';
 import { Badge } from '@/shadcn/ui/badge';
+import { Label } from '@/shadcn/ui/label';
+import { Input } from '@/shadcn/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shadcn/ui/tabs';
 import { Separator } from '@/shadcn/ui/separator';
 import { Alert, AlertDescription } from '@/shadcn/ui/alert';
@@ -20,11 +22,11 @@ import { Head } from '@inertiajs/react';
 const DEFAULT_TAB = 'profile';
 
 export default function UserDashboard() {
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+
     const getInitialTab = () => {
-        // Check if we are in the browser environment
         if (typeof window !== 'undefined') {
             const params = new URLSearchParams(window.location.search);
-            // Read the 'tab' parameter, or fall back to the default
             const urlTab = params.get('tab');
             return urlTab || DEFAULT_TAB;
         }
@@ -34,19 +36,16 @@ export default function UserDashboard() {
     const [activeTab, setActiveTab] = useState(getInitialTab);
 
     useEffect(() => {
-        // This ensures the URL updates every time you click a sidebar link internally
         const params = new URLSearchParams(window.location.search);
-        
+
         if (activeTab === DEFAULT_TAB) {
             params.delete('tab');
         } else {
             params.set('tab', activeTab);
         }
-
-        // Use history.replaceState to change the URL without a full page reload
         window.history.replaceState(
-            null, 
-            '', 
+            null,
+            '',
             `${window.location.pathname}${params.toString() ? '?' + params.toString() : ''}`
         );
     }, [activeTab]);
@@ -93,15 +92,112 @@ export default function UserDashboard() {
         }
     };
 
+    const [isLoading, setIsLoading] = useState(false);
+    const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+    const auth = localStorage.getItem('auth') ? JSON.parse(localStorage.getItem('auth')!) : null;
+
+    const [formData, setFormData] = useState({
+        name: auth?.name || '',
+        email: auth?.email || 'john@example.com',
+        phone: auth?.phone || '+1234567890',
+        address: auth?.address || '123 Main St, City, Country',
+        dob: auth?.dob || '1990-01-01',
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+    });
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { id, value } = e.target;
+        setFormData(prev => ({ ...prev, [id]: value }));
+    };
+
+    const handleSubmit = async (e: React.FormEvent, isPasswordForm = false) => {
+        e.preventDefault();
+        setIsLoading(true);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        setIsLoading(false);
+        alert(isPasswordForm ? 'Password updated successfully!' : 'Profile updated successfully!');
+    };
+
     return (
         <>
+            {/* Mobile Sidebar Toggle */}
+
             <GuestLayout>
                 <Head title="User Dashboard" />
                 <div className="min-h-screen bg-background">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                            {/* Sidebar */}
-                            <aside className="lg:col-span-1">
+                            <div className="lg:hidden mb-4 relative">
+                                <button
+                                    className="w-full flex items-center justify-between gap-2 px-4 py-3 rounded-lg border shadow-sm bg-card hover:bg-accent transition-colors"
+                                    onClick={() => setSidebarOpen(!sidebarOpen)}
+                                >
+                                    <div className="flex items-center gap-2">
+                                        <Menu className="h-5 w-5" />
+                                        <span className="font-medium">
+                                            {[
+                                                { icon: User, label: 'Manage My Account', tab: 'profile' },
+                                                { icon: Package, label: 'My Orders', tab: 'orders' },
+                                                { icon: Heart, label: 'Wishlist & Stores', tab: 'wishlist' },
+                                                { icon: Star, label: 'My Reviews', tab: 'reviews' },
+                                                { icon: MapPin, label: 'Address Book', tab: 'addresses' },
+                                                { icon: CreditCard, label: 'Payment Options', tab: 'payments' },
+                                                { icon: Store, label: 'Sell on Platform', tab: 'sell' },
+                                            ].find(item => item.tab === activeTab)?.label}
+                                        </span>
+                                    </div>
+                                    <svg
+                                        className={`h-5 w-5 transition-transform ${sidebarOpen ? 'rotate-180' : ''}`}
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+
+                                {sidebarOpen && (
+                                    <Card className="absolute top-full mt-2 w-full z-50 shadow-xl border-2">
+                                        <CardContent className="p-2">
+                                            <nav className="space-y-1">
+                                                {[
+                                                    { icon: User, label: 'Manage My Account', tab: 'profile' },
+                                                    { icon: Package, label: 'My Orders', tab: 'orders' },
+                                                    { icon: Heart, label: 'Wishlist & Stores', tab: 'wishlist' },
+                                                    { icon: Star, label: 'My Reviews', tab: 'reviews' },
+                                                    { icon: MapPin, label: 'Address Book', tab: 'addresses' },
+                                                    { icon: CreditCard, label: 'Payment Options', tab: 'payments' },
+                                                    { icon: Store, label: 'Sell on Platform', tab: 'sell' },
+                                                ].map((item) => (
+                                                    <button
+                                                        key={item.label}
+                                                        onClick={() => {
+                                                            setActiveTab(item.tab);
+                                                            setSidebarOpen(false);
+                                                        }}
+                                                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === item.tab
+                                                            ? 'bg-primary/10 text-primary font-medium'
+                                                            : 'hover:bg-secondary text-foreground'
+                                                            }`}
+                                                    >
+                                                        <item.icon className="h-5 w-5" />
+                                                        <span>{item.label}</span>
+                                                        {activeTab === item.tab && <ArrowRight className="ml-auto h-4 w-4" />}
+                                                    </button>
+                                                ))}
+                                            </nav>
+                                        </CardContent>
+                                    </Card>
+                                )}
+                            </div>
+
+                            {/* Desktop Sidebar */}
+                            <aside className="hidden lg:block lg:col-span-1">
                                 <Card className="shadow-lg border">
                                     <CardHeader className="pb-4">
                                         <CardTitle className="text-lg">My Account</CardTitle>
@@ -134,7 +230,6 @@ export default function UserDashboard() {
                                     </CardContent>
                                 </Card>
                             </aside>
-
                             {/* Main Content */}
                             <main className="lg:col-span-3">
                                 <Card className="shadow-xl border">
@@ -377,9 +472,196 @@ export default function UserDashboard() {
 
                                         {/* Profile */}
                                         {activeTab === 'profile' && (
-                                            <div className="text-center py-12">
-                                                <User className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                                                <p className="text-muted-foreground">Profile management coming soon!</p>
+                                            <div className="container mx-auto px-4 py-8">
+                                                <div className="space-y-6">
+                                                    <div>
+                                                        <h1 className="text-3xl font-bold">Account Settings</h1>
+                                                        <p className="text-muted-foreground">
+                                                            Manage your account settings and update your personal information
+                                                        </p>
+                                                    </div>
+
+                                                    <Tabs defaultValue="profile" className="w-full">
+                                                        <TabsList className="grid w-full grid-cols-2">
+                                                            <TabsTrigger value="profile" className="flex items-center gap-2">
+                                                                <User className="h-4 w-4" />
+                                                                <span>Profile</span>
+                                                            </TabsTrigger>
+                                                            <TabsTrigger value="password" className="flex items-center gap-2">
+                                                                <Lock className="h-4 w-4" />
+                                                                <span>Password</span>
+                                                            </TabsTrigger>
+                                                        </TabsList>
+
+                                                        {/* Profile Tab */}
+                                                        <TabsContent value="profile">
+                                                            <Card>
+                                                                <CardHeader>
+                                                                    <CardTitle>Profile Information</CardTitle>
+                                                                    <CardDescription>Update your account's profile information.</CardDescription>
+                                                                </CardHeader>
+                                                                <form onSubmit={(e) => handleSubmit(e, false)}>
+                                                                    <CardContent className="space-y-4">
+                                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                                            <div className="space-y-2">
+                                                                                <Label htmlFor="name">Full Name</Label>
+                                                                                <div className="relative">
+                                                                                    <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                                                                                    <Input
+                                                                                        id="name"
+                                                                                        className="pl-10"
+                                                                                        value={formData.name}
+                                                                                        onChange={handleInputChange}
+                                                                                    />
+                                                                                </div>
+                                                                            </div>
+
+                                                                            <div className="space-y-2">
+                                                                                <Label htmlFor="email">Email</Label>
+                                                                                <div className="relative">
+                                                                                    <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                                                                                    <Input
+                                                                                        id="email"
+                                                                                        type="email"
+                                                                                        className="pl-10"
+                                                                                        value={formData.email}
+                                                                                        onChange={handleInputChange}
+                                                                                    />
+                                                                                </div>
+                                                                            </div>
+
+                                                                            <div className="space-y-2">
+                                                                                <Label htmlFor="phone">Phone Number</Label>
+                                                                                <div className="relative">
+                                                                                    <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                                                                                    <Input
+                                                                                        id="phone"
+                                                                                        type="tel"
+                                                                                        className="pl-10"
+                                                                                        value={formData.phone}
+                                                                                        onChange={handleInputChange}
+                                                                                    />
+                                                                                </div>
+                                                                            </div>
+
+                                                                            <div className="space-y-2">
+                                                                                <Label htmlFor="dob">Date of Birth</Label>
+                                                                                <div className="relative">
+                                                                                    <Calendar className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                                                                                    <Input
+                                                                                        id="dob"
+                                                                                        type="date"
+                                                                                        className="pl-10"
+                                                                                        value={formData.dob}
+                                                                                        onChange={handleInputChange}
+                                                                                    />
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div className="space-y-2">
+                                                                            <Label htmlFor="address">Address</Label>
+                                                                            <div className="relative">
+                                                                                <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                                                                <textarea
+                                                                                    id="address"
+                                                                                    className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 pl-10 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                                                                    value={formData.address}
+                                                                                    onChange={handleInputChange}
+                                                                                />
+                                                                            </div>
+                                                                        </div>
+                                                                    </CardContent>
+                                                                    <CardFooter>
+                                                                        <Button type="submit" disabled={isLoading}>
+                                                                            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                                                            Save Changes
+                                                                        </Button>
+                                                                    </CardFooter>
+                                                                </form>
+                                                            </Card>
+                                                        </TabsContent>
+
+                                                        {/* Password Tab */}
+                                                        <TabsContent value="password">
+                                                            <Card>
+                                                                <CardHeader>
+                                                                    <CardTitle>Update Password</CardTitle>
+                                                                    <CardDescription>Change your password here.</CardDescription>
+                                                                </CardHeader>
+                                                                <form onSubmit={(e) => handleSubmit(e, true)}>
+                                                                    <CardContent className="space-y-4">
+                                                                        <div className="space-y-2">
+                                                                            <Label htmlFor="currentPassword">Current Password</Label>
+                                                                            <div className="relative">
+                                                                                <Input
+                                                                                    id="currentPassword"
+                                                                                    type={showCurrentPassword ? "text" : "password"}
+                                                                                    value={formData.currentPassword}
+                                                                                    onChange={handleInputChange}
+                                                                                    className="pr-10"
+                                                                                />
+                                                                                <button
+                                                                                    type="button"
+                                                                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                                                                    onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                                                                                >
+                                                                                    {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div className="space-y-2">
+                                                                            <Label htmlFor="newPassword">New Password</Label>
+                                                                            <div className="relative">
+                                                                                <Input
+                                                                                    id="newPassword"
+                                                                                    type={showNewPassword ? "text" : "password"}
+                                                                                    value={formData.newPassword}
+                                                                                    onChange={handleInputChange}
+                                                                                    className="pr-10"
+                                                                                />
+                                                                                <button
+                                                                                    type="button"
+                                                                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                                                                    onClick={() => setShowNewPassword(!showNewPassword)}
+                                                                                >
+                                                                                    {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div className="space-y-2">
+                                                                            <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                                                                            <div className="relative">
+                                                                                <Input
+                                                                                    id="confirmPassword"
+                                                                                    type={showConfirmPassword ? "text" : "password"}
+                                                                                    value={formData.confirmPassword}
+                                                                                    onChange={handleInputChange}
+                                                                                    className="pr-10"
+                                                                                />
+                                                                                <button
+                                                                                    type="button"
+                                                                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                                                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                                                                >
+                                                                                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </CardContent>
+                                                                    <CardFooter>
+                                                                        <Button type="submit" disabled={isLoading}>
+                                                                            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                                                            Update Password
+                                                                        </Button>
+                                                                    </CardFooter>
+                                                                </form>
+                                                            </Card>
+                                                        </TabsContent>
+                                                    </Tabs>
+                                                </div>
                                             </div>
                                         )}
                                     </CardContent>
@@ -387,8 +669,8 @@ export default function UserDashboard() {
                             </main>
                         </div>
                     </div>
-                </div>
-            </GuestLayout>
+                </div >
+            </GuestLayout >
         </>
     );
 }
