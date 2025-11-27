@@ -191,6 +191,7 @@ export type ProductDetail = {
     in_wishlist: boolean;
     colors: string[];
     sizes: string[];
+    original_price: string;
     rating: number | null;
     reviews_count: number;
     has_variant: boolean;

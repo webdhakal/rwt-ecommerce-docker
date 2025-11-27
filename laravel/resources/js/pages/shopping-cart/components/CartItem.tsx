@@ -4,13 +4,15 @@ import { Link } from '@inertiajs/react';
 import { Button } from '@/shadcn/ui/button';
 
 const CartItem = ({ item, onQuantityChange, onRemove, onSaveForLater }) => {
+  
   const [isRemoving, setIsRemoving] = useState(false);
   const [quantity, setQuantity] = useState(item?.quantity);
-
+  let stock=item?.product?.variant?.stock;
+  
   const handleQuantityChange = (newQuantity) => {
-    if (newQuantity < 1 || newQuantity > item?.stock) return;
+    if (newQuantity < 1 || newQuantity > stock) return;
     setQuantity(newQuantity);
-    onQuantityChange(item?.id, newQuantity);
+    onQuantityChange(item?.id, newQuantity, item?.product?.variant?.id);
   };
 
   const handleRemove = async () => {
@@ -35,8 +37,8 @@ const CartItem = ({ item, onQuantityChange, onRemove, onSaveForLater }) => {
           <Link href={route('product-detail', item?.id)} className="block">
             <div className="w-full sm:w-24 h-48 sm:h-24 bg-surface rounded-lg overflow-hidden">
               <img
-                src={item?.image}
-                alt={item?.name}
+                src={item?.product?.files?.[0]?.url || ""}
+                alt={item?.product?.name}
                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-200"
               />
             </div>
@@ -52,37 +54,37 @@ const CartItem = ({ item, onQuantityChange, onRemove, onSaveForLater }) => {
                 href={route('product-detail', item?.id)}
                 className="text-lg font-semibold text-text-primary hover:text-accent transition-colors duration-200 line-clamp-2"
               >
-                {item?.name}
+                {item?.product?.name}
               </Link>
 
               <Link
                 href="/vendor-store-profile"
                 className="text-sm text-text-secondary hover:text-accent transition-colors duration-200 mt-1 inline-block"
               >
-                by {item?.vendor}
+                by {item?.vendor|| 'Default Vendor'}
               </Link>
 
               {/* Variants */}
-              {item?.variants && item?.variants?.length > 0 && (
+              {item?.product?.variant  && (
                 <div className="flex flex-wrap gap-2 mt-2">
-                  {item?.variants?.map((variant, index) => (
+                 
                     <span
-                      key={index}
+                      
                       className="text-xs bg-muted text-text-secondary px-2 py-1 rounded-md"
                     >
-                      {variant?.name}: {variant?.value}
+                      {item?.product?.variant?.size_name}: {item?.product?.variant?.color_name}
                     </span>
-                  ))}
+                
                 </div>
               )}
 
               {/* Stock Status */}
               <div className="flex items-center gap-2 mt-2">
-                <div className={`w-2 h-2 rounded-full ${item?.stock > 10 ? 'bg-success' : item?.stock > 0 ? 'bg-warning' : 'bg-error'
+                <div className={`w-2 h-2 rounded-full ${stock > 10 ? 'bg-success' : stock > 0 ? 'bg-warning' : 'bg-error'
                   }`}></div>
-                <span className={`text-sm ${item?.stock > 10 ? 'text-success' : item?.stock > 0 ? 'text-warning' : 'text-error'
+                <span className={`text-sm ${stock > 10 ? 'text-success' : stock > 0 ? 'text-warning' : 'text-error'
                   }`}>
-                  {item?.stock > 10 ? 'In Stock' : item?.stock > 0 ? `Only ${item?.stock} left` : 'Out of Stock'}
+                  {stock > 10 ? 'In Stock' : stock > 0 ? `Only ${stock} left` : 'Out of Stock'}
                 </span>
               </div>
 
@@ -123,7 +125,7 @@ const CartItem = ({ item, onQuantityChange, onRemove, onSaveForLater }) => {
                   variant="outline"
                   size="icon"
                   onClick={() => handleQuantityChange(quantity - 1)}
-                  disabled={quantity <= 1 || item?.stock === 0}
+                  disabled={quantity <= 1 || stock === 0}
                   className="w-8 h-8"
                 >
                   <Icon name="Minus" size={14} />
@@ -137,7 +139,7 @@ const CartItem = ({ item, onQuantityChange, onRemove, onSaveForLater }) => {
                   variant="outline"
                   size="icon"
                   onClick={() => handleQuantityChange(quantity + 1)}
-                  disabled={quantity >= item?.stock}
+                  disabled={quantity >= stock}
                   className="w-8 h-8"
                 >
                   <Icon name="Plus" size={14} />
