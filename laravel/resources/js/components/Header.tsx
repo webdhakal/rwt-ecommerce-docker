@@ -6,9 +6,11 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Menu as CategoryMenu } from '@/types/Menu';
 import { Link, router } from '@inertiajs/react';
 import { ChevronDown, Heart, MapPin, Menu, MoveUpRight, Search, ShoppingCart, Store, User, X } from 'lucide-react';
-import React, { forwardRef, useEffect, useRef, useState } from 'react';
+import React, { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 import NavigationSkeleton from './skeletons/NavigationSkeleton';
 import ToggleThemeButton from './Button/ToggleThemeButton';
+import SearchOverlay from './SearchOverlay';
+
 
 // Use forwardRef so GuestLayout can measure the <header>
 const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...props }, ref) => {
@@ -28,8 +30,40 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
     const [categories, setCategories] = useState<CategoryMenu[]>(data?.payload?.data || []);
 
     const [query, setQuery] = useState('');
-    const [open, setOpen] = useState(false);
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const searchInputRef = useRef<HTMLInputElement>(null);
+
+    // Handle keyboard shortcuts
+    const handleKeyDown = useCallback((e: KeyboardEvent) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+            e.preventDefault();
+            setIsSearchOpen(true);
+        } else if (e.key === 'Escape') {
+            setIsSearchOpen(false);
+        }
+    }, []);
+
+    // Toggle body scroll when search is open/closed
+    useEffect(() => {
+        if (isSearchOpen) {
+            document.body.style.overflow = 'hidden';
+            searchInputRef.current?.focus();
+        } else {
+            document.body.style.overflow = '';
+        }
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [isSearchOpen]);
+
+    // Add keyboard event listener
+    useEffect(() => {
+        window.addEventListener('keydown', handleKeyDown);
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [handleKeyDown]);
 
     // Mock data
     const trendingItems = [
@@ -37,6 +71,43 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
         { id: 2, name: 'Air Jordan 1', type: 'Product' },
         { id: 3, name: 'Samsung Galaxy Watch', type: 'Product' },
     ];
+
+
+    // Close search when clicking outside
+    const handleClickOutside = useCallback((e: MouseEvent) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+            setIsSearchOpen(false);
+        }
+    }, []);
+
+    // Add event listeners for keyboard and click outside
+    useEffect(() => {
+        document.addEventListener('keydown', handleKeyDown);
+        document.addEventListener('mousedown', handleClickOutside);
+        
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [handleKeyDown, handleClickOutside]);
+
+    // Focus input when search opens
+    useEffect(() => {
+        if (isSearchOpen && searchInputRef.current) {
+            searchInputRef.current.focus();
+        }
+        
+        // Prevent background scrolling when search is open
+        if (isSearchOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+        
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [isSearchOpen]);
 
     useEffect(() => {
         if (!data) return;
@@ -52,10 +123,10 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
 
             if (currentScrollY > 100) {
                 setIsScrolled(true);
-                setOpen(false);
+                setIsMobileMenuOpen(false);
                 if (currentScrollY > lastScrollY && currentScrollY > 200) {
                     setIsVisible(false);
-                    setOpen(false);
+                    setIsMobileMenuOpen(false);
                 } else {
                     setIsVisible(true);
                 }
@@ -71,11 +142,14 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
         return () => window.removeEventListener('scroll', controlNavbar);
     }, [lastScrollY]);
 
-    const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
-        e.stopPropagation();
+    const handleWheel = useCallback((e: React.WheelEvent<HTMLDivElement>) => {
         const container = e.currentTarget;
-        container.scrollLeft += e.deltaY;
-    };
+        const isHorizontal = Math.abs(e.deltaX) > Math.abs(e.deltaY);
+        if (isHorizontal) {
+            container.scrollLeft += e.deltaX;
+            e.preventDefault();
+        }
+    }, []);
 
     return (
         <header
@@ -94,6 +168,17 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between py-2 text-sm">
                         <div className="flex items-center space-x-4">
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-9 w-9 rounded-full"
+                                onClick={() => setIsSearchOpen(true)}
+                            >
+                                <Search className="h-4 w-4" />
+                                <kbd className="pointer-events-none absolute right-1.5 top-1.5 hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100 sm:flex">
+                                    <span className="text-xs">⌘</span>K
+                                </kbd>
+                            </Button>
                             <div className="flex items-center text-muted-foreground">
                                 <MapPin className="mr-1 h-3 w-3" />
                                 <span className="hidden sm:inline">Free shipping on orders over $50</span>
@@ -130,61 +215,54 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
                         <div className="mx-8 hidden max-w-2xl flex-1 lg:block">
                             <div className="relative flex items-center">
                                 <Command className="flex-1 rounded-full border border-border bg-background shadow-md">
-                                    <CommandInput
-                                        placeholder="Search for products, brands, vendors..."
-                                        value={query}
-                                        onValueChange={(value) => {
-                                            setQuery(value);
-                                            setOpen(value.length > 0);
-                                        }}
-                                        className="flex-1 rounded-full px-12 py-5 text-sm focus:ring-0 focus:outline-none lg:text-base"
-                                        onBlur={(e) => {
-                                            if (!dropdownRef.current?.contains(e.relatedTarget as Node)) {
-                                                setOpen(false);
-                                            }
-                                        }}
+                                  <CommandInput
+                                    placeholder="Search for products, brands, vendors..."
+                                    value={query}
+                                    onValueChange={setQuery}
+                                    className="flex-1 rounded-full px-12 py-5 text-sm focus:ring-0 focus:outline-none lg:text-base"
+                                    onFocus={() => setIsSearchOpen(true)}
                                     />
 
-                                    {open && query.length > 0 && (
-                                        <CommandList
-                                            ref={dropdownRef}
-                                            className="absolute top-12 left-0 z-50 w-full space-y-4 rounded-xl border border-border bg-popover p-4 shadow-lg"
-                                        >
-                                            <CommandGroup heading="Trending Items">
-                                                <div className="mt-2 flex flex-wrap gap-2">
-                                                    {trendingItems.map((item) => (
-                                                        <div
-                                                            key={item.id}
-                                                            className="flex cursor-pointer items-center space-x-1 rounded-md border border-border bg-background px-3 py-1 transition hover:bg-secondary"
-                                                        >
-                                                            <MoveUpRight size={14} className="text-muted-foreground" />
-                                                            <span className="text-sm font-medium">{item.name}</span>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </CommandGroup>
+                                    {/* {isSearchOpen && (
+                                            <CommandList
+                                                ref={dropdownRef}
+                                                className="absolute top-12 left-0 z-50 w-full space-y-4 rounded-xl border border-border bg-popover p-4 shadow-lg"
+                                            >
+                                                <CommandGroup heading="Trending Items">
+                                                    <div className="mt-2 flex flex-wrap gap-2">
+                                                        {trendingItems.map((item) => (
+                                                            <div
+                                                                key={item.id}
+                                                                className="flex cursor-pointer items-center space-x-1 rounded-md border border-border bg-background px-3 py-1 transition hover:bg-secondary"
+                                                            >
+                                                                <MoveUpRight size={14} className="text-muted-foreground" />
+                                                                <span className="text-sm font-medium">{item.name}</span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </CommandGroup>
 
-                                            <CommandGroup heading="Categories">
-                                                <div className="scrollbar-hide mt-2 flex space-x-3 overflow-x-auto pb-1" onWheel={handleWheel}>
-                                                    {categories.map((cat, index) => (
-                                                        <div
-                                                            key={cat.id}
-                                                            className="flex flex-shrink-0 cursor-pointer items-center gap-2 rounded-md bg-secondary px-4 py-2 transition hover:bg-secondary/70"
-                                                        >
-                                                            <img
-                                                                className="flex h-16 w-24 items-center justify-center rounded-lg bg-card text-xs text-muted-foreground"
-                                                                src={randomImage(index)}
-                                                                alt={cat.name}
-                                                            />
-                                                            <span className="text-sm font-medium text-foreground">{cat.name}</span>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </CommandGroup>
+                                                <CommandGroup heading="Categories">
+                                                    <div className="scrollbar-hide mt-2 flex space-x-3 overflow-x-auto pb-1" onWheel={handleWheel}>
+                                                        {categories.map((cat, index) => (
+                                                            <div
+                                                                key={cat.id}
+                                                                className="flex flex-shrink-0 cursor-pointer items-center gap-2 rounded-md bg-secondary px-4 py-2 transition hover:bg-secondary/70"
+                                                            >
+                                                                <img
+                                                                    className="flex h-16 w-24 items-center justify-center rounded-lg bg-card text-xs text-muted-foreground"
+                                                                    src={randomImage(index)}
+                                                                    alt={cat.name}
+                                                                />
+                                                                <span className="text-sm font-medium text-foreground">{cat.name}</span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </CommandGroup>
 
-                                            {!categories && !trendingItems && <CommandEmpty>No results found.</CommandEmpty>}
-                                        </CommandList>
-                                    )}
+                                                {!categories && !trendingItems && <CommandEmpty>No results found.</CommandEmpty>}
+                                            </CommandList>
+                                    )} */}
                                 </Command>
 
                                 <div className="absolute top-1/2 right-0 flex-shrink-0 -translate-y-1/2">
@@ -391,6 +469,19 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
                     </div>
                 </div>
             )}
+            
+            {/* Search Overlay */}
+            <SearchOverlay
+                isOpen={isSearchOpen}
+                onClose={() => setIsSearchOpen(false)}
+                query={query}
+                onQueryChange={setQuery}
+                searchInputRef={searchInputRef}
+                trendingItems={trendingItems}
+                categories={categories}
+                randomImage={randomImage}
+                onWheel={handleWheel}
+                />
         </header>
     );
 });

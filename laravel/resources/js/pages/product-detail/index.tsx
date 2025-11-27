@@ -10,6 +10,7 @@ import ProductTabs from './components/ProductTabs';
 import RelatedProducts from './components/RelatedProducts';
 import SocialShare from './components/SocialShare';
 import VendorInfoPanel from './components/VendorInfoPanel';
+import { useStoreCart } from '@/api/hooks/useShoppingCart';
 
 export function slugParser(url: string) {
     return url.split('/')[url.split('/').length - 1];
@@ -24,10 +25,9 @@ function mapProductDetailToUI(product: ProductDetail) {
         price: parseFloat(product.price),
         originalPrice: parseFloat(product.base_price),
         description: product.description,
-        images: [
-            // ⚠️ Backend didn’t provide images → use placeholder
-            'https://via.placeholder.com/800x800?text=No+Image',
-        ],
+        images: product?.files?.length > 0 
+            ? product.files.map((file) => file.url)
+            : ['https://via.placeholder.com/800x800?text=No+Image'],
         variants: product.variants ? product.variants.map((v) => ({
             id: v.id,
             name: `${v.size?.size_code ?? ''} ${v.color?.name ?? ''}`.trim(),
@@ -58,6 +58,7 @@ function mapProductDetailToUI(product: ProductDetail) {
         reviews: [], // since backend didn’t provide reviews
         reviewDistribution: {},
         viewCount: 0,
+        has_variant: product.has_variant,
         shareCount: 0,
     };
 }
@@ -69,11 +70,12 @@ const ProductDetailPage = () => {
     const slug = slugParser(url);
 
     const { data } = useProductDetail(slug);
-
+    console.log(data)
     // Map API payload → UI product
     const product = data?.payload ? mapProductDetailToUI(data.payload as ProductDetail) : null; // send data in payload.data
 
-    // Mock related products (keep as is)
+
+        // Mock related products (keep as is)
     const relatedProducts = [
         {
             id: 'rel-001',
@@ -152,8 +154,15 @@ const ProductDetailPage = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    const {mutate:addtoCart} = useStoreCart()
+
     const handleAddToCart = (cartItem) => {
         console.log('Adding to cart:', cartItem);
+        addtoCart({
+            variant: cartItem.variant.id,
+            quantity: cartItem.quantity,
+            cartId: localStorage.getItem('guest_id') || undefined
+        })
         setAddToCartSuccess(true);
         setTimeout(() => setAddToCartSuccess(false), 3000);
     };
@@ -161,7 +170,7 @@ const ProductDetailPage = () => {
     if (!product) return <div>Loading...</div>;
     return (
         <GuestLayout>
-            <div className="container mx-auto px-4 py-6 sm:px-6 lg:px-8">
+            <div className="container mx-auto px-4 py-6 sm:px-6 lg:px-8 mt-2 border">
                 {/* Product Section */}
                 <div className="mb-12 grid grid-cols-1 gap-8 lg:grid-cols-2">
                     {/* Product Images */}

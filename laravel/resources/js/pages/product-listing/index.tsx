@@ -39,7 +39,6 @@ const ProductListingCategoryBrowse = () => {
     // API hooks
     const { data, isLoading } = useProducts(undefined, filters);
     const { data: sidebarData, isLoading: isSidebarLoading } = useSidebar();
-
     // Derived state
     const products = data?.payload?.data || [];
     const [sidebar, setSidebar] = useState<SidebarData>(sidebarData?.payload?.data as SidebarData);

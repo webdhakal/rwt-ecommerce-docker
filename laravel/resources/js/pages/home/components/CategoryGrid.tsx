@@ -25,7 +25,7 @@ const CategoryGrid = () => {
                         href={`/product-listing?category=${encodeURIComponent(category?.name)}`}
                         className="group block"
                     >
-                        <div className="bg-surface relative overflow-hidden rounded-lg border border-border transition-all duration-300 group-hover:scale-105 hover:shadow-lg">
+                        <div className="bg-surface relative overflow-hidden rounded-lg border border-border transition-all duration-300 group-hover:scale-105 hover:shadow-lg h-64">
                             {/* Category Image */}
                             <div className="relative h-32 overflow-hidden sm:h-40 lg:h-32">
                                 <img

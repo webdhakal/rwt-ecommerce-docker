@@ -10,6 +10,7 @@ import Icon from '@/components/AppIcon';
 import { Button } from '@/shadcn/ui/button';
 import { Head } from '@inertiajs/react';
 import GuestLayout from '@/layouts/guest-layout';
+import { useShoppingCart,useDeleteCartItem, useUpdateCartItem } from '@/api/hooks/useShoppingCart';
 
 const ShoppingCart = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -18,86 +19,106 @@ const ShoppingCart = () => {
   const [appliedPromoCode, setAppliedPromoCode] = useState('');
   const [showUndoRemove, setShowUndoRemove] = useState(null);
 
+  const guestCartId= localStorage.getItem('guest_id');
+
+ const { data: carts, isLoading, isError, error } = useShoppingCart({
+    refetchOnMount: true,
+    cartId: guestCartId || undefined
+  });
+  
+
+
+useEffect(() => {
+    if (carts?.payload?.items) {
+      setCartItems(carts.payload.items);
+    }
+  }, [carts]);
+
+
   // Mock cart data
-  useEffect(() => {
-    const mockCartItems = [
-      {
-        id: 1,
-        name: 'iPhone 15 Pro Max 256GB - Natural Titanium',
-        vendor: 'Apple Store Official',
-        price: 1199.99,
-        originalPrice: 1299.99,
-        quantity: 1,
-        stock: 15,
-        image: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400&h=400&fit=crop',
-        variants: [
-          { name: 'Color', value: 'Natural Titanium' },
-          { name: 'Storage', value: '256GB' }
-        ],
-        deliveryInfo: 'Free delivery by Dec 30'
-      },
-      {
-        id: 2,
-        name: 'AirPods Pro (2nd Generation) with MagSafe Case',
-        vendor: 'Apple Store Official',
-        price: 249.99,
-        quantity: 2,
-        stock: 8,
-        image: 'https://images.unsplash.com/photo-1606220945770-b5b6c2c55bf1?w=400&h=400&fit=crop',
-        variants: [
-          { name: 'Color', value: 'White' }
-        ],
-        deliveryInfo: 'Free delivery by Dec 28'
-      },
-      {
-        id: 3,
-        name: 'MacBook Air 13-inch M2 Chip - Midnight',
-        vendor: 'TechStore Pro',
-        price: 1099.99,
-        originalPrice: 1199.99,
-        quantity: 1,
-        stock: 3,
-        image: 'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=400&h=400&fit=crop',
-        variants: [
-          { name: 'Color', value: 'Midnight' },
-          { name: 'Memory', value: '8GB' },
-          { name: 'Storage', value: '256GB SSD' }
-        ],
-        deliveryInfo: 'Free delivery by Jan 2'
-      }
-    ];
+  // useEffect(() => {
+  //   const mockCartItems = [
+  //     {
+  //       id: 1,
+  //       name: 'iPhone 15 Pro Max 256GB - Natural Titanium',
+  //       vendor: 'Apple Store Official',
+  //       price: 1199.99,
+  //       originalPrice: 1299.99,
+  //       quantity: 1,
+  //       stock: 15,
+  //       image: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400&h=400&fit=crop',
+  //       variants: [
+  //         { name: 'Color', value: 'Natural Titanium' },
+  //         { name: 'Storage', value: '256GB' }
+  //       ],
+  //       deliveryInfo: 'Free delivery by Dec 30'
+  //     },
+  //     {
+  //       id: 2,
+  //       name: 'AirPods Pro (2nd Generation) with MagSafe Case',
+  //       vendor: 'Apple Store Official',
+  //       price: 249.99,
+  //       quantity: 2,
+  //       stock: 8,
+  //       image: 'https://images.unsplash.com/photo-1606220945770-b5b6c2c55bf1?w=400&h=400&fit=crop',
+  //       variants: [
+  //         { name: 'Color', value: 'White' }
+  //       ],
+  //       deliveryInfo: 'Free delivery by Dec 28'
+  //     },
+  //     {
+  //       id: 3,
+  //       name: 'MacBook Air 13-inch M2 Chip - Midnight',
+  //       vendor: 'TechStore Pro',
+  //       price: 1099.99,
+  //       originalPrice: 1199.99,
+  //       quantity: 1,
+  //       stock: 3,
+  //       image: 'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=400&h=400&fit=crop',
+  //       variants: [
+  //         { name: 'Color', value: 'Midnight' },
+  //         { name: 'Memory', value: '8GB' },
+  //         { name: 'Storage', value: '256GB SSD' }
+  //       ],
+  //       deliveryInfo: 'Free delivery by Jan 2'
+  //     }
+  //   ];
 
-    const mockSavedItems = [
-      {
-        id: 4,
-        name: 'iPad Pro 12.9-inch M2 Chip',
-        vendor: 'Apple Store Official',
-        price: 1099.99,
-        originalPrice: 1199.99,
-        stock: 12,
-        image: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=400&h=400&fit=crop',
-        variants: [
-          { name: 'Color', value: 'Space Gray' },
-          { name: 'Storage', value: '128GB' }
-        ]
-      },
-      {
-        id: 5,
-        name: 'Apple Watch Series 9 GPS',
-        vendor: 'WearTech Hub',
-        price: 399.99,
-        stock: 0,
-        image: 'https://images.unsplash.com/photo-1434493789847-2f02dc6ca35d?w=400&h=400&fit=crop',
-        variants: [
-          { name: 'Size', value: '45mm' },
-          { name: 'Color', value: 'Midnight' }
-        ]
-      }
-    ];
+  //   const mockSavedItems = [
+  //     {
+  //       id: 4,
+  //       name: 'iPad Pro 12.9-inch M2 Chip',
+  //       vendor: 'Apple Store Official',
+  //       price: 1099.99,
+  //       originalPrice: 1199.99,
+  //       stock: 12,
+  //       image: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=400&h=400&fit=crop',
+  //       variants: [
+  //         { name: 'Color', value: 'Space Gray' },
+  //         { name: 'Storage', value: '128GB' }
+  //       ]
+  //     },
+  //     {
+  //       id: 5,
+  //       name: 'Apple Watch Series 9 GPS',
+  //       vendor: 'WearTech Hub',
+  //       price: 399.99,
+  //       stock: 0,
+  //       image: 'https://images.unsplash.com/photo-1434493789847-2f02dc6ca35d?w=400&h=400&fit=crop',
+  //       variants: [
+  //         { name: 'Size', value: '45mm' },
+  //         { name: 'Color', value: 'Midnight' }
+  //       ]
+  //     }
+  //   ];
 
-    setCartItems(mockCartItems);
-    setSavedItems(mockSavedItems);
-  }, []);
+  //   setCartItems(carts?.item);
+  //   setSavedItems(mockSavedItems);
+  // }, []);
+
+ 
+
+  
 
   // Calculate totals
   const subtotal = cartItems?.reduce((sum, item) => sum + (item?.price * item?.quantity), 0);
@@ -105,28 +126,46 @@ const ShoppingCart = () => {
   const shipping = subtotal > 50 ? 0 : 9.99; // Free shipping over $50
   const total = subtotal + tax + shipping - discount;
   const itemCount = cartItems?.reduce((sum, item) => sum + item?.quantity, 0);
+  
+  const { mutate: updateItem } = useUpdateCartItem();
 
-  const handleQuantityChange = (itemId, newQuantity) => {
-    setCartItems(items =>
-      items?.map(item =>
-        item?.id === itemId ? { ...item, quantity: newQuantity } : item
-      )
-    );
-  };
+
+const handleQuantityChange = (itemId: string, newQuantity: number, variantId: string) => {
+  updateItem({
+    itemId,
+    variant: variantId,
+    quantity: newQuantity,
+    cartId: guestCartId || undefined
+  });
+};
+
+    const { mutate: deleteCartItem } = useDeleteCartItem();
 
   const handleRemoveItem = (itemId) => {
     const itemToRemove = cartItems?.find(item => item?.id === itemId);
     setCartItems(items => items?.filter(item => item?.id !== itemId));
 
     // Show undo option
+    const timeoutId = setTimeout(() => {
+    // This runs if undo is not clicked within 5 seconds
+    deleteCartItem({ 
+      itemId, 
+      cartId: guestCartId || undefined 
+    });
+    setShowUndoRemove(null);
+  }, 5000);
+
     setShowUndoRemove({
       item: itemToRemove,
-      timeout: setTimeout(() => setShowUndoRemove(null), 5000)
+      timeout: timeoutId
     });
+
   };
 
   const handleUndoRemove = () => {
     if (showUndoRemove) {
+          clearTimeout(showUndoRemove.timeout);
+
       setCartItems(items => [...items, showUndoRemove?.item]);
       clearTimeout(showUndoRemove?.timeout);
       setShowUndoRemove(null);
@@ -161,7 +200,7 @@ const ShoppingCart = () => {
   const handleAddToCart = (product) => {
     const existingItem = cartItems?.find(item => item?.id === product?.id);
     if (existingItem) {
-      handleQuantityChange(product?.id, existingItem?.quantity + 1);
+      handleQuantityChange(product?.id, existingItem?.quantity + 1, existingItem?.variant);
     } else {
       setCartItems(items => [...items, { ...product, quantity: 1, stock: 10 }]);
     }
@@ -223,7 +262,7 @@ const ShoppingCart = () => {
             <div className="flex items-center gap-3">
               <Icon name="Trash2" size={20} className="text-text-secondary" />
               <span className="text-text-primary">
-                "{showUndoRemove?.item?.name}" removed from cart
+                "{showUndoRemove?.item?.product?.name}" removed from cart
               </span>
             </div>
             <Button
@@ -238,6 +277,8 @@ const ShoppingCart = () => {
             </Button>
           </div>
         )}
+
+
 
         {/* Cart Content */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -285,3 +326,4 @@ const ShoppingCart = () => {
 };
 
 export default ShoppingCart;
+

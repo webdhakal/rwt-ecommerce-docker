@@ -46,7 +46,7 @@ const ProductItem = ({ name, category, price, original }: any) => (
 
 export default function TemuStyleThreeColumnLayout() {
     return (
-        <div className="max-w-7xl mx-auto px-4 py-8 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-2 bg-surface py-8 bg-white">
             {/* Section Headers */}
             <div className="grid grid-cols-3 gap-8 mb-6">
                 <h2 className="text-2xl font-bold text-gray-900">New Arrivals</h2>

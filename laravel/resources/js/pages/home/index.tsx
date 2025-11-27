@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import HeroBanner from './components/HeroBanner';
 import CategoryGrid from './components/CategoryGrid';
 import ProductSection from './components/ProductSection';
@@ -12,6 +12,7 @@ import { logger } from '@/logger';
 import ServiceBlock from '@/components/Homepage/ServiceBlock';
 import DealOfTheDay from '@/components/Homepage/DealOfDayBlock';
 import ProductHighlight from '@/components/Homepage/ProductHighlight';
+import { useShoppingCart } from '@/api/hooks/useShoppingCart';
 
 const Homepage = () => {
   // Mock product data
@@ -238,6 +239,21 @@ const Homepage = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+  
+  const { data } = useShoppingCart();
+  const [guestId, setGuestId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const guestLocal = localStorage.getItem('guest_id');
+    if (guestLocal) {
+      setGuestId(guestLocal);
+    } else if (data?.payload?.id) {
+      const newGuestId = data.payload.id;
+      localStorage.setItem('guest_id', newGuestId);
+      setGuestId(newGuestId);
+    }
+  }, [data]);
+  
 
   return (
     <GuestLayout>

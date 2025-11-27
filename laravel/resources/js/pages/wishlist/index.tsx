@@ -6,6 +6,7 @@ import { Input } from '@/shadcn/ui/input';
 import ProductListItem from './components/ProductListItem';
 import { Link } from '@inertiajs/react';
 import GuestLayout from '@/layouts/guest-layout';
+import { useCategories } from '@/api/hooks/useCategories';
 
 const WishlistCenter = () => {
     const [searchQuery, setSearchQuery] = useState('');
@@ -13,6 +14,13 @@ const WishlistCenter = () => {
     const [filterCategory, setFilterCategory] = useState('all');
     const [viewMode, setViewMode] = useState('list'); // 'list' or 'grid'
 
+    // Categories
+    const { data: categoriesList = [], isLoading } = useCategories(
+        { params: { limit: 6 } }, // 👈 pass params
+        { refetchOnMount: true },
+    );
+    const categories = categoriesList?.payload?.data;
+    console.log(categories)
     // Mock wishlist products data for ecommerce
     const [wishlistProducts, setWishlistProducts] = useState([
         {
@@ -164,16 +172,17 @@ const WishlistCenter = () => {
                 { name: "Black", hex: "#000000" },
                 { name: "Tan", hex: "#D2B48C" }]
 
-        }]
+        }]  
     );
 
-    const categories = [
-        { value: 'all', label: 'All Categories', count: wishlistProducts?.length },
-        { value: 'electronics', label: 'Electronics', count: wishlistProducts?.filter((p) => p?.category?.toLowerCase()?.includes('electronic'))?.length },
-        { value: 'clothing', label: 'Clothing', count: wishlistProducts?.filter((p) => p?.category?.toLowerCase()?.includes('clothing'))?.length },
-        { value: 'home', label: 'Home & Kitchen', count: wishlistProducts?.filter((p) => p?.category?.toLowerCase()?.includes('home'))?.length },
-        { value: 'sports', label: 'Sports & Outdoors', count: wishlistProducts?.filter((p) => p?.category?.toLowerCase()?.includes('sports'))?.length },
-        { value: 'accessories', label: 'Accessories', count: wishlistProducts?.filter((p) => p?.category?.toLowerCase()?.includes('accessories'))?.length }];
+    const { data: categoriesData, isLoading: isCategoriesLoading } = useCategories();
+    // const categories = [
+    //     { value: 'all', label: 'All Categories', count: wishlistProducts?.length },
+    //     { value: 'electronics', label: 'Electronics', count: wishlistProducts?.filter((p) => p?.category?.toLowerCase()?.includes('electronic'))?.length },
+    //     { value: 'clothing', label: 'Clothing', count: wishlistProducts?.filter((p) => p?.category?.toLowerCase()?.includes('clothing'))?.length },
+    //     { value: 'home', label: 'Home & Kitchen', count: wishlistProducts?.filter((p) => p?.category?.toLowerCase()?.includes('home'))?.length },
+    //     { value: 'sports', label: 'Sports & Outdoors', count: wishlistProducts?.filter((p) => p?.category?.toLowerCase()?.includes('sports'))?.length },
+    //     { value: 'accessories', label: 'Accessories', count: wishlistProducts?.filter((p) => p?.category?.toLowerCase()?.includes('accessories'))?.length }];
 
 
     const sortOptions = [
@@ -346,8 +355,8 @@ const WishlistCenter = () => {
                                         className="px-4 py-2 border border-border rounded-lg bg-background text-text-primary focus:ring-2 focus:ring-primary focus:border-transparent">
 
                                         {categories?.map((category) =>
-                                            <option key={category?.value} value={category?.value}>
-                                                {category?.label} ({category?.count})
+                                            <option key={category?.id} value={category?.id}>
+                                                {category?.name} ({category?.count})
                                             </option>
                                         )}
                                     </select>
