@@ -29,6 +29,6 @@ export interface AlternateApiResponse<T> {
     status: 'ok' | 'error';
     payload?: {
         data: T;
-        pagination: PaginationMeta;
+        pagination?: PaginationMeta;
     };
 }
