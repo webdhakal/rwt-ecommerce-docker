@@ -21,10 +21,10 @@ const ShoppingCart = () => {
 
   const guestCartId= localStorage.getItem('guest_id');
 
- const { data: carts, isLoading, isError, error } = useShoppingCart({
-    refetchOnMount: true,
-    cartId: guestCartId || undefined
-  });
+  const { data: carts, isLoading, isError, error } = useShoppingCart({
+      refetchOnMount: true,
+      cartId: guestCartId || undefined
+    });
   
 
 
@@ -229,7 +229,7 @@ const handleQuantityChange = (itemId: string, newQuantity: number, variantId: st
       <Head title={`Shopping Cart (${itemCount} ${itemCount === 1 ? 'item' : 'items'}) - EcommerceHub`} />
 
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-4">
         <BreadcrumbNavigation customBreadcrumbs={breadcrumbs} />
 
         {/* Page Header */}

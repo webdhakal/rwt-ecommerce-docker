@@ -1,10 +1,9 @@
 // Create a new file at: resources/js/components/SearchOverlay.tsx
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState} from 'react';
 import { createPortal } from 'react-dom';
 import { Search, X } from 'lucide-react';
 import { Command, CommandList, CommandGroup } from '@/shadcn/ui/command';
 import { Link } from '@inertiajs/react';
-import { Button } from '@/shadcn/ui/button';
 import { useSearch } from '@/api/hooks/useSearch';
 
 interface SearchOverlayProps {
@@ -32,6 +31,21 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({
 }) => {
   const overlayRef = useRef<HTMLDivElement>(null);
   const { searchResults, isLoading, isError } = useSearch(query);
+  const [searchCategories, setSearchCategories] = useState<Array<{ id: number; name: string; [key: string]: any }>>([]);
+  
+  // useEffect(() => {
+  //   if (!searchResults?.length) {
+  //     setSearchCategories([]);
+  //     return;
+  //   }
+    
+  //   // Get all unique categories from search results
+  //   const allCategories = searchResults.flatMap(item => item.categories || []);
+  //   const uniqueCategories = Array.from(new Map(allCategories.map(cat => [cat.id, cat])).values());
+    
+  //   setSearchCategories(uniqueCategories);
+  // }, [searchResults]);
+
 
   useEffect(() => {
     if (isOpen) {
@@ -129,6 +143,8 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({
                 </CommandGroup>
               )}
 
+             
+
               {/* Search Results */}
               {isLoading ? (
                 <div className="flex justify-center p-4">
@@ -179,6 +195,28 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({
                   No results found for "{query}"
                 </div>
               ) : null}
+
+               {/* Search Result Categories Section */}
+              {query && searchCategories.length > 0 && (
+                <CommandGroup heading="Related Categories" className="mt-4">
+                  <div className="mt-2 flex space-x-3 overflow-x-auto pb-2" onWheel={onWheel}>
+                    {searchCategories.map((cat, index) => (
+                      <div
+                        key={cat.id}
+                        className="flex flex-shrink-0 cursor-pointer flex-col items-center gap-2 rounded-lg bg-secondary p-3 transition hover:bg-secondary/70"
+                        onClick={() => onClose()}
+                      >
+                        <img
+                          className="h-16 w-16 rounded-lg bg-card object-cover"
+                          src={randomImage(index)}
+                          alt={cat.name}
+                        />
+                        <span className="text-xs font-medium">{cat.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </CommandGroup>
+              )}
             </CommandList>
           </Command>
         </div>

@@ -6,13 +6,26 @@ import { FilterState } from '@/types/Sidebar';
 import api from '../clients/axiosClient';
 
 export const getProducts = async ({
-    params,
-    queryFilters,
+  params = {},
+  queryFilters = {},
 }: {
-    params?: ParamsI;
-    queryFilters: FilterState;
+  params?: Record<string, any>;
+  queryFilters?: FilterState;
 }): Promise<AlternateApiResponse<Product[]>> => {
-    console.log(queryParamsBuilder(queryFilters));
-    const response = await api.get(`/public/products?${queryParamsBuilder(queryFilters)}`, { ...params });
-    return response.data as AlternateApiResponse<Product[]>;
+  // Convert params to query string
+  const paramsString = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined) {
+      paramsString.append(key, String(value));
+    }
+  });
+  
+  // Combine with queryFilters
+  const queryString = queryParamsBuilder(queryFilters);
+  const fullQueryString = [queryString, paramsString.toString()]
+    .filter(Boolean)
+    .join('&');
+  
+  const response = await api.get(`/public/products?${fullQueryString}`);
+  return response.data as AlternateApiResponse<Product[]>;
 };

@@ -13,81 +13,11 @@ import ServiceBlock from '@/components/Homepage/ServiceBlock';
 import DealOfTheDay from '@/components/Homepage/DealOfDayBlock';
 import ProductHighlight from '@/components/Homepage/ProductHighlight';
 import { useShoppingCart } from '@/api/hooks/useShoppingCart';
+import { useProducts } from '@/api/hooks/useProducts';
+import { Product } from '@/types/Product';
 
 const Homepage = () => {
-  // Mock product data
-  const featuredProducts = [
-    {
-      id: 1,
-      name: "iPhone 15 Pro Max 256GB",
-      slug: "iPhone 15 Pro Max 256GB",
-      price: 1199.99,
-      originalPrice: 1299.99,
-      image: "https://images.pexels.com/photos/404280/pexels-photo-404280.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&dpr=1",
-      vendor: "TechHub Electronics",
-      rating: 4.8,
-      reviewCount: 2847,
-      isNew: true,
-      discount: 8,
-      isWishlisted: false
-    },
-    {
-      id: 2,
-      name: "Samsung Galaxy S24 Ultra",
-      slug: "Samsung Galaxy S24 Ultra",
-      price: 1099.99,
-      originalPrice: 1199.99,
-      image: "https://images.pexels.com/photos/699122/pexels-photo-699122.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&dpr=1",
-      vendor: "Mobile World",
-      rating: 4.7,
-      reviewCount: 1923,
-      isNew: false,
-      discount: 8,
-      isWishlisted: true
-    },
-    {
-      id: 3,
-      name: "MacBook Air M2 13-inch",
-      slug: "MacBook Air M2 13-inch",
-      price: 999.99,
-      originalPrice: 1199.99,
-      image: "https://images.pexels.com/photos/18105/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=400&h=400&dpr=1",
-      vendor: "Apple Store Pro",
-      rating: 4.9,
-      reviewCount: 3456,
-      isNew: true,
-      discount: 17,
-      isWishlisted: false
-    },
-    {
-      id: 4,
-      name: "Sony WH-1000XM5 Headphones",
-      slug: "Sony WH-1000XM5 Headphones",
-      price: 349.99,
-      originalPrice: 399.99,
-      image: "https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&dpr=1",
-      vendor: "Audio Excellence",
-      rating: 4.6,
-      reviewCount: 1567,
-      isNew: false,
-      discount: 13,
-      isWishlisted: false
-    },
-    {
-      id: 5,
-      name: "Nike Air Max 270 Sneakers",
-      slug: "Nike Air Max 270 Sneakers",
-      price: 129.99,
-      originalPrice: 159.99,
-      image: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&dpr=1",
-      vendor: "SportStyle",
-      rating: 4.5,
-      reviewCount: 892,
-      isNew: false,
-      discount: 19,
-      isWishlisted: true
-    }
-  ];
+
 
   const bestSellers = [
     {
@@ -235,6 +165,25 @@ const Homepage = () => {
     }
   ];
 
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  
+  // Fetch featured products with categories
+  const { data: featuredProductsData } = useProducts(
+    { refetchOnMount: true }
+  );
+
+  useEffect(() => {
+  if (featuredProductsData?.payload?.data) {
+    setFeaturedProducts(featuredProductsData.payload.data);
+  }
+}, [featuredProductsData]);
+
+  // Update featured products when data is loaded
+  useEffect(() => {
+    if (featuredProductsData?.payload?.data) {
+      setFeaturedProducts(featuredProductsData.payload.data);
+    }
+  }, [featuredProductsData]);
   // Scroll to top on component mount
   useEffect(() => {
     window.scrollTo(0, 0);

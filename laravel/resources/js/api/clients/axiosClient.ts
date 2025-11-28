@@ -1,4 +1,4 @@
-    import { logger } from '@/logger';
+ import { logger } from '@/logger';
     import { errorHandlers, useErrorStore } from '@/store/error.store';
     import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
     import { ROUTES } from '../routes';
@@ -190,27 +190,12 @@
     }
 
     // API methods with proper typing
-    const api = {
-        get: async <T>(url: string, config?: CustomAxiosConfig): Promise<T> => {
-            const response = await axiosInstance.get<T>(url, config);
-            return response.data;
-        },
-        post: async <T>(url: string, data?: unknown, config?: CustomAxiosConfig): Promise<T> => {
-            const response = await axiosInstance.post<T>(url, data, config);
-            return response.data;
-        },
-        put: async <T>(url: string, data?: unknown, config?: CustomAxiosConfig): Promise<T> => {
-            const response = await axiosInstance.put<T>(url, data, config);
-            return response.data;
-        },
-        delete: async <T>(url: string, config?: CustomAxiosConfig): Promise<T> => {
-            const response = await axiosInstance.delete<T>(url, config);
-            return response.data;
-        },
-        patch: async <T>(url: string, data?: unknown, config?: CustomAxiosConfig): Promise<T> => {
-            const response = await axiosInstance.patch<T>(url, data, config);
-            return response.data;
-        },
-    };
+const api = {
+    get: <T>(url: string, config?: CustomAxiosConfig) => axiosInstance.get<T>(url, config),
+    post: <T>(url: string, data?: unknown, config?: CustomAxiosConfig) => axiosInstance.post<T>(url, data, config),
+    put: <T>(url: string, data?: unknown, config?: CustomAxiosConfig) => axiosInstance.put<T>(url, data, config),
+    delete: <T>(url: string, config?: CustomAxiosConfig) => axiosInstance.delete<T>(url, config),
+    patch: <T>(url: string, data?: unknown, config?: CustomAxiosConfig) => axiosInstance.patch<T>(url, data, config),
+};
 
     export default api;

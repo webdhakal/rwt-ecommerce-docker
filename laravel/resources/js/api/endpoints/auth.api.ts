@@ -51,53 +51,53 @@ export interface AuthResponse {
 // ---- LOGIN ----
 export const login = async (payload: LoginPayload): Promise<AlternateApiResponse<AuthResponse>> => {
     const res = await api.post('/login', payload);
-    return res;
+    return res.data;
 };
 
 // ---- REGISTER ----
 export const register = async (payload: RegisterPayload): Promise<AlternateApiResponse<AuthResponse>> => {
     const res = await api.post('/register', payload);
-    return res;
+    return res.data;
 };
 
 // ---- ME ----
 export const me = async (): Promise<AlternateApiResponse<any>> => {
     const res = await api.get(ROUTES.AUTH.ME);
-    return res;
+    return res.data;
 };
 
 // ---- FORGOT PASSWORD ----
 export const forgotPassword = async (payload: ForgotPasswordPayload): Promise<AlternateApiResponse<ForgotPasswordResponse>> => {
     const res = await api.post('/forgot-password', payload);
-    return res;
+    return res.data;
 };
 
 // ---- VERIFY OTP ----
 export const verifyOtp = async (payload: VerifyOtpPayload): Promise<AlternateApiResponse<{ token: string }>> => {
     const res = await api.post('/reset-password', payload);
-    return res;
+    return res.data;
 };
 
 // ---- VERIFY PASSWORD TOKEN ----
 export const verifyPasswordToken = async (payload: VerifyPasswordTokenPayload): Promise<AlternateApiResponse<any>> => {
     const res = await api.post(ROUTES.AUTH.VERIFY_PASSWORD_TOKEN, payload);
-    return res;
+    return res.data;
 };
 
 // ---- RESET PASSWORD ----
 export const resetPassword = async (payload: ResetPasswordPayload): Promise<AlternateApiResponse<any>> => {
     const res = await api.post(ROUTES.AUTH.RESET_PASSWORD, payload);
-    return res;
+    return res.data;
 };
 
 // ---- REFRESH TOKEN ----
 export const refreshToken = async (): Promise<AlternateApiResponse<AuthResponse>> => {
     const res = await api.get(ROUTES.AUTH.REFRESH);
-    return res;
+    return res.data;
 };
 
 // ---- LOGOUT ----
 export const logout = async (): Promise<AlternateApiResponse<any>> => {
     const res = await api.post(ROUTES.AUTH.LOGOUT);
-    return res;
+    return res.data;
 };
