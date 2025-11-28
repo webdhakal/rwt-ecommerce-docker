@@ -34,7 +34,7 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
     const [open, setOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
-    const auth = JSON.parse(localStorage.getItem('auth') || 'null');
+    const auth = (localStorage.getItem('authToken') || 'null');
     const isUser = !!auth;
 
     // Mock data

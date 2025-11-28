@@ -23,6 +23,8 @@ export const ROUTES = {
         FORGOT_PASSWORD: withAuthPrefix("forgot-password"),
         VERIFY_PASSWORD_TOKEN: withAuthPrefix("verify-password-token"),
         RESET_PASSWORD: withAuthPrefix("reset-password"),
+        UPDATE_PROFILE: withAuthPrefix("update-profile"),
+        CHANGE_PASSWORD: withAuthPrefix("change-password"),
     },
     GUEST: {
         LOGIN: withGuestPrefix("login"),

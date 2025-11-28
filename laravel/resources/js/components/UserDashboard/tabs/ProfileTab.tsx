@@ -1,43 +1,116 @@
-import { useState } from 'react';
-import { User, Lock, Mail, Phone, Calendar, MapPin, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { User, Key, Lock, Mail, Phone, Calendar, MapPin, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/shadcn/ui/card';
 import { Button } from '@/shadcn/ui/button';
 import { Label } from '@/shadcn/ui/label';
 import { Input } from '@/shadcn/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shadcn/ui/tabs';
+import { useToast } from '@/shadcn/hooks/use-toast';
+import { useUpdateProfile, useChangePassword, useMe } from '@/api/hooks/useAuth';
+import { Toast } from '@/shadcn/ui/toast';
 
 export default function ProfileTab() {
+    const { toast } = useToast();
     const [isLoading, setIsLoading] = useState(false);
     const [showCurrentPassword, setShowCurrentPassword] = useState(false);
     const [showNewPassword, setShowNewPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-    const auth = localStorage.getItem('auth') ? JSON.parse(localStorage.getItem('auth')!) : null;
+    // In ProfileTab.tsx
+    const { data: user } = useMe();
 
     const [formData, setFormData] = useState({
-        name: auth?.name || '',
-        email: auth?.email || 'john@example.com',
-        phone: auth?.phone || '+1234567890',
-        address: auth?.address || '123 Main St, City, Country',
-        dob: auth?.dob || '1990-01-01',
+        name: user?.name || '',
+        email: user?.email || '',
+        phone: user?.phone || '',
+        address: '', // Not in the API response
+        dob: '',     // Not in the API response
         currentPassword: '',
         newPassword: '',
         confirmPassword: ''
     });
+
+    // Update form data when user data is loaded
+    useEffect(() => {
+        if (user) {
+            setFormData(prev => ({
+                ...prev,
+                name: user.name || '',
+                email: user.email || '',
+                phone: user.phone || ''
+            }));
+        }
+    }, [user]);
+
+    // Initialize the mutations
+    const updateProfileMutation = useUpdateProfile();
+    const changePasswordMutation = useChangePassword();
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { id, value } = e.target;
         setFormData(prev => ({ ...prev, [id]: value }));
     };
 
-    const handleSubmit = async (e: React.FormEvent, isPasswordForm = false) => {
+    const handleProfileSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        setIsLoading(false);
-        alert(isPasswordForm ? 'Password updated successfully!' : 'Profile updated successfully!');
+
+        try {
+            const { currentPassword, newPassword, confirmPassword, ...profileData } = formData;
+            await updateProfileMutation.mutateAsync(profileData);
+
+            toast({
+                title: 'Profile updated successfully!',
+                variant: 'default',
+            });
+        } catch (error) {
+            // Error handling is done in the mutation
+        } finally {
+            setIsLoading(false);
+        }
     };
 
+    const handlePasswordSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (formData.newPassword !== formData.confirmPassword) {
+            toast({
+                title: 'Error',
+                description: 'New password and confirm password do not match',
+                variant: 'destructive',
+            });
+            return;
+        }
+
+        setIsLoading(true);
+
+        try {
+            const { currentPassword, newPassword, confirmPassword } = formData;
+            await changePasswordMutation.mutateAsync({
+                old_password: currentPassword,
+                new_password: newPassword,
+                confirm_password: confirmPassword
+            });
+
+            // Clear password fields on success
+            setFormData(prev => ({
+                ...prev,
+                currentPassword: '',
+                newPassword: '',
+                confirmPassword: ''
+            }));
+
+        } catch (error) {
+            toast({
+                title: 'Error',
+                description: error.response?.data?.message || error.message,
+                variant: 'destructive',
+            });
+
+        } finally {
+            setIsLoading(false);
+        }
+    };
     return (
         <Card className="shadow-xl border">
             <CardHeader>
@@ -53,7 +126,7 @@ export default function ProfileTab() {
                     </div>
 
                     <Tabs defaultValue="profile" className="w-full">
-                        <TabsList className="grid w-full grid-cols-2">
+                        <TabsList className="grid w-full grid-cols-3">
                             <TabsTrigger value="profile" className="flex items-center gap-2">
                                 <User className="h-4 w-4" />
                                 <span>Profile</span>
@@ -61,6 +134,10 @@ export default function ProfileTab() {
                             <TabsTrigger value="password" className="flex items-center gap-2">
                                 <Lock className="h-4 w-4" />
                                 <span>Password</span>
+                            </TabsTrigger>
+                            <TabsTrigger value="twoFA" className="flex items-center gap-2">
+                                <Key className="h-4 w-4" />
+                                <span>2FA</span>
                             </TabsTrigger>
                         </TabsList>
 
@@ -71,7 +148,7 @@ export default function ProfileTab() {
                                     <CardTitle>Profile Information</CardTitle>
                                     <CardDescription>Update your account's profile information.</CardDescription>
                                 </CardHeader>
-                                <form onSubmit={(e) => handleSubmit(e, false)}>
+                                <form onSubmit={(e) => handleProfileSubmit(e, false)}>
                                     <CardContent className="space-y-4">
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div className="space-y-2">
@@ -83,6 +160,7 @@ export default function ProfileTab() {
                                                         className="pl-10"
                                                         value={formData.name}
                                                         onChange={handleInputChange}
+                                                        disabled={isLoading}
                                                     />
                                                 </div>
                                             </div>
@@ -97,6 +175,7 @@ export default function ProfileTab() {
                                                         className="pl-10"
                                                         value={formData.email}
                                                         onChange={handleInputChange}
+                                                        disabled={isLoading}
                                                     />
                                                 </div>
                                             </div>
@@ -111,6 +190,7 @@ export default function ProfileTab() {
                                                         className="pl-10"
                                                         value={formData.phone}
                                                         onChange={handleInputChange}
+                                                        disabled={isLoading}
                                                     />
                                                 </div>
                                             </div>
@@ -125,6 +205,7 @@ export default function ProfileTab() {
                                                         className="pl-10"
                                                         value={formData.dob}
                                                         onChange={handleInputChange}
+                                                        disabled={isLoading}
                                                     />
                                                 </div>
                                             </div>
@@ -139,13 +220,14 @@ export default function ProfileTab() {
                                                     className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 pl-10 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                                                     value={formData.address}
                                                     onChange={handleInputChange}
+                                                    disabled={isLoading}
                                                 />
                                             </div>
                                         </div>
                                     </CardContent>
                                     <CardFooter>
-                                        <Button className="mt-4" type="submit" disabled={isLoading}>
-                                            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                        <Button className="mt-4" type="submit" disabled={isLoading || updateProfileMutation.isPending}>
+                                            {(isLoading || updateProfileMutation.isPending) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                             Save Changes
                                         </Button>
                                     </CardFooter>
@@ -160,7 +242,7 @@ export default function ProfileTab() {
                                     <CardTitle>Update Password</CardTitle>
                                     <CardDescription>Change your password here.</CardDescription>
                                 </CardHeader>
-                                <form onSubmit={(e) => handleSubmit(e, true)}>
+                                <form onSubmit={(e) => handlePasswordSubmit(e, true)}>
                                     <CardContent className="space-y-4">
                                         <div className="space-y-2">
                                             <Label htmlFor="currentPassword">Current Password</Label>
@@ -223,8 +305,85 @@ export default function ProfileTab() {
                                         </div>
                                     </CardContent>
                                     <CardFooter>
-                                        <Button className="mt-4" type="submit" disabled={isLoading}>
-                                            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                        <Button className="mt-4" type="submit" disabled={isLoading || changePasswordMutation.isPending}>
+                                            {(isLoading || changePasswordMutation.isPending) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                            Update Password
+                                        </Button>
+                                    </CardFooter>
+                                </form>
+                            </Card>
+                        </TabsContent>
+                        <TabsContent value="twoFA">
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Update Password</CardTitle>
+                                    <CardDescription>Change your password here.</CardDescription>
+                                </CardHeader>
+                                <form onSubmit={(e) => handlePasswordSubmit(e, true)}>
+                                    <CardContent className="space-y-4">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="currentPassword">Current Password</Label>
+                                            <div className="relative">
+                                                <Input
+                                                    id="currentPassword"
+                                                    type={showCurrentPassword ? "text" : "password"}
+                                                    value={formData.currentPassword}
+                                                    onChange={handleInputChange}
+                                                    className="pr-10"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                                    onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                                                >
+                                                    {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <Label htmlFor="newPassword">New Password</Label>
+                                            <div className="relative">
+                                                <Input
+                                                    id="newPassword"
+                                                    type={showNewPassword ? "text" : "password"}
+                                                    value={formData.newPassword}
+                                                    onChange={handleInputChange}
+                                                    className="pr-10"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                                    onClick={() => setShowNewPassword(!showNewPassword)}
+                                                >
+                                                    {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                                            <div className="relative">
+                                                <Input
+                                                    id="confirmPassword"
+                                                    type={showConfirmPassword ? "text" : "password"}
+                                                    value={formData.confirmPassword}
+                                                    onChange={handleInputChange}
+                                                    className="pr-10"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                                >
+                                                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                    <CardFooter>
+                                        <Button className="mt-4" type="submit" disabled={isLoading || changePasswordMutation.isPending}>
+                                            {(isLoading || changePasswordMutation.isPending) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                             Update Password
                                         </Button>
                                     </CardFooter>

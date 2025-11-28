@@ -103,7 +103,7 @@ export default function ForgotPassword() {
                             </div>
                         )}
 
-                        <form onSubmit={handleSubmit} className="space-y-6">
+                        <form onSubmit={handleSubmit} className="space-y-6 mt-2">
                             {!success && (
                                 <Button
                                     type="submit"
