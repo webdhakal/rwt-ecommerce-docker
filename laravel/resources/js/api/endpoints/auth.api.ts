@@ -44,6 +44,7 @@ export interface UpdateProfilePayload {
     email?: string;
     phone?: string;
     address?: string;
+    avatar?: string;
     // Add other profile fields as needed
 }
 

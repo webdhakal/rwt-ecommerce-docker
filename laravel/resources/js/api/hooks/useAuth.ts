@@ -90,8 +90,7 @@ export const useMe = (enabled: boolean = true) => {
         queryFn: authApi.me,
         enabled: enabled && hasToken,
         retry: false,
-        staleTime: 5 * 60 * 1000, // 5 minutes
-        select: (data) => data.payload // Directly return the payload
+        select: (data) => data.payload
     });
 };
 
@@ -205,66 +204,48 @@ export const useRefreshToken = () => {
 // ---- useUpdateProfile Hook ----
 export const useUpdateProfile = () => {
     const queryClient = useQueryClient();
-    const { data: userData } = useMe(); // Get the current user data
-    
+
     return useMutation({
         mutationFn: authApi.updateProfile,
+
         onSuccess: async (data: AxiosResponse) => {
-            if (!data.data?.payload) {
+            let payload = data.data?.payload;
+
+            // Backend did NOT return updated user → manually fetch it
+            if (!payload) {
                 try {
-                    const updatedUser = await queryClient.fetchQuery(authKeys.me(), () => 
-                        authApi.me()
-                    );
-                    
-                    // const authData = localStorage.getItem('auth');
-                    // if (authData && updatedUser?.data?.payload) {
-                    //     const auth = JSON.parse(authData);
-                    //     localStorage.setItem('auth', JSON.stringify({ 
-                    //         ...auth, 
-                    //         ...updatedUser.data.payload
-                    //     }));
-                    // }
-                    
-                    toast({
-                        title: data.data?.message || 'Profile updated successfully',
-                        variant: 'default'
-                    });
-                    return;
+                    const updatedUserResponse = await authApi.me();
+                    payload = updatedUserResponse.data.payload;
+
+                    // Update the cache
+                    queryClient.setQueryData(authKeys.me(), payload);
+
                 } catch (error) {
-                    console.error('Failed to fetch updated user data:', error);
+                    console.error("Failed to fetch updated user:", error);
                 }
-            }
-            
-            // If we have payload, proceed with the original logic
-            queryClient.setQueryData(authKeys.me(), (oldData: any) => ({
-                ...oldData,
-                ...(data.data?.payload || {})
-            }));
-            
-            const authData = localStorage.getItem('auth');
-            if (authData && data.data?.payload) {
-                const auth = JSON.parse(authData);
-                localStorage.setItem('auth', JSON.stringify({ 
-                    ...auth, 
-                    ...data.data.payload
+            } else {
+                // Backend *did* return payload → update cache normally
+                queryClient.setQueryData(authKeys.me(), (oldData: any) => ({
+                    ...oldData,
+                    ...payload,
                 }));
             }
-            
-            toast({
-                title: data.data?.message || 'Profile updated successfully',
-                variant: 'default'
-            });
+
+            // Return payload so component can use it
+            return payload;
         },
+
         onError: (error: any) => {
             toast({
-                title: 'Failed to update profile',
+                title: "Failed to update profile",
                 description: error.response?.data?.message || error.message,
-                variant: 'destructive'
+                variant: "destructive",
             });
             throw error;
-        }
+        },
     });
 };
+
 
 // ---- useChangePassword Hook ----
 export const useChangePassword = () => {
