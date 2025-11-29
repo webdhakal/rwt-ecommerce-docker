@@ -4,16 +4,13 @@ import { Button } from '@/shadcn/ui/button';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandList } from '@/shadcn/ui/command';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/shadcn/ui/dropdown-menu';
 import { Menu as CategoryMenu } from '@/types/Menu';
-import { usePage, Link, router } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { ChevronDown, Heart, MapPin, Menu, MoveUpRight, Search, ShoppingCart, Store, User, X } from 'lucide-react';
 import React, { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 import NavigationSkeleton from './skeletons/NavigationSkeleton';
 import ToggleThemeButton from './Button/ToggleThemeButton';
-import { getUsers } from '@/api/endpoints/users.api';
-import api from '@/api/clients/axiosClient'
-import { useLogout } from '@/api/hooks/useAuth';
 import SearchOverlay from './SearchOverlay';
-
+import { useLogout } from '@/api/hooks/useAuth';
 
 // Use forwardRef so GuestLayout can measure the <header>
 const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...props }, ref) => {
@@ -38,6 +35,10 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
     const searchInputRef = useRef<HTMLInputElement>(null);
 
     // Handle keyboard shortcuts
+
+    const auth = (localStorage.getItem("authToken") !== null);
+    const isUser = !!auth;
+
     const handleKeyDown = useCallback((e: KeyboardEvent) => {
         if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
             e.preventDefault();
@@ -68,9 +69,6 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
         };
     }, [handleKeyDown]);
 
-    const auth = JSON.parse(localStorage.getItem('auth') || 'null');
-    const isUser = !!auth;
-
     // Mock data
     const trendingItems = [
         { id: 1, name: 'iPhone 15 Pro', type: 'Product' },
@@ -90,7 +88,7 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
     useEffect(() => {
         document.addEventListener('keydown', handleKeyDown);
         document.addEventListener('mousedown', handleClickOutside);
-        
+
         return () => {
             document.removeEventListener('keydown', handleKeyDown);
             document.removeEventListener('mousedown', handleClickOutside);
@@ -102,14 +100,14 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
         if (isSearchOpen && searchInputRef.current) {
             searchInputRef.current.focus();
         }
-        
+
         // Prevent background scrolling when search is open
         if (isSearchOpen) {
             document.body.style.overflow = 'hidden';
         } else {
             document.body.style.overflow = '';
         }
-        
+
         return () => {
             document.body.style.overflow = '';
         };
@@ -164,7 +162,8 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
 
     const handleLogout = async (e) => {
         logoutMutation.mutate();
-    }
+    };
+
     const handleWheel = useCallback((e: React.WheelEvent<HTMLDivElement>) => {
         const container = e.currentTarget;
         const isHorizontal = Math.abs(e.deltaX) > Math.abs(e.deltaY);
@@ -235,12 +234,12 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
                         <div className="mx-8 hidden max-w-2xl flex-1 lg:block">
                             <div className="relative flex items-center">
                                 <Command className="flex-1 rounded-full border border-border bg-background shadow-md">
-                                  <CommandInput
-                                    placeholder="Search for products, brands, vendors..."
-                                    value={query}
-                                    onValueChange={setQuery}
-                                    className="flex-1 rounded-full px-12 py-5 text-sm focus:ring-0 focus:outline-none lg:text-base"
-                                    onFocus={() => setIsSearchOpen(true)}
+                                    <CommandInput
+                                        placeholder="Search for products, brands, vendors..."
+                                        value={query}
+                                        onValueChange={setQuery}
+                                        className="flex-1 rounded-full px-12 py-5 text-sm focus:ring-0 focus:outline-none lg:text-base"
+                                        onFocus={() => setIsSearchOpen(true)}
                                     />
 
                                     {/* {isSearchOpen && (
@@ -363,6 +362,7 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
                                     </Link>
                                 )}
 
+
                                 <ToggleThemeButton />
                             </div>
 
@@ -397,7 +397,7 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
                                             <DropdownMenuContent className="w-48">
                                                 {categories.map((category) => (
                                                     <DropdownMenuItem key={category.id} onClick={() => console.log('Selected:', category.name)}>
-                                                        <Link href={route('product-listing', { category: category.slug })}>{category.name}</Link>
+                                                        {category.name}
                                                     </DropdownMenuItem>
                                                 ))}
                                             </DropdownMenuContent>
@@ -406,13 +406,9 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
                                 </div>
                                 {categories &&
                                     categories.map((category) => (
-                                        <Link
-                                            key={category.id}
-                                            href={route('product-listing', { category: category.slug })}
-                                            className="font-medium text-foreground transition-colors hover:text-primary"
-                                        >
+                                        <button key={category.id} className="font-medium text-foreground transition-colors hover:text-primary">
                                             {category.name}
-                                        </Link>
+                                        </button>
                                     ))}
                             </div>
                             <div className="flex items-center space-x-6">
@@ -522,12 +518,13 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
                                 </Link>
                             )}
 
+
                             <ToggleThemeButton />
                         </div>
                     </div>
                 </div>
             )}
-            
+
             {/* Search Overlay */}
             <SearchOverlay
                 isOpen={isSearchOpen}
@@ -539,7 +536,7 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
                 categories={categories}
                 randomImage={randomImage}
                 onWheel={handleWheel}
-                />
+            />
         </header>
     );
 });

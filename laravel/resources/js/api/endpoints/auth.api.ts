@@ -1,6 +1,7 @@
 import api from "../clients/axiosClient";
 import { ROUTES } from "../routes";
 import { AlternateApiResponse } from "@/interfaces/api.interface";
+import { User } from "@/interfaces/user.interface";
 
 // ---- Types ----
 export interface LoginPayload {
@@ -30,6 +31,21 @@ export interface ResetPasswordPayload {
     email: string;
     password: string;
     confirm_password: string;
+}
+
+export interface ChangePasswordPayload {
+    old_password: string;
+    new_password: string;
+    confirm_password: string;
+}
+
+export interface UpdateProfilePayload {
+    name?: string;
+    email?: string;
+    phone?: string;
+    address?: string;
+    files?: File[];
+    // Add other profile fields as needed
 }
 
 export interface VerifyPasswordTokenPayload {
@@ -99,5 +115,17 @@ export const refreshToken = async (): Promise<AlternateApiResponse<AuthResponse>
 // ---- LOGOUT ----
 export const logout = async (): Promise<AlternateApiResponse<any>> => {
     const res = await api.post(ROUTES.AUTH.LOGOUT);
+    return res.data;
+};
+
+// ---- UPDATE PROFILE ----
+export const updateProfile = async (payload: UpdateProfilePayload): Promise<AlternateApiResponse<User>> => {
+    const res = await api.post(ROUTES.AUTH.UPDATE_PROFILE, payload);
+    return res.data;
+};
+
+// ---- CHANGE PASSWORD ----
+export const changePassword = async (payload: ChangePasswordPayload): Promise<AlternateApiResponse<{ message: string }>> => {
+    const res = await api.post(ROUTES.AUTH.CHANGE_PASSWORD, payload);
     return res.data;
 };

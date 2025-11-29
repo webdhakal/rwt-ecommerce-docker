@@ -9,27 +9,34 @@ import { Link, usePage } from "@inertiajs/react"
 import { FormEventHandler, useState } from "react"
 import { Eye, EyeOff } from "lucide-react"
 import { useLogin } from "@/api/hooks/useAuth"
+import { toast } from "sonner"
 
 export default function LoginPage() {
     const { appName } = usePage<PageProps>().props
-    
+
     const [formData, setFormData] = useState({
         email: '',
         password: '',
         remember: false,
     });
-    
+
     const [showPassword, setShowPassword] = useState(false);
-    
+
     const loginMutation = useLogin({
         onSuccess: (response) => {
             localStorage.setItem('authToken', response.payload?.access_token);
             localStorage.setItem('refreshToken', response.payload?.refreshToken);
             localStorage.setItem('auth', JSON.stringify(response.payload?.auth));
 
-            toast({ title: response.message, description: 'Redirecting to dashboard...' });
+            toast.success(response.message, {
+                description: 'Redirecting to dashboard...',
+                duration: 1500,
+            });
 
-            window.location.href = '/dashboard';
+            // Add a small delay before redirecting to allow the toast to be seen
+            setTimeout(() => {
+                window.location.href = '/dashboard';
+            }, 1500);
         },
         onError: (err: any) => {
             toast({
@@ -41,7 +48,7 @@ export default function LoginPage() {
 
     const handleSubmit: FormEventHandler = async (e) => {
         e.preventDefault();
-        
+
         loginMutation.mutate({
             login: formData.email,
             password: formData.password,
@@ -82,12 +89,12 @@ export default function LoginPage() {
                                                 <Label htmlFor="password">Password</Label>
                                             </div>
                                             <div className="relative">
-                                                <Input 
-                                                    id="password" 
+                                                <Input
+                                                    id="password"
                                                     type={showPassword ? "text" : "password"}
                                                     value={formData.password}
                                                     onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                                                    required 
+                                                    required
                                                     className="pr-10"
                                                     disabled={loginMutation.isPending}
                                                 />
@@ -130,20 +137,18 @@ export default function LoginPage() {
                                             </div>
                                         </div>
 
-                                        <Button 
-                                            type="submit" 
-                                            className="w-full" 
+                                        <Button
+                                            type="submit"
+                                            className="w-full"
                                             disabled={loginMutation.isPending}
                                         >
                                             {loginMutation.isPending ? 'Logging in...' : 'Login'}
                                         </Button>
-                                        
                                         <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
                                             <span className="relative z-10 bg-background px-2 text-muted-foreground">
                                                 Or continue with
                                             </span>
                                         </div>
-                                        
                                         <div className="grid grid-cols-3 gap-4">
                                             <Button variant="outline" className="w-full" type="button">
                                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -173,7 +178,6 @@ export default function LoginPage() {
                                                 <span className="sr-only">Login with Meta</span>
                                             </Button>
                                         </div>
-                                        
                                         <div className="text-center text-sm">
                                             Don&apos;t have an account?{" "}
                                             <Link href={route('register')} className="underline underline-offset-4">

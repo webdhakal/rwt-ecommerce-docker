@@ -146,16 +146,8 @@ export interface Product {
     has_variant: boolean;
     variants?: ProductVariant[];
     created_at: string;
-    categories: Array<ProductCategories>;
 }
 
-export type ProductCategories ={
-    id:string;
-    initial:string;
-    name:string;
-    slug:string;
-    type:string;
-}
 export type ProductVariant = {
     id: string;
     name: string | null;

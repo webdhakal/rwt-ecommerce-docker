@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 import { initializeTheme } from './shadcn/hooks/use-appearance';
 import LoaderWrapper from './components/LoaderWrapper';
-import { Toaster } from './shadcn/ui/sonner';
+import { Toaster } from 'sonner';
 import dynamicThemes from '../../dynamic-themes.json'
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
@@ -26,10 +26,17 @@ createInertiaApp({
 
         root.render(
             <QueryClientProvider client={queryClient}>
+                <Toaster position="top-center"
+                    richColors
+                    closeButton
+                    toastOptions={{
+                        style: {
+                            zIndex: 10000, // Ensure it's above other elements
+                        },
+                    }} />
                 <LoaderWrapper>
                     <App {...props} />
                 </LoaderWrapper>
-                <Toaster closeButton richColors />
             </QueryClientProvider>,
         );
 

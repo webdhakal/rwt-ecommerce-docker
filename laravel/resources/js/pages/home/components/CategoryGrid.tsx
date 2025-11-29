@@ -6,6 +6,7 @@ import CategoryGridSkeleton from './skeletons/CategoryGridSkeleton';
 
 const CategoryGrid = () => {
     const { data: categories = [], isLoading } = useCategories(
+        { params: { limit: 6 } }, // 👈 pass params
         { refetchOnMount: true },
     );
 
@@ -22,24 +23,16 @@ const CategoryGrid = () => {
                     <Link
                         key={category?.id}
                         href={`/product-listing?category=${encodeURIComponent(category?.name)}`}
-                        className="group block" 
+                        className="group block"
                     >
                         <div className="bg-surface relative overflow-hidden rounded-lg border border-border transition-all duration-300 group-hover:scale-105 hover:shadow-lg h-64">
                             {/* Category Image */}
                             <div className="relative h-32 overflow-hidden sm:h-40 lg:h-32">
-                                {category?.image? (
-                                    <img
-                                        src={category?.image}
-                                        alt={category?.name}
-                                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                    />
-                                ) : (
-                                    <img
-                                        src={'https://picsum.photos/200/300?random=101'}
-                                        alt={category?.name}
-                                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                    />
-                                )}
+                                <img
+                                    src={category?.image}
+                                    alt={category?.name}
+                                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                />
                                 <div
                                     className={`absolute inset-0 bg-gradient-to-t ${category?.color} opacity-20 transition-opacity duration-300 group-hover:opacity-30`}
                                 ></div>

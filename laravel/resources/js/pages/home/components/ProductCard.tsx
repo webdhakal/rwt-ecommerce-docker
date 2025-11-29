@@ -8,6 +8,7 @@ import { useState } from 'react';
 const ProductCard = ({ product, showQuickAdd = true }: { product: Product; showQuickAdd: boolean }) => {
     const [isWishlisted, setIsWishlisted] = useState(product?.isWishlisted || false);
     const [isAddingToCart, setIsAddingToCart] = useState(false);
+
     const handleWishlistToggle = (e) => {
         e?.preventDefault();
         e?.stopPropagation();
@@ -43,17 +44,15 @@ const ProductCard = ({ product, showQuickAdd = true }: { product: Product; showQ
         }
 
         return stars;
-    };  
-    
+    };
 
-const formattedPrice = product?.price ? Number(product.price).toFixed(2) : '0.00';
     return (
         <div className="group relative overflow-hidden rounded-lg border border-border bg-background transition-all duration-300 hover:scale-[1.02] hover:shadow-lg">
             <Link href={route('product-detail', product?.slug)} className="block">
                 {/* Product Image */}
                 <div className="bg-surface relative aspect-square overflow-hidden">
                     <img
-                        src={product?.files?.[0]?.url || 'https://picsum.photos/200/300?random=101'}
+                        src={product?.image}
                         alt={product?.name}
                         className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
@@ -106,7 +105,7 @@ const formattedPrice = product?.price ? Number(product.price).toFixed(2) : '0.00
 
                     {/* Price */}
                     <div className="mb-3 flex items-center space-x-2">
-                        <span className="text-text-primary text-lg font-bold">${formattedPrice}</span>
+                        <span className="text-text-primary text-lg font-bold">${product?.price?.toFixed(2)}</span>
                         {product?.originalPrice && product?.originalPrice > product?.price && (
                             <span className="text-text-secondary text-sm line-through">${product?.originalPrice?.toFixed(2)}</span>
                         )}
