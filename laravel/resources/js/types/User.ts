@@ -11,3 +11,10 @@ export interface UserProps {
     user: User;
     onLogout: () => void;
 }
+
+export interface Receiptent{
+    first_name:string;
+    last_name:string;
+    email:string;
+    phone:string;
+}

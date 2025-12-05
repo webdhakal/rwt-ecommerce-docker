@@ -13,6 +13,8 @@ import { getUsers } from '@/api/endpoints/users.api';
 import api from '@/api/clients/axiosClient'
 import { useLogout } from '@/api/hooks/useAuth';
 import SearchOverlay from './SearchOverlay';
+import { useShoppingCart } from '@/api/hooks/useShoppingCart';
+import { getWishlistData } from '@/api/hooks/useWishlist';
 
 
 // Use forwardRef so GuestLayout can measure the <header>
@@ -70,6 +72,22 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
 
     const auth = JSON.parse(localStorage.getItem('auth') || 'null');
     const isUser = !!auth;
+
+    const guestLocal = localStorage.getItem('guest_id');
+    const { data:cartData } = useShoppingCart({cartId: guestLocal||undefined});
+    const {data:wishlistData} = getWishlistData();
+    
+
+    const [guestId, setGuestId] = useState<string | null>(null);
+    useEffect(() => {
+        if (guestLocal) {
+            setGuestId(guestLocal);
+        } else if (cartData?.payload?.id) {
+            const newGuestId = cartData.payload.id;
+            localStorage.setItem('guest_id', newGuestId);
+            setGuestId(newGuestId);
+        }
+      }, [cartData]);
 
     // Mock data
     const trendingItems = [
@@ -303,7 +321,7 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
                                 >
                                     <Heart className="h-6 w-6" />
                                     <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-xs text-destructive-foreground">
-                                        3
+                                        {wishlistData?.payload?.items?.length}
                                     </span>
                                     <div className="absolute bottom-0 left-1/2 mt-2 -translate-x-1/2 translate-y-full transform rounded bg-popover px-2 py-1 text-xs text-popover-foreground opacity-0 transition-opacity group-hover:opacity-100 border border-border">
                                         Wishlist
@@ -317,7 +335,7 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
                                 >
                                     <ShoppingCart className="h-6 w-6" />
                                     <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
-                                        2
+                                        {cartData?.payload?.cart_count}
                                     </span>
                                     <div className="absolute bottom-0 left-1/2 mt-2 -translate-x-1/2 translate-y-full transform rounded bg-popover px-2 py-1 text-xs text-popover-foreground opacity-0 transition-opacity group-hover:opacity-100 border border-border">
                                         Cart

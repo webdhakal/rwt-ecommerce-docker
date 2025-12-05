@@ -126,27 +126,36 @@ export interface ProductSize {
 // }
 
 export interface Product {
-    id: string;
-    name: string;
-    slug: string;
-    code: string;
-    status: boolean;
-    summary: string;
-    description: string;
-    shippingOptions: Array<{ name: string; duration: string; price: number }>;
-    specifications: string;
-    features: string;
-    stock: number;
-    base_price: string;
-    price: string;
-    colors: string[];
-    sizes: string[];
-    in_wishlist: boolean;
-    rating: number | null;
-    has_variant: boolean;
-    variants?: ProductVariant[];
-    created_at: string;
-    categories: Array<ProductCategories>;
+  initials: string | null;
+  id: string;
+  name: string;
+  slug: string;
+  sku: string;
+  code: string;
+  status: string;
+  summary: string;
+  short_description: string;
+  description: string;
+  specifications: Record<string, string>;
+  features: string[];
+  stock_status: string;
+  stock: number;
+  in_wishlist: boolean;
+  is_published: boolean;
+  is_featured: boolean;
+  rating: number;
+  reviews_count: number;
+  has_variant: boolean;
+  price: string;
+  price_range: string;
+  colors: string[];
+  sizes: string[];
+  variant_count: number;
+  default_attributes: any[];
+  variants: ProductVariant[];
+  shipping_methods: any[];
+  warranty: string;
+  created_at: string;
 }
 
 export type ProductCategories ={
@@ -172,10 +181,15 @@ export type ProductVariant = {
         created_at: string;
     } | null;
     price: string;
+    unit_weight: string;
+    previous_price: string;
+    cost_per_item: string;
+    attributes: any;
     base_price: string;
     status: boolean;
-    sku_suffix: string | null;
+    sku_suffix: string;
     stock: number;
+    is_backorder: boolean;
     created_at: string;
 };
 

@@ -2,39 +2,18 @@ import React, { useState } from 'react';
 import { Button } from '@/shadcn/ui/button';
 import { Checkbox } from '@/shadcn/ui/checkbox';
 import Icon from '@/components/AppIcon';
+import { OrderSend } from '@/types/Order';
+import { useOrder } from '@/api/hooks/userOrders';
 
-const OrderReview = ({ onBack, onPlaceOrder, shippingData, paymentData, orderData }) => {
+const OrderReview = ({ onBack, onPlaceOrder, shippingData, paymentData,cartItems }: { onBack: () => void; onPlaceOrder: () => void; shippingData: any; paymentData: any; cartItems: any }) => {
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [orderData, setOrderData] = useState<OrderSend | null>(null);
 
-  const cartItems = [
-    {
-      id: 1,
-      name: "iPhone 15 Pro Max",
-      variant: "256GB, Natural Titanium",
-      price: 1199.00,
-      quantity: 1,
-      image: "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400&h=400&fit=crop"
-    },
-    {
-      id: 2,
-      name: "AirPods Pro (2nd Gen)",
-      variant: "USB-C",
-      price: 249.00,
-      quantity: 2,
-      image: "https://images.unsplash.com/photo-1606220945770-b5b6c2c55bf1?w=400&h=400&fit=crop"
-    },
-    {
-      id: 3,
-      name: "MagSafe Charger",
-      variant: "White",
-      price: 39.00,
-      quantity: 1,
-      image: "https://images.unsplash.com/photo-1583394838336-acd977736f90?w=400&h=400&fit=crop"
-    }
-  ];
+  const { createOrder, isCreating, isSuccess, error } = useOrder();
+console.log("cartitems", cartItems)
 
-  const subtotal = cartItems?.reduce((sum, item) => sum + (item?.price * item?.quantity), 0);
+  const subtotal = cartItems?.reduce((sum: number, item: any) => sum + (item?.price * item?.quantity), 0);
   const shippingCost = shippingData?.shippingMethod === 'standard' ? 5.99 :
     shippingData?.shippingMethod === 'express' ? 12.99 : 24.99;
   const tax = subtotal * 0.08; // 8% tax
@@ -46,9 +25,52 @@ const OrderReview = ({ onBack, onPlaceOrder, shippingData, paymentData, orderDat
       alert('Please agree to the terms and conditions');
       return;
     }
+    
+    const datatosend: OrderSend = {
+      grand_total: total,
+      payment_method: paymentData?.paymentMethod || '',
+      discount_amount: discount,
+      payment_status: "pending",
+      notes: paymentData?.notes || 'nothing',
+      user:{
+        first_name: shippingData?.firstName || '',
+        last_name: shippingData?.lastName || '',
+        email: shippingData?.email || '',
+        phone: shippingData?.phone || ''
+      },
+      relation:{
+        orderItems: cartItems?.map((item: any) => ({
+          variant: item?.product?.variant?.id,
+          total_amount: total,
+          unit_amount: item?.price,
+          quantity: item?.quantity,
+        })),
+        fromAddress:[],
+        addresses: [{
+          phone: shippingData?.phone || '',
+          email: shippingData?.email || '',
+          custom_fields: {
+            is_shipping: true,
+            default: true
+          },
+          country: shippingData?.country || '',
+          state: shippingData?.state || '',
+          city: shippingData?.city || '',
+        }]
+      }
+      
+    };
+
+
+    setOrderData(datatosend); 
+    console.log("Data to send:", datatosend);
 
     setIsProcessing(true);
 
+    // Call the API to create the order
+    createOrder(datatosend);
+
+    
     // Simulate order processing
     setTimeout(() => {
       onPlaceOrder();
@@ -88,15 +110,15 @@ const OrderReview = ({ onBack, onPlaceOrder, shippingData, paymentData, orderDat
             <div key={item?.id} className="flex items-center space-x-4 p-4 bg-surface rounded-lg">
               <div className="w-16 h-16 bg-muted rounded-lg overflow-hidden flex-shrink-0">
                 <img
-                  src={item?.image}
-                  alt={item?.name}
+                  src={item?.product?.files?.[0]?.url}
+                  alt={item?.product?.name}
                   className="w-full h-full object-cover"
                 />
               </div>
 
               <div className="flex-1 min-w-0">
-                <h4 className="font-medium text-text-primary truncate">{item?.name}</h4>
-                <p className="text-sm text-text-secondary">{item?.variant}</p>
+                <h4 className="font-medium text-text-primary truncate">{item?.product?.name}</h4>
+                <p className="text-sm text-text-secondary">{item?.product?.variant?.size_name}:{item?.product?.variant?.color_name}</p>
                 <p className="text-sm text-text-secondary">Qty: {item?.quantity}</p>
               </div>
 

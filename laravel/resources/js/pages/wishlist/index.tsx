@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Icon from '@/components/AppIcon';
 import Button from '@/components/Button';
 import Header from '@/components/Header';
@@ -7,12 +7,18 @@ import ProductListItem from './components/ProductListItem';
 import { Link } from '@inertiajs/react';
 import GuestLayout from '@/layouts/guest-layout';
 import { useCategories } from '@/api/hooks/useCategories';
+import { deleteWishlistProductData, getWishlistData } from '@/api/hooks/useWishlist';
+import { useStoreCart } from '@/api/hooks/useShoppingCart';
+import { deleteWishlistData } from '@/api/hooks/useWishlist';
 
 const WishlistCenter = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [sortBy, setSortBy] = useState('dateAdded');
     const [filterCategory, setFilterCategory] = useState('all');
     const [viewMode, setViewMode] = useState('list'); // 'list' or 'grid'
+    const [wishlistProducts, setWishlistProducts] = useState([]);
+        const {mutate:addtoCart} = useStoreCart()
+    
 
     // Categories
     const { data: categoriesList = [], isLoading } = useCategories(
@@ -20,169 +26,17 @@ const WishlistCenter = () => {
         { refetchOnMount: true },
     );
     const categories = categoriesList?.payload?.data;
-    console.log(categories)
-    // Mock wishlist products data for ecommerce
-    const [wishlistProducts, setWishlistProducts] = useState([
-        {
-            id: 1,
-            name: "Premium Wireless Bluetooth Headphones with Noise Cancellation",
-            brand: "AudioTech Pro",
-            description: "Experience crystal-clear audio with advanced noise cancellation technology. Perfect for work, travel, and leisure.",
-            image: "https://images.unsplash.com/photo-1713801129175-8e60c67e0412",
-            imageAlt: "Black premium wireless headphones with soft ear cushions and sleek design on white background",
-            category: "Electronics",
-            price: 299.99,
-            salePrice: 249.99,
-            originalPrice: 299.99,
-            installmentPrice: 41.66,
-            rating: 4.8,
-            reviewCount: 1247,
-            inStock: true,
-            isOnSale: true,
-            isNewArrival: false,
-            isLimitedStock: false,
-            freeShipping: true,
-            dateAdded: "2024-10-20T10:30:00Z",
-            availableColors: [
-                { name: "Midnight Black", hex: "#000000" },
-                { name: "Silver", hex: "#C0C0C0" },
-                { name: "Rose Gold", hex: "#E8B4B8" }]
+    const { data: wishlistData, refetch } = getWishlistData();
+    // Add this useEffect after the wishlistData declaration
+        useEffect(() => {
+        if (wishlistData?.payload?.items) {
+            setWishlistProducts(wishlistData.payload.items);
+        }
+        }, [wishlistData]);
 
-        },
-        {
-            id: 2,
-            name: "Organic Cotton Blend Comfort Fit T-Shirt",
-            brand: "EcoWear",
-            description: "Soft, breathable, and sustainably made. This versatile t-shirt is perfect for everyday wear with superior comfort.",
-            image: "https://images.unsplash.com/photo-1644096967763-3ade4740f11b",
-            imageAlt: "Navy blue organic cotton t-shirt laid flat showing natural fabric texture and comfortable fit",
-            category: "Clothing",
-            price: 24.99,
-            salePrice: null,
-            originalPrice: null,
-            installmentPrice: null,
-            rating: 4.6,
-            reviewCount: 892,
-            inStock: true,
-            isOnSale: false,
-            isNewArrival: true,
-            isLimitedStock: false,
-            freeShipping: false,
-            dateAdded: "2024-10-18T14:15:00Z",
-            availableSizes: ["XS", "S", "M", "L", "XL", "XXL"],
-            availableColors: [
-                { name: "Navy Blue", hex: "#000080" },
-                { name: "Forest Green", hex: "#228B22" },
-                { name: "Charcoal Gray", hex: "#36454F" },
-                { name: "White", hex: "#FFFFFF" },
-                { name: "Black", hex: "#000000" }]
 
-        },
-        {
-            id: 3,
-            name: "Professional Chef's Kitchen Knife Set with Wooden Block",
-            brand: "CulinaryMaster",
-            description: "High-carbon stainless steel blades with ergonomic handles. Includes 8 essential knives and premium storage block.",
-            image: "https://images.unsplash.com/photo-1700515268359-09d3dbbe2ef3",
-            imageAlt: "Professional kitchen knife set with sharp stainless steel blades displayed in elegant wooden block holder",
-            category: "Home & Kitchen",
-            price: 199.99,
-            salePrice: 149.99,
-            originalPrice: 199.99,
-            installmentPrice: 25.00,
-            rating: 4.9,
-            reviewCount: 567,
-            inStock: true,
-            isOnSale: true,
-            isNewArrival: false,
-            isLimitedStock: true,
-            freeShipping: true,
-            dateAdded: "2024-10-15T09:45:00Z"
-        },
-        {
-            id: 4,
-            name: "Ultra-Lightweight Running Shoes with Advanced Cushioning",
-            brand: "RunElite",
-            description: "Engineered for performance with responsive foam and breathable mesh. Designed for long-distance comfort and speed.",
-            image: "https://images.unsplash.com/photo-1705270701543-16469e92c36a",
-            imageAlt: "Modern running shoes in bright colors with mesh upper and cushioned sole, photographed on athletic surface",
-            category: "Sports & Outdoors",
-            price: 159.99,
-            salePrice: null,
-            originalPrice: null,
-            installmentPrice: 26.67,
-            rating: 4.7,
-            reviewCount: 1034,
-            inStock: false,
-            isOnSale: false,
-            isNewArrival: true,
-            isLimitedStock: false,
-            freeShipping: true,
-            dateAdded: "2024-10-12T16:20:00Z",
-            availableSizes: ["7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11"],
-            availableColors: [
-                { name: "Electric Blue", hex: "#0080FF" },
-                { name: "Neon Green", hex: "#39FF14" },
-                { name: "Sunset Orange", hex: "#FF4500" }]
+   
 
-        },
-        {
-            id: 5,
-            name: "Smart Home Security Camera with Night Vision",
-            brand: "SecureView",
-            description: "1080p HD monitoring with motion detection, two-way audio, and smartphone app control. Weather-resistant design.",
-            image: "https://images.unsplash.com/photo-1666613789626-e8b9352639fe",
-            imageAlt: "White smart security camera with modern dome design mounted on wall, showing LED indicators and lens",
-            category: "Home Security",
-            price: 89.99,
-            salePrice: 69.99,
-            originalPrice: 89.99,
-            installmentPrice: null,
-            rating: 4.5,
-            reviewCount: 743,
-            inStock: true,
-            isOnSale: true,
-            isNewArrival: false,
-            isLimitedStock: false,
-            freeShipping: false,
-            dateAdded: "2024-10-08T11:10:00Z"
-        },
-        {
-            id: 6,
-            name: "Artisan Hand-Crafted Leather Wallet with RFID Protection",
-            brand: "LeatherCraft Co.",
-            description: "Premium full-grain leather with RFID blocking technology. Handcrafted with attention to detail and built to last.",
-            image: "https://images.unsplash.com/photo-1619169427949-dee9aeb6d94b",
-            imageAlt: "Brown leather wallet showing hand-stitched details and multiple card compartments, crafted from premium materials",
-            category: "Accessories",
-            price: 79.99,
-            salePrice: null,
-            originalPrice: null,
-            installmentPrice: null,
-            rating: 4.8,
-            reviewCount: 456,
-            inStock: true,
-            isOnSale: false,
-            isNewArrival: false,
-            isLimitedStock: true,
-            freeShipping: false,
-            dateAdded: "2024-10-05T13:25:00Z",
-            availableColors: [
-                { name: "Classic Brown", hex: "#8B4513" },
-                { name: "Black", hex: "#000000" },
-                { name: "Tan", hex: "#D2B48C" }]
-
-        }]  
-    );
-
-    const { data: categoriesData, isLoading: isCategoriesLoading } = useCategories();
-    // const categories = [
-    //     { value: 'all', label: 'All Categories', count: wishlistProducts?.length },
-    //     { value: 'electronics', label: 'Electronics', count: wishlistProducts?.filter((p) => p?.category?.toLowerCase()?.includes('electronic'))?.length },
-    //     { value: 'clothing', label: 'Clothing', count: wishlistProducts?.filter((p) => p?.category?.toLowerCase()?.includes('clothing'))?.length },
-    //     { value: 'home', label: 'Home & Kitchen', count: wishlistProducts?.filter((p) => p?.category?.toLowerCase()?.includes('home'))?.length },
-    //     { value: 'sports', label: 'Sports & Outdoors', count: wishlistProducts?.filter((p) => p?.category?.toLowerCase()?.includes('sports'))?.length },
-    //     { value: 'accessories', label: 'Accessories', count: wishlistProducts?.filter((p) => p?.category?.toLowerCase()?.includes('accessories'))?.length }];
 
 
     const sortOptions = [
@@ -239,18 +93,37 @@ const WishlistCenter = () => {
     };
 
     // Event handlers
-    const handleRemoveFromWishlist = (productId) => {
-        setWishlistProducts((prev) => prev?.filter((product) => product?.id !== productId));
-    };
+    const { mutate: removeFromWishlist } = deleteWishlistData('');
+    const { mutate: deleteWishlistProduct } = deleteWishlistProductData();
 
-    const handleAddToCart = async (product) => {
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        console.log('Added to cart:', product);
-        // You could show a toast notification here
+    const handleRemoveFromWishlist = async (productId: number) => {
+        try {
+            await removeFromWishlist(productId.toString(), {
+                onSuccess: () => {
+                    setWishlistProducts((prev) => prev?.filter((product) => product?.id !== productId));
+                },
+            });
+        } catch (error) {
+            console.error('Error in handleRemoveFromWishlist:', error);
+        }
+    };  
+    
+   const handleAddToCart = async (product: any, productId: number) => {
+        try {
+            await addtoCart({
+                variant: product.variants[0].id,
+                quantity: product.quantity || 1, 
+                cartId: localStorage.getItem('guest_id') || undefined
+            }, {
+                onSuccess: () => {
+                    handleRemoveFromWishlist(productId);
+                },
+            });
+        } catch (error) {
+            console.error('Error in handleAddToCart:', error);
+        }
     };
-
-    const handleShareProduct = (product) => {
+    const handleShareProduct = (product: any) => {
         if (navigator?.share) {
             navigator?.share({
                 title: product?.name,
@@ -261,13 +134,23 @@ const WishlistCenter = () => {
             // Fallback for browsers that don't support Web Share API
             const url = `${window?.location?.origin}/product/${product?.id}`;
             navigator?.clipboard?.writeText(url);
-            console.log('Product URL copied to clipboard:', url);
         }
     };
 
-    const handleClearWishlist = () => {
+    const handleClearWishlist =async () => {
         if (window?.confirm('Are you sure you want to clear your entire wishlist?')) {
-            setWishlistProducts([]);
+            try{
+                await deleteWishlistProduct({
+                    onSuccess: () => {
+                        setWishlistProducts([]);
+                        refetch();
+                        
+                    },
+                })
+              
+            }catch(error){
+                console.error('Error in handleClearWishlist:', error);
+            }
         }
     };
 
@@ -279,7 +162,6 @@ const WishlistCenter = () => {
         for (const product of inStockProducts) {
             await handleAddToCart(product);
         }
-        console.log(`Added ${inStockProducts?.length} items to cart`);
     };
 
     const filteredProducts = getFilteredAndSortedProducts();
@@ -322,7 +204,7 @@ const WishlistCenter = () => {
                                 </div>
                                 <div className="text-center p-6 bg-white/50 backdrop-blur-sm rounded-xl border border-border">
                                     <div className="text-2xl font-bold text-warning mb-1">
-                                        ${wishlistProducts?.reduce((sum, p) => sum + (p?.salePrice || p?.price), 0)?.toFixed(2)}
+                                        ${wishlistProducts?.reduce((sum, p) => sum + Number(p?.product?.price), 0)?.toFixed(2)}
                                     </div>
                                     <div className="text-sm text-muted-foreground">Total Value</div>
                                 </div>
@@ -444,7 +326,8 @@ const WishlistCenter = () => {
                                         {filteredProducts?.map((product) =>
                                             <ProductListItem
                                                 key={product?.id}
-                                                product={product}
+                                                productId={product?.id} 
+                                                product={product.product}
                                                 onRemoveFromWishlist={handleRemoveFromWishlist}
                                                 onAddToCart={handleAddToCart}
                                                 onShareProduct={handleShareProduct} />

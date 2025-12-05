@@ -3,11 +3,12 @@ import { Button } from '@/shadcn/ui/button';
 import { ProductDetail } from '@/types/Product';
 import { useState } from 'react';
 
-const ProductInfo = ({ product, onAddToCart }: { product: ProductDetail; onAddToCart: any }) => {
+const ProductInfo = ({ product, onAddToCart, onAddToWishlist }: { product: ProductDetail; onAddToCart: any; onAddToWishlist: any }) => {
     const [selectedVariant, setSelectedVariant] = useState(product?.variants?.[0] || null);
     const [quantity, setQuantity] = useState(1);
-    console.log(product)
     const hasvariant = product?.has_variant;
+
+    
 
     const handleVariantChange = (variant) => {
         setSelectedVariant(variant);
@@ -25,6 +26,9 @@ const ProductInfo = ({ product, onAddToCart }: { product: ProductDetail; onAddTo
             variant: selectedVariant,
             quantity,
         });
+    };
+    const handleAddToWishlist = () => {
+        onAddToWishlist(product);
     };
 
     const renderStars = (rating) => {
@@ -140,7 +144,7 @@ const ProductInfo = ({ product, onAddToCart }: { product: ProductDetail; onAddTo
                 </Button>
 
                 <div className="flex space-x-3">
-                    <Button variant="outline" size="lg" fullWidth iconName="Heart" iconPosition="left">
+                    <Button variant="outline" size="lg" fullWidth iconName="Heart" iconPosition="left"  onClick={handleAddToWishlist}>
                         Add to Wishlist
                     </Button>
                     <Button variant="outline" size="lg" fullWidth iconName="Share2" iconPosition="left">

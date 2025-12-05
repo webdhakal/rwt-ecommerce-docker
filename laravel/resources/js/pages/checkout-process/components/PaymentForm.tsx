@@ -27,7 +27,7 @@ const PaymentForm = ({ onNext, onBack, paymentData, setPaymentData }) => {
 
   const paymentMethods = [
     {
-      id: 'card',
+      id: 'credit',
       name: 'Credit/Debit Card',
       icon: 'CreditCard',
       description: 'Visa, Mastercard, American Express'
@@ -283,13 +283,14 @@ const PaymentForm = ({ onNext, onBack, paymentData, setPaymentData }) => {
         </div>
 
         {/* Billing Address */}
-        <div className="bg-card border border-border rounded-lg p-6">
+        {/* <div className="bg-card border border-border rounded-lg p-6">
+          
           <Checkbox
             label="Billing address same as shipping address"
             checked={paymentData?.sameAsShipping || false}
             onChange={(e) => handleInputChange('sameAsShipping', e?.target?.checked)}
           />
-        </div>
+        </div> */}
 
         {/* Navigation Buttons */}
         <div className="flex justify-between pt-6">

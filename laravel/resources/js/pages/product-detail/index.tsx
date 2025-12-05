@@ -11,6 +11,7 @@ import RelatedProducts from './components/RelatedProducts';
 import SocialShare from './components/SocialShare';
 import VendorInfoPanel from './components/VendorInfoPanel';
 import { useStoreCart } from '@/api/hooks/useShoppingCart';
+import { storeWishlistData } from '@/api/hooks/useWishlist';
 
 export function slugParser(url: string) {
     return url.split('/')[url.split('/').length - 1];
@@ -70,10 +71,8 @@ const ProductDetailPage = () => {
     const slug = slugParser(url);
 
     const { data } = useProductDetail(slug);
-    console.log(data)
     // Map API payload → UI product
     const product = data?.payload ? mapProductDetailToUI(data.payload as ProductDetail) : null; // send data in payload.data
-
 
         // Mock related products (keep as is)
     const relatedProducts = [
@@ -155,6 +154,7 @@ const ProductDetailPage = () => {
     }, []);
 
     const {mutate:addtoCart} = useStoreCart()
+    const {mutate:onAddToWishlist} = storeWishlistData()
 
     const handleAddToCart = (cartItem) => {
         console.log('Adding to cart:', cartItem);
@@ -165,6 +165,11 @@ const ProductDetailPage = () => {
         })
         setAddToCartSuccess(true);
         setTimeout(() => setAddToCartSuccess(false), 3000);
+    };
+
+    const handleAddToWishlist = (product) => {
+        console.log('Adding to wishlist:', product);
+        onAddToWishlist({product:product.id})
     };
 
     if (!product) return <div>Loading...</div>;
@@ -183,7 +188,7 @@ const ProductDetailPage = () => {
 
                     {/* Product Information */}
                     <div className="space-y-6">
-                        <ProductInfo product={product} onAddToCart={handleAddToCart} />
+                        <ProductInfo product={product} onAddToCart={handleAddToCart} onAddToWishlist={handleAddToWishlist} />
                         <div className="hidden lg:block">
                             <SocialShare product={product} />
                         </div>

@@ -15,6 +15,8 @@ import ProductHighlight from '@/components/Homepage/ProductHighlight';
 import { useShoppingCart } from '@/api/hooks/useShoppingCart';
 import { useProducts } from '@/api/hooks/useProducts';
 import { Product } from '@/types/Product';
+import SlidingCarasoul from './components/SlidingCarasoul';
+
 
 const Homepage = () => {
 
@@ -189,19 +191,7 @@ const Homepage = () => {
     window.scrollTo(0, 0);
   }, []);
   
-  const { data } = useShoppingCart();
-  const [guestId, setGuestId] = useState<string | null>(null);
-
-  useEffect(() => {
-    const guestLocal = localStorage.getItem('guest_id');
-    if (guestLocal) {
-      setGuestId(guestLocal);
-    } else if (data?.payload?.id) {
-      const newGuestId = data.payload.id;
-      localStorage.setItem('guest_id', newGuestId);
-      setGuestId(newGuestId);
-    }
-  }, [data]);
+  
   
 
   return (
@@ -235,7 +225,8 @@ const Homepage = () => {
           />
         </div>
       </section>
-
+      
+      
       <ProductHighlight />
 
       <section className="px-4 sm:px-6 lg:px-8">
@@ -269,6 +260,13 @@ const Homepage = () => {
       </section>
 
       <NewsletterSignup />
+
+      <SlidingCarasoul 
+        speed={20} // Adjust speed (pixels per second)
+        direction="left" // or "right"
+        className="my-8"
+      />
+      
     </GuestLayout >
   );
 };

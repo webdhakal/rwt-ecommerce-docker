@@ -7,11 +7,18 @@ import OrderSummary from './components/OrderSummary';
 import OrderConfirmation from './components/OrderConfirmation';
 import Icon from '@/components/AppIcon';
 import GuestLayout from '@/layouts/guest-layout';
+import { useShoppingCart } from '@/api/hooks/useShoppingCart';
+import { useShippingCharge } from '@/api/hooks/useShippingCharge';
 
 const CheckoutProcess = () => {
   // const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
   const [isOrderComplete, setIsOrderComplete] = useState(false);
+  const guestCartId= localStorage.getItem('guest_id');
+  const { data: cartData } = useShoppingCart({ cartId: guestCartId || undefined });
+ 
+  
+  const [total, setTotal] = useState(0);
 
   const [shippingData, setShippingData] = useState({
     firstName: '',
@@ -25,6 +32,8 @@ const CheckoutProcess = () => {
     country: '',
     shippingMethod: ''
   });
+
+const {data: shippingCharge} = useShippingCharge(shippingData.state ? shippingData.state : undefined);
 
   const [paymentData, setPaymentData] = useState({
     paymentMethod: '',
@@ -92,6 +101,9 @@ const CheckoutProcess = () => {
     setIsOrderComplete(true);
   };
 
+
+
+
   // const handleBackToShopping = () => {
   //   navigate('/homepage');
   // };
@@ -102,7 +114,6 @@ const CheckoutProcess = () => {
   }
 
   const CurrentStepComponent = steps?.[currentStep]?.component;
-
   return (
     <GuestLayout>
       <div className="min-h-screen bg-surface">
@@ -139,7 +150,7 @@ const CheckoutProcess = () => {
                       onPlaceOrder={handlePlaceOrder}
                       shippingData={shippingData}
                       paymentData={paymentData}
-                      orderData={orderData}
+                      cartItems={cartData?.payload?.items}
                     />
                   )}
                 </div>
@@ -150,6 +161,7 @@ const CheckoutProcess = () => {
                 <OrderSummary
                   shippingData={shippingData}
                   paymentData={paymentData}
+                  cartData={cartData}
                 />
               </div>
             </div>

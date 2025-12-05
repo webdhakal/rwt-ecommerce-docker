@@ -5,7 +5,6 @@ import Icon from '@/components/AppIcon';
 const ProductImageGallery = ({ images, productName }) => {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isZoomed, setIsZoomed] = useState(false);
-
   const handleThumbnailClick = (index) => {
     setSelectedImageIndex(index);
     setIsZoomed(false);

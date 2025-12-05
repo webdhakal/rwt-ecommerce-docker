@@ -50,7 +50,9 @@ const OrderSummary = ({
   };
 
   const handleCheckout = () => {
-    // navigate('/checkout-process');
+    // Placeholder for checkout logic
+    console.log('Checkout initiated');  
+    window.location.href = '/checkout-process';
   };
 
   return (

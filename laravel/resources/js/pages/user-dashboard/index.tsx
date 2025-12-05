@@ -16,6 +16,7 @@ import { Separator } from '@/shadcn/ui/separator';
 import { Alert, AlertDescription } from '@/shadcn/ui/alert';
 import GuestLayout from '@/layouts/guest-layout';
 import { Head } from '@inertiajs/react';
+import { getWishlistData } from '@/api/hooks/useWishlist';
 
 const DEFAULT_TAB = 'profile';
 
@@ -51,10 +52,11 @@ export default function UserDashboard() {
         );
     }, [activeTab]);
 
-    const wishlistItems = [
-        { id: 1, name: "Monster Truck Toy Cars Push Cars For Toddlers", price: 133, originalPrice: 240, discount: 45, store: "Deal Den", inStock: true },
-        { id: 2, name: "Wireless Bluetooth Earbuds with Noise Cancellation", price: 899, originalPrice: 1999, discount: 55, store: "TechHub", inStock: true },
-    ];
+    //getting wishlist data
+    const {data:wishlistData} = getWishlistData();
+    const wishlistItems = wishlistData?.payload?.items;
+
+    //storign wishlist data in state
 
     const orders = [
         { id: "ORD001", date: "Nov 15, 2025", status: "Delivered", total: 899, items: 2 },
@@ -154,7 +156,7 @@ export default function UserDashboard() {
                                         {activeTab === 'wishlist' && (
                                             <Tabs defaultValue="wishlist-items" className="w-full">
                                                 <TabsList className="grid w-full grid-cols-3 mb-8">
-                                                    <TabsTrigger value="wishlist-items">Wishlist ({wishlistItems.length})</TabsTrigger>
+                                                    <TabsTrigger value="wishlist-items">Wishlist ({wishlistItems?.length})</TabsTrigger>
                                                     <TabsTrigger value="purchases">Past Purchases</TabsTrigger>
                                                     <TabsTrigger value="stores">Followed Stores ({followedStores.length})</TabsTrigger>
                                                 </TabsList>
@@ -164,27 +166,27 @@ export default function UserDashboard() {
                                                         <h3 className="text-lg font-semibold">Your Wishlist</h3>
                                                         <Button className="bg-primary hover:bg-primary/90">Add All to Cart</Button>
                                                     </div>
-                                                    {wishlistItems.map((item) => (
+                                                    {wishlistItems?.map((item) => (
                                                         <div key={item.id} className="bg-card border rounded-xl p-6 hover:shadow-lg transition-shadow">
                                                             <div className="flex items-start gap-6">
                                                                 <div className="bg-muted border-2 border-dashed rounded-xl w-24 h-24 flex-shrink-0" />
                                                                 <div className="flex-1">
                                                                     <div className="flex items-start justify-between">
                                                                         <div>
-                                                                            <h4 className="font-medium text-foreground line-clamp-2">{item.name}</h4>
+                                                                            <h4 className="font-medium text-foreground line-clamp-2">{item.product.name}</h4>
                                                                             <p className="text-sm text-muted-foreground mt-1">{item.store}</p>
                                                                         </div>
-                                                                        <Button variant="ghost" size="icon"><Trash2 className="h-5 w-5 text-muted-foreground" /></Button>
+                                                                        <Button variant="ghost" size="icon" onClick={()=>deleteaWishlistItem(item.id)}><Trash2 className="h-5 w-5 text-muted-foreground" /></Button>
                                                                     </div>
                                                                     <div className="mt-4 flex items-center gap-4">
                                                                         <div>
                                                                             <div className="flex items-baseline gap-2">
-                                                                                <span className="text-2xl font-bold text-primary">Rs. {item.price}</span>
-                                                                                <span className="text-lg text-muted-foreground line-through">Rs. {item.originalPrice}</span>
+                                                                                <span className="text-2xl font-bold text-primary">Rs. {item.product.price}</span>
+                                                                                <span className="text-lg text-muted-foreground line-through">Rs. {item.product.originalPrice}</span>
                                                                             </div>
                                                                             <div className="flex items-center gap-2 mt-2">
                                                                                 <Badge variant="secondary" className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400">
-                                                                                    <TrendingDown className="h-3 w-3 mr-1" /> -{item.discount}%
+                                                                                    <TrendingDown className="h-3 w-3 mr-1" /> -{item.product.discount}%
                                                                                 </Badge>
                                                                                 <span className="text-sm font-medium text-green-600 dark:text-green-400">Price dropped</span>
                                                                             </div>

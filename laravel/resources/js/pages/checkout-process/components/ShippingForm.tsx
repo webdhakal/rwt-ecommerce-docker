@@ -1,26 +1,41 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Icon from '@/components/AppIcon';
 import { Input } from '@/shadcn/ui/input';
 import Select from '@/components/Select';
 import Button from '@/components/Button';
-
+import { useGetLocation } from '@/api/hooks/useCountry';
 const ShippingForm = ({ onNext, shippingData, setShippingData }) => {
   const [errors, setErrors] = useState({});
+  const [stateid, setStateid] = useState();
+  const { data, isLoading, error, refetch } = useGetLocation({state:stateid});
+  
 
-  const countryOptions = [
-    { value: 'us', label: 'United States' },
-    { value: 'ca', label: 'Canada' },
-    { value: 'uk', label: 'United Kingdom' },
-    { value: 'au', label: 'Australia' }
-  ];
+const countryOptions = data?.payload?.country 
+  ? [{
+      value: data.payload.country.id,
+      label: data.payload.country.name,
+    }]
+  : [];
 
-  const stateOptions = [
-    { value: 'ca', label: 'California' },
-    { value: 'ny', label: 'New York' },
-    { value: 'tx', label: 'Texas' },
-    { value: 'fl', label: 'Florida' }
-  ];
 
+const stateOptions = data?.payload?.states?.map((item) => ({
+  value: item?.id,
+  label: item?.name,
+})) || []; 
+
+
+useEffect(() => {
+  if (shippingData?.state) {
+    setStateid(shippingData?.state);
+    refetch();
+  }
+}, [shippingData?.state]);
+
+const cityOptions=data?.payload?.cities?.map((item)=>({
+  value: item?.id,
+  label: item?.name
+})) || [];
+  
   const shippingMethods = [
     {
       id: 'standard',
@@ -80,9 +95,10 @@ const ShippingForm = ({ onNext, shippingData, setShippingData }) => {
 
   const handleSubmit = (e) => {
     e?.preventDefault();
-    if (validateForm()) {
-      onNext();
-    }
+    // if (validateForm()) {
+    //   onNext();
+    // }
+    onNext();
   };
 
   return (
@@ -156,20 +172,18 @@ const ShippingForm = ({ onNext, shippingData, setShippingData }) => {
               error={errors?.address}
               required
             />
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Input
-                label="City"
-                type="text"
-                placeholder="Enter city"
-                value={shippingData?.city || ''}
-                onChange={(e) => handleInputChange('city', e?.target?.value)}
-                error={errors?.city}
+                          <Select
+                label="Country"
+                placeholder="Select country"
+                options={countryOptions}
+                value={shippingData?.country || ''}
+                onChange={(value) => handleInputChange('country', value)}
+                error={errors?.country}
                 required
               />
 
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Select
-                label="State/Province"
                 placeholder="Select state"
                 options={stateOptions}
                 value={shippingData?.state || ''}
@@ -177,9 +191,18 @@ const ShippingForm = ({ onNext, shippingData, setShippingData }) => {
                 error={errors?.state}
                 required
               />
+              <Select
+                placeholder="Select city"
+                options={cityOptions}
+                value={shippingData?.city || ''}
+                onChange={(value) => handleInputChange('city', value)}
+                error={errors?.city}
+                required
+              />
+
 
               <Input
-                label="ZIP/Postal Code"
+
                 type="text"
                 placeholder="Enter ZIP code"
                 value={shippingData?.zipCode || ''}
@@ -189,15 +212,7 @@ const ShippingForm = ({ onNext, shippingData, setShippingData }) => {
               />
             </div>
 
-            <Select
-              label="Country"
-              placeholder="Select country"
-              options={countryOptions}
-              value={shippingData?.country || ''}
-              onChange={(value) => handleInputChange('country', value)}
-              error={errors?.country}
-              required
-            />
+
           </div>
         </div>
 
@@ -252,6 +267,10 @@ const ShippingForm = ({ onNext, shippingData, setShippingData }) => {
             iconName="ArrowRight"
             iconPosition="right"
             className="min-w-[200px]"
+            onClick={(e) => {
+              e.preventDefault();
+              handleSubmit(e);
+            }}
           >
             Continue to Payment
           </Button>

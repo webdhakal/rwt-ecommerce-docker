@@ -3,24 +3,21 @@ import Icon from '../../../components/AppIcon';
 import Button from '@/components/Button';
 import { Link } from '@inertiajs/react';
 
-const ProductListItem = ({ product, onRemoveFromWishlist, onAddToCart, onShareProduct }) => {
+const ProductListItem = ({ productId, product, onRemoveFromWishlist, onAddToCart, onShareProduct }) => {
     const [isLoading, setIsLoading] = useState(false);
-
     const handleAddToCart = async () => {
         setIsLoading(true);
         try {
-            await onAddToCart?.(product);
+            await onAddToCart(product, productId);
         } catch (error) {
             console.error('Error adding to cart:', error);
         } finally {
             setIsLoading(false);
         }
     };
-
-    const handleRemoveFromWishlist = () => {
-        onRemoveFromWishlist?.(product?.id);
+   const handleRemoveFromWishlist = async () => {
+    onRemoveFromWishlist?.(productId);
     };
-
     const handleShare = () => {
         onShareProduct?.(product);
     };
@@ -47,8 +44,8 @@ const ProductListItem = ({ product, onRemoveFromWishlist, onAddToCart, onSharePr
                     <Link href={`/product/${product?.id}`}>
                         <div className="w-full sm:w-32 h-48 sm:h-32 rounded-lg overflow-hidden bg-muted group-hover:shadow-md transition-shadow duration-300">
                             <img
-                                src={product?.image}
-                                alt={product?.imageAlt}
+                                src={product?.file?.[0] ?.url || '/placeholder-image.jpg'}
+                                alt={product?.imageAlt || 'Product image'}
                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                 loading="lazy"
                             />
@@ -75,7 +72,7 @@ const ProductListItem = ({ product, onRemoveFromWishlist, onAddToCart, onSharePr
                     </div>
 
                     {/* Stock Status */}
-                    {!product?.inStock && (
+                    {product?.stock_status !== "in_stock" && (
                         <div className="absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center">
                             <span className="bg-error text-white text-sm px-3 py-1 rounded-md font-medium">
                                 Out of Stock
@@ -146,7 +143,7 @@ const ProductListItem = ({ product, onRemoveFromWishlist, onAddToCart, onSharePr
                             </div>
 
                             {/* Size/Color Options */}
-                            {(product?.availableSizes?.length > 0 || product?.availableColors?.length > 0) && (
+                            {(product?.availableSizes?.length > 0 || product?.colors?.length > 0) && (
                                 <div className="flex flex-wrap gap-3 mb-3">
                                     {product?.availableSizes?.length > 0 && (
                                         <div className="flex items-center space-x-2">
@@ -164,15 +161,16 @@ const ProductListItem = ({ product, onRemoveFromWishlist, onAddToCart, onSharePr
                                         </div>
                                     )}
 
-                                    {product?.availableColors?.length > 0 && (
+                                    {product?.colors?.length > 0 && (
+                                        
                                         <div className="flex items-center space-x-2">
                                             <span className="text-xs text-muted-foreground">Colors:</span>
                                             <div className="flex gap-1">
-                                                {product?.availableColors?.slice(0, 4)?.map((color, index) => (
+                                                {product?.colors?.slice(0, 4)?.map((color, index) => (
                                                     <div
                                                         key={index}
                                                         className="w-4 h-4 rounded-full border border-border"
-                                                        style={{ backgroundColor: color?.hex }}
+                                                        style={{ backgroundColor: color }}
                                                         title={color?.name}
                                                     />
                                                 ))}
@@ -218,15 +216,15 @@ const ProductListItem = ({ product, onRemoveFromWishlist, onAddToCart, onSharePr
                                 </button>
 
                                 <Button
-                                    variant={product?.inStock ? "default" : "secondary"}
+                                    variant={product?.stock_status === 'in_stock' ? "default" : "secondary"}
                                     size="sm"
                                     onClick={handleAddToCart}
-                                    disabled={!product?.inStock || isLoading}
+                                    disabled={product?.stock_status !== 'in_stock' || isLoading}
                                     iconName={isLoading ? "Loader2" : "ShoppingCart"}
                                     iconPosition="left"
                                     className={isLoading ? "animate-spin" : ""}
                                 >
-                                    {!product?.inStock ? 'Out of Stock' : isLoading ? 'Adding...' : 'Add to Cart'}
+                                    {product?.stock_status !== 'in_stock' ? 'Out of Stock' : isLoading ? 'Adding...' : 'Add to Cart'}
                                 </Button>
                             </div>
                         </div>
