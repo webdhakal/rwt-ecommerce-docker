@@ -20,12 +20,8 @@ const CategoryGrid = () => {
             </div>
             <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6 lg:gap-6">
                 {categoriesData?.map((category: Category) => (
-                    <Link
-                        key={category?.id}
-                        href={`/product-listing?category=${encodeURIComponent(category?.name)}`}
-                        className="group block"
-                    >
-                        <div className="bg-surface relative overflow-hidden rounded-lg border border-border transition-all duration-300 group-hover:scale-105 hover:shadow-lg h-64">
+                    <Link key={category?.id} href={`/product-listing?category=${encodeURIComponent(category?.name)}`} className="group block">
+                        <div className="bg-surface relative h-64 overflow-hidden rounded-lg border border-border transition-all duration-300 group-hover:scale-105 hover:shadow-lg">
                             {/* Category Image */}
                             <div className="relative h-32 overflow-hidden sm:h-40 lg:h-32">
                                 <img

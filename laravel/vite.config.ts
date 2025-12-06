@@ -17,13 +17,13 @@ export default defineConfig({
     //   cssCodeSplit: true,
     // },
     server: {
-        host: "0.0.0.0",  // Required for Docker
-        port: 5173,       // INTERNAL container port
+        host: '0.0.0.0', // Required for Docker
+        port: 5173, // INTERNAL container port
         strictPort: true,
         hmr: {
-            host: "localhost", // Use 'localhost' for the host (where the browser connects)
-            port: 5173,        // Internal port
-            clientPort: 5200,  // Tell the client to connect to the HOST's port 5200
+            host: 'localhost', // Use 'localhost' for the host (where the browser connects)
+            port: 5173, // Internal port
+            clientPort: 5200, // Tell the client to connect to the HOST's port 5200
         },
     },
     plugins: [
@@ -34,6 +34,6 @@ export default defineConfig({
             refresh: true,
         }),
         react(),
-        tailwindcss()
-    ]
+        tailwindcss(),
+    ],
 });

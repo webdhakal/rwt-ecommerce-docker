@@ -2,21 +2,21 @@
 
 'use client';
 
-import { useState } from 'react';
 import GuestLayout from '@/layouts/guest-layout';
-import { Head } from '@inertiajs/react';
 import { toast } from '@/shadcn/hooks/use-toast';
+import { Head } from '@inertiajs/react';
+import { useState } from 'react';
 
 // Hooks
 import { useForgotPassword } from '@/api/hooks/useAuth';
 
 // ShadCN UI Components
+import { Alert, AlertDescription, AlertTitle } from '@/shadcn/ui/alert';
 import { Button } from '@/shadcn/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shadcn/ui/card';
 import { Input } from '@/shadcn/ui/input';
 import { Label } from '@/shadcn/ui/label';
-import { Alert, AlertDescription, AlertTitle } from '@/shadcn/ui/alert';
-import { Mail, Loader2, CheckCircle } from 'lucide-react';
+import { CheckCircle, Loader2, Mail } from 'lucide-react';
 
 export default function ForgotPassword() {
     const [email, setEmail] = useState('');
@@ -26,7 +26,7 @@ export default function ForgotPassword() {
         onSuccess: (data) => {
             toast({
                 title: data.message || 'Success',
-                description: 'Please check your email for the OTP code.'
+                description: 'Please check your email for the OTP code.',
             });
             window.location.href = route('reset-password');
         },
@@ -34,9 +34,9 @@ export default function ForgotPassword() {
             toast({
                 title: 'Failed to send OTP',
                 description: error.response?.data?.message || error.message,
-                variant: 'destructive'
+                variant: 'destructive',
             });
-        }
+        },
     });
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -45,7 +45,7 @@ export default function ForgotPassword() {
             toast({
                 title: 'Error',
                 description: 'Email is required',
-                variant: 'destructive'
+                variant: 'destructive',
             });
             return;
         }
@@ -57,14 +57,12 @@ export default function ForgotPassword() {
         <GuestLayout>
             <Head title="Forgot Password" />
 
-            <div className="max-w-md w-full mx-auto p-4 sm:p-6 lg:p-8">
+            <div className="mx-auto w-full max-w-md p-4 sm:p-6 lg:p-8">
                 <Card className="shadow-2xl">
                     <CardHeader className="space-y-1 text-center">
-                        <Mail className="h-10 w-10 text-primary mx-auto mb-2" />
+                        <Mail className="mx-auto mb-2 h-10 w-10 text-primary" />
                         <CardTitle className="text-2xl">Forgot Your Password?</CardTitle>
-                        <CardDescription>
-                            Enter your email address below to receive a password reset link.
-                        </CardDescription>
+                        <CardDescription>Enter your email address below to receive a password reset link.</CardDescription>
                     </CardHeader>
 
                     <CardContent>
@@ -72,12 +70,10 @@ export default function ForgotPassword() {
                             Status Message (Success) 
                         -------------------- */}
                         {success ? (
-                            <Alert className="border-green-400 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400">
+                            <Alert className="border-green-400 bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400">
                                 <CheckCircle className="h-4 w-4" />
                                 <AlertTitle>Success!</AlertTitle>
-                                <AlertDescription>
-                                    Password reset link has been sent to your email. Please check your inbox.
-                                </AlertDescription>
+                                <AlertDescription>Password reset link has been sent to your email. Please check your inbox.</AlertDescription>
                             </Alert>
                         ) : (
                             <div className="space-y-6">
@@ -103,13 +99,9 @@ export default function ForgotPassword() {
                             </div>
                         )}
 
-                        <form onSubmit={handleSubmit} className="space-y-6 mt-2">
+                        <form onSubmit={handleSubmit} className="mt-2 space-y-6">
                             {!success && (
-                                <Button
-                                    type="submit"
-                                    className="w-full"
-                                    disabled={forgotPasswordMutation.isPending}
-                                >
+                                <Button type="submit" className="w-full" disabled={forgotPasswordMutation.isPending}>
                                     {forgotPasswordMutation.isPending ? (
                                         <>
                                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />

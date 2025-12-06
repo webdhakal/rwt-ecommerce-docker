@@ -1,164 +1,153 @@
-import '../../../css/tiptap.css'
-import { FormEvent, useState } from 'react'
-import TipTapToolbar from './TipTapToolbar'
-import { EditorContent, useEditor } from '@tiptap/react'
-import Heading from '@tiptap/extension-heading'
-import StarterKit from '@tiptap/starter-kit'
-import Underline from '@tiptap/extension-underline'
-import Image from '@tiptap/extension-image'
-import ListItem from '@tiptap/extension-list-item'
-import OrderedList from '@tiptap/extension-ordered-list'
-import BulletList from '@tiptap/extension-bullet-list'
-import Table from '@tiptap/extension-table'
-import TableCell from '@tiptap/extension-table-cell'
-import TableHeader from '@tiptap/extension-table-header'
-import TableRow from '@tiptap/extension-table-row'
-import HardBreak from '@tiptap/extension-hard-break'
-import Link from '@tiptap/extension-link'
-import Superscript from '@tiptap/extension-superscript'
-import Subscript from '@tiptap/extension-subscript'
-import CharacterCount from '@tiptap/extension-character-count'
-import { Card, CardContent } from '@/shadcn/ui/card'
-import { Separator } from '@/shadcn/ui/separator'
-import { Column, Columns } from './extensions/Columns'
-import { Button } from '@/shadcn/ui/button'
-import { Label } from '@/shadcn/ui/label'
+import { Card, CardContent } from '@/shadcn/ui/card';
+import { Separator } from '@/shadcn/ui/separator';
+import BulletList from '@tiptap/extension-bullet-list';
+import CharacterCount from '@tiptap/extension-character-count';
+import HardBreak from '@tiptap/extension-hard-break';
+import Heading from '@tiptap/extension-heading';
+import Image from '@tiptap/extension-image';
+import Link from '@tiptap/extension-link';
+import ListItem from '@tiptap/extension-list-item';
+import OrderedList from '@tiptap/extension-ordered-list';
+import Subscript from '@tiptap/extension-subscript';
+import Superscript from '@tiptap/extension-superscript';
+import Table from '@tiptap/extension-table';
+import TableCell from '@tiptap/extension-table-cell';
+import TableHeader from '@tiptap/extension-table-header';
+import TableRow from '@tiptap/extension-table-row';
+import Underline from '@tiptap/extension-underline';
+import { EditorContent, useEditor } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import { FormEvent, useState } from 'react';
+import '../../../css/tiptap.css';
+import { Column, Columns } from './extensions/Columns';
+import TipTapToolbar from './TipTapToolbar';
 
 const TipTap = () => {
-  const [content, setContent] = useState<string>('<p><strong>sauravp</strong> is bold.</p>')
-  const [customHtml, setCustomHtml] = useState<string>('')
-  const [customCss, setCustomCss] = useState<string>('')
-  const [htmlView, setHtmlView] = useState<boolean>(false)
+    const [content, setContent] = useState<string>('<p><strong>sauravp</strong> is bold.</p>');
+    const [customHtml, setCustomHtml] = useState<string>('');
+    const [customCss, setCustomCss] = useState<string>('');
+    const [htmlView, setHtmlView] = useState<boolean>(false);
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault()
-    console.log({
-      editorContent: content,
-      customHtml: customHtml.split('\n').join(''),
-      customCss: customCss.split('\n').join(''),
-    })
-  }
+    const handleSubmit = (e: FormEvent) => {
+        e.preventDefault();
+        console.log({
+            editorContent: content,
+            customHtml: customHtml.split('\n').join(''),
+            customCss: customCss.split('\n').join(''),
+        });
+    };
 
-  const editor = useEditor({
-    extensions: [
-      Heading.configure({ levels: [1, 2, 3, 4, 5, 6] }),
-      StarterKit.configure({ heading: false }),
-      Underline,
-      Image.configure({ inline: true, allowBase64: true }),
-      Table.configure({ resizable: true }),
-      TableRow,
-      TableHeader,
-      TableCell,
-      BulletList.configure({
-        itemTypeName: 'listItem',
-        HTMLAttributes: { class: 'list-disc' },
-        keepMarks: true,
-        keepAttributes: true,
-      }),
-      OrderedList.configure({
-        itemTypeName: 'listItem',
-        HTMLAttributes: { class: 'list-decimal' },
-        keepMarks: true,
-        keepAttributes: true,
-      }),
-      ListItem,
-      HardBreak,
-      Link.configure({
-        openOnClick: false,
-        autolink: true,
-        defaultProtocol: 'https',
-        protocols: ['http', 'https'],
-        isAllowedUri: (url, ctx) => {
-          try {
-            const parsedUrl = url.includes(':')
-              ? new URL(url)
-              : new URL(`${ctx.defaultProtocol}://${url}`)
-            if (!ctx.defaultValidate(parsedUrl.href)) return false
-            const disallowedProtocols = ['ftp', 'file', 'mailto']
-            const protocol = parsedUrl.protocol.replace(':', '')
-            if (disallowedProtocols.includes(protocol)) return false
-            const allowedProtocols = ctx.protocols.map((p) =>
-              typeof p === 'string' ? p : p.scheme,
-            )
-            if (!allowedProtocols.includes(protocol)) return false
-            const disallowedDomains = ['example-phishing.com', 'malicious-site.net']
-            const domain = parsedUrl.hostname
-            if (disallowedDomains.includes(domain)) return false
-            return true
-          } catch {
-            return false
-          }
+    const editor = useEditor({
+        extensions: [
+            Heading.configure({ levels: [1, 2, 3, 4, 5, 6] }),
+            StarterKit.configure({ heading: false }),
+            Underline,
+            Image.configure({ inline: true, allowBase64: true }),
+            Table.configure({ resizable: true }),
+            TableRow,
+            TableHeader,
+            TableCell,
+            BulletList.configure({
+                itemTypeName: 'listItem',
+                HTMLAttributes: { class: 'list-disc' },
+                keepMarks: true,
+                keepAttributes: true,
+            }),
+            OrderedList.configure({
+                itemTypeName: 'listItem',
+                HTMLAttributes: { class: 'list-decimal' },
+                keepMarks: true,
+                keepAttributes: true,
+            }),
+            ListItem,
+            HardBreak,
+            Link.configure({
+                openOnClick: false,
+                autolink: true,
+                defaultProtocol: 'https',
+                protocols: ['http', 'https'],
+                isAllowedUri: (url, ctx) => {
+                    try {
+                        const parsedUrl = url.includes(':') ? new URL(url) : new URL(`${ctx.defaultProtocol}://${url}`);
+                        if (!ctx.defaultValidate(parsedUrl.href)) return false;
+                        const disallowedProtocols = ['ftp', 'file', 'mailto'];
+                        const protocol = parsedUrl.protocol.replace(':', '');
+                        if (disallowedProtocols.includes(protocol)) return false;
+                        const allowedProtocols = ctx.protocols.map((p) => (typeof p === 'string' ? p : p.scheme));
+                        if (!allowedProtocols.includes(protocol)) return false;
+                        const disallowedDomains = ['example-phishing.com', 'malicious-site.net'];
+                        const domain = parsedUrl.hostname;
+                        if (disallowedDomains.includes(domain)) return false;
+                        return true;
+                    } catch {
+                        return false;
+                    }
+                },
+                shouldAutoLink: (url) => {
+                    try {
+                        const parsedUrl = url.includes(':') ? new URL(url) : new URL(`https://${url}`);
+                        const disallowedDomains = ['example-no-autolink.com', 'another-no-autolink.com'];
+                        const domain = parsedUrl.hostname;
+                        return !disallowedDomains.includes(domain);
+                    } catch {
+                        return false;
+                    }
+                },
+            }),
+            Superscript,
+            Subscript,
+            CharacterCount.configure(),
+            Columns,
+            Column,
+        ],
+        content: content,
+        editorProps: {
+            attributes: {
+                class: 'flex flex-col px-4 py-3 border border-input border-gray-700 w-full gap-3 font-medium text-[16px] pt-4 outline-none',
+            },
         },
-        shouldAutoLink: (url) => {
-          try {
-            const parsedUrl = url.includes(':') ? new URL(url) : new URL(`https://${url}`)
-            const disallowedDomains = ['example-no-autolink.com', 'another-no-autolink.com']
-            const domain = parsedUrl.hostname
-            return !disallowedDomains.includes(domain)
-          } catch {
-            return false
-          }
+        onUpdate: ({ editor }) => {
+            setContent(editor.getHTML());
         },
-      }),
-      Superscript,
-      Subscript,
-      CharacterCount.configure(),
-      Columns,
-      Column,
-    ],
-    content: content,
-    editorProps: {
-      attributes: {
-        class:
-          'flex flex-col px-4 py-3 border border-input border-gray-700 w-full gap-3 font-medium text-[16px] pt-4 outline-none',
-      },
-    },
-    onUpdate: ({ editor }) => {
-      setContent(editor.getHTML())
-    },
-  })
+    });
 
-  return (
-    <form onSubmit={handleSubmit} className="grid pb-10">
-      <div className="w-full max-w-4xl">
-        <TipTapToolbar
-          editor={editor}
-          content={content}
-          setContent={setContent}
-          isHtmlView={htmlView}
-          toggleHtmlView={() => setHtmlView((prev) => !prev)}
-        />
-        {htmlView ? (
-          <textarea
-            value={editor ? editor.getHTML() : ''}
-            onChange={(e) => editor && editor.commands.setContent(e.target.value)}
-            className="w-full border border-gray-700 p-2"
-            style={{ whiteSpace: 'pre-line', minHeight: '150px' }}
-          />
-        ) : (
-          <EditorContent style={{ whiteSpace: 'pre-line' }} editor={editor} />
-        )}
-        {editor !== null && (
-          <Card className="mt-4 w-fit">
-            <CardContent className="flex items-center space-x-4 p-4">
-              <div className="flex items-center space-x-2">
-                <span className="text-sm font-medium">
-                  {editor.storage.characterCount.characters()} characters
-                </span>
-              </div>
-              <Separator orientation="vertical" className="h-6" />
-              <div className="flex items-center space-x-2">
-                <span className="text-sm font-medium">
-                  {editor.storage.characterCount.words()} words
-                </span>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+    return (
+        <form onSubmit={handleSubmit} className="grid pb-10">
+            <div className="w-full max-w-4xl">
+                <TipTapToolbar
+                    editor={editor}
+                    content={content}
+                    setContent={setContent}
+                    isHtmlView={htmlView}
+                    toggleHtmlView={() => setHtmlView((prev) => !prev)}
+                />
+                {htmlView ? (
+                    <textarea
+                        value={editor ? editor.getHTML() : ''}
+                        onChange={(e) => editor && editor.commands.setContent(e.target.value)}
+                        className="w-full border border-gray-700 p-2"
+                        style={{ whiteSpace: 'pre-line', minHeight: '150px' }}
+                    />
+                ) : (
+                    <EditorContent style={{ whiteSpace: 'pre-line' }} editor={editor} />
+                )}
+                {editor !== null && (
+                    <Card className="mt-4 w-fit">
+                        <CardContent className="flex items-center space-x-4 p-4">
+                            <div className="flex items-center space-x-2">
+                                <span className="text-sm font-medium">{editor.storage.characterCount.characters()} characters</span>
+                            </div>
+                            <Separator orientation="vertical" className="h-6" />
+                            <div className="flex items-center space-x-2">
+                                <span className="text-sm font-medium">{editor.storage.characterCount.words()} words</span>
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
 
-        {/* this might come in use later... */}
+                {/* this might come in use later... */}
 
-        {/* <h1 className="mt-6 ">Editor Content Preview:</h1>
+                {/* <h1 className="mt-6 ">Editor Content Preview:</h1>
         <Card className="mt-1">
           <CardContent>
             <div className="custom-preview p-4">
@@ -244,9 +233,9 @@ const TipTap = () => {
             Add
           </Button>
         </div> */}
-      </div>
-    </form>
-  )
-}
+            </div>
+        </form>
+    );
+};
 
-export default TipTap
+export default TipTap;

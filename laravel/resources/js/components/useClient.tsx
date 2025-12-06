@@ -1,18 +1,17 @@
-import React, { useState, useEffect, ComponentType } from 'react'
+import React, { ComponentType, useEffect, useState } from 'react';
 
 export const useClient = <P extends object>(WrappedComponent: ComponentType<P>): React.FC<P> => {
-  return (props: P) => {
-    const [isClient, setIsClient] = useState(false)
+    return (props: P) => {
+        const [isClient, setIsClient] = useState(false);
 
-    useEffect(() => {
-      setIsClient(true)
-    }, [])
+        useEffect(() => {
+            setIsClient(true);
+        }, []);
 
-    if (!isClient) {
-      return null;
-    }
-    
+        if (!isClient) {
+            return null;
+        }
 
-    return <WrappedComponent {...props} />
-  }
-}
+        return <WrappedComponent {...props} />;
+    };
+};

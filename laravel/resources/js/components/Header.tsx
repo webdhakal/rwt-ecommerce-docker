@@ -1,16 +1,16 @@
+import { useLogout } from '@/api/hooks/useAuth';
 import { useMenu } from '@/api/hooks/useMenu';
 import { randomImage } from '@/libs/Helper';
 import { Button } from '@/shadcn/ui/button';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandList } from '@/shadcn/ui/command';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/shadcn/ui/dropdown-menu';
+import { Command, CommandInput } from '@/shadcn/ui/command';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/shadcn/ui/dropdown-menu';
 import { Menu as CategoryMenu } from '@/types/Menu';
 import { Link, router } from '@inertiajs/react';
-import { ChevronDown, Heart, MapPin, Menu, MoveUpRight, Search, ShoppingCart, Store, User, X } from 'lucide-react';
+import { ChevronDown, Heart, MapPin, Menu, Search, ShoppingCart, Store, User, X } from 'lucide-react';
 import React, { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
-import NavigationSkeleton from './skeletons/NavigationSkeleton';
 import ToggleThemeButton from './Button/ToggleThemeButton';
 import SearchOverlay from './SearchOverlay';
-import { useLogout } from '@/api/hooks/useAuth';
+import NavigationSkeleton from './skeletons/NavigationSkeleton';
 
 // Use forwardRef so GuestLayout can measure the <header>
 const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...props }, ref) => {
@@ -36,7 +36,7 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
 
     // Handle keyboard shortcuts
 
-    const auth = (localStorage.getItem("authToken") !== null);
+    const auth = localStorage.getItem('authToken') !== null;
     const isUser = !!auth;
 
     const handleKeyDown = useCallback((e: KeyboardEvent) => {
@@ -75,7 +75,6 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
         { id: 2, name: 'Air Jordan 1', type: 'Product' },
         { id: 3, name: 'Samsung Galaxy Watch', type: 'Product' },
     ];
-
 
     // Close search when clicking outside
     const handleClickOutside = useCallback((e: MouseEvent) => {
@@ -146,21 +145,10 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
         return () => window.removeEventListener('scroll', controlNavbar);
     }, [lastScrollY]);
 
-    const logoutMutation = useLogout({
-        onSuccess: (response) => {
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('auth');
-        },
-        onError: (err: any) => {
-            toast({
-                title: 'Logout Failed',
-                description: err.response?.data?.message || err.message,
-            });
-        },
-    });
+    const logoutMutation = useLogout();
 
-
-    const handleLogout = async (e) => {
+    const handleLogout = async (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
         logoutMutation.mutate();
     };
 
@@ -177,27 +165,23 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
         <header
             ref={ref}
             {...props}
-            className={`fixed top-0 right-0 left-0 z-50 transition-all duration-700 ease-out ${isVisible ? 'translate-y-0' : '-translate-y-full'
-                } ${isScrolled ? 'bg-background/95 backdrop-blur-sm shadow-lg' : 'bg-background'
-                }`}
+            className={`fixed top-0 right-0 left-0 z-50 w-full transition-all duration-700 ease-out ${isVisible ? 'translate-y-0' : '-translate-y-full'
+                } ${isScrolled ? 'bg-background/95 shadow-lg backdrop-blur-sm' : 'bg-background'}`}
         >
             {/* Top Bar */}
-            <div className={`hidden border-b border-border md:block transition-all duration-700 ease-out ${isAtTop ? 'max-h-20 opacity-100' : 'max-h-0 opacity-0 overflow-hidden'
-                }`}>
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div
+                className={`hidden border-b border-border transition-all duration-700 ease-out md:block ${isAtTop ? 'max-h-20 opacity-100' : 'max-h-0 overflow-hidden opacity-0'
+                    }`}
+            >
+                <div className="w-full px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between py-2 text-sm">
                         <div className="flex items-center space-x-4">
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-9 w-9 rounded-full"
-                                onClick={() => setIsSearchOpen(true)}
-                            >
-                                <Search className="h-4 w-4" />
-                                <kbd className="pointer-events-none absolute right-1.5 top-1.5 hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100 sm:flex">
+                            {/* <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full" onClick={() => setIsSearchOpen(true)}>
+                                <Search className="h-4 w-4 " />
+                                <kbd className="pointer-events-none absolute top-1.5 right-1.5 hidden h-5 items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100 select-none sm:flex">
                                     <span className="text-xs">⌘</span>K
                                 </kbd>
-                            </Button>
+                            </Button> */}
                             <div className="flex items-center text-muted-foreground">
                                 <MapPin className="mr-1 h-3 w-3" />
                                 <span className="hidden sm:inline">Free shipping on orders over $50</span>
@@ -214,7 +198,7 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
 
             {/* Main Header */}
             <div className="border-b border-border">
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between py-4">
                         {/* Logo */}
                         <Link href="/" as="div" className="flex cursor-pointer items-center">
@@ -223,9 +207,7 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
                                     <Store className="h-6 w-6 text-primary-foreground" />
                                 </div>
                                 <div className="hidden sm:block">
-                                    <h1 className="bg-gradient-to-r from-primary to-accent bg-clip-text text-2xl font-bold text-transparent">
-                                        RWT
-                                    </h1>
+                                    <h1 className="bg-gradient-to-r from-primary to-accent bg-clip-text text-2xl font-bold text-transparent">RWT</h1>
                                     <p className="text-xs text-muted-foreground">Multi-Vendor Store</p>
                                 </div>
                             </div>
@@ -295,7 +277,7 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
                         {/* Right Side Icons */}
                         <div className="flex items-center space-x-4">
                             {/* Wishlist, Cart, User - Hidden on mobile */}
-                            <div className="space-x-4 flex items-center invisible lg:visible">
+                            <div className="invisible flex items-center space-x-4 lg:visible">
                                 <Button
                                     href={route('wishlist')}
                                     className="group relative bg-background p-2 text-muted-foreground transition hover:bg-secondary hover:text-primary"
@@ -304,7 +286,7 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
                                     <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-xs text-destructive-foreground">
                                         3
                                     </span>
-                                    <div className="absolute bottom-0 left-1/2 mt-2 -translate-x-1/2 translate-y-full transform rounded bg-popover px-2 py-1 text-xs text-popover-foreground opacity-0 transition-opacity group-hover:opacity-100 border border-border">
+                                    <div className="absolute bottom-0 left-1/2 mt-2 -translate-x-1/2 translate-y-full transform rounded border border-border bg-popover px-2 py-1 text-xs text-popover-foreground opacity-0 transition-opacity group-hover:opacity-100">
                                         Wishlist
                                     </div>
                                 </Button>
@@ -318,7 +300,7 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
                                     <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
                                         2
                                     </span>
-                                    <div className="absolute bottom-0 left-1/2 mt-2 -translate-x-1/2 translate-y-full transform rounded bg-popover px-2 py-1 text-xs text-popover-foreground opacity-0 transition-opacity group-hover:opacity-100 border border-border">
+                                    <div className="absolute bottom-0 left-1/2 mt-2 -translate-x-1/2 translate-y-full transform rounded border border-border bg-popover px-2 py-1 text-xs text-popover-foreground opacity-0 transition-opacity group-hover:opacity-100">
                                         Cart
                                     </div>
                                 </Button>
@@ -329,7 +311,7 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
                                         <DropdownMenuTrigger asChild>
                                             <Button className="group relative bg-background p-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-primary">
                                                 <User className="h-6 w-6" />
-                                                <div className="absolute bottom-0 left-1/2 mt-2 -translate-x-1/2 translate-y-full transform rounded bg-popover px-2 py-1 text-xs text-popover-foreground opacity-0 transition-opacity group-hover:opacity-100 border border-border">
+                                                <div className="absolute bottom-0 left-1/2 mt-2 -translate-x-1/2 translate-y-full transform rounded border border-border bg-popover px-2 py-1 text-xs text-popover-foreground opacity-0 transition-opacity group-hover:opacity-100">
                                                     Account
                                                 </div>
                                             </Button>
@@ -348,7 +330,7 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
                                             </DropdownMenuItem>
                                             <DropdownMenuSeparator />
                                             <DropdownMenuItem asChild>
-                                                <Button className="bg-black w-full text-start" onClick={handleLogout}>
+                                                <Button className="w-full bg-black text-start" onClick={handleLogout}>
                                                     Logout
                                                 </Button>
                                             </DropdownMenuItem>
@@ -361,7 +343,6 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
                                         </Button>
                                     </Link>
                                 )}
-
 
                                 <ToggleThemeButton />
                             </div>
@@ -380,9 +361,11 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
 
             {/* Navigation */}
             {!isLoading ? (
-                <div className={`hidden border-b border-border lg:block transition-all duration-700 ease-out ${isAtTop ? 'max-h-20 opacity-100' : 'max-h-0 opacity-0 overflow-hidden'
-                    }`}>
-                    <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div
+                    className={`hidden border-b border-border transition-all duration-700 ease-out lg:block ${isAtTop ? 'max-h-20 opacity-100' : 'max-h-0 overflow-hidden opacity-0'
+                        }`}
+                >
+                    <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
                         <nav className="flex items-center justify-between py-3">
                             <div className="flex items-center space-x-8">
                                 <div className="group relative">
@@ -413,7 +396,13 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
                             </div>
                             <div className="flex items-center space-x-6">
                                 <button className="font-semibold text-primary transition-colors hover:text-primary/80">Today's Deals</button>
-                                <Link as="button" href={route('vendor-store')} className="font-semibold text-accent transition-colors hover:text-accent/80">Best Vendors</Link>
+                                <Link
+                                    as="button"
+                                    href={route('vendor-store')}
+                                    className="font-semibold text-accent transition-colors hover:text-accent/80"
+                                >
+                                    Best Vendors
+                                </Link>
                             </div>
                         </nav>
                     </div>
@@ -424,7 +413,7 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
 
             {/* Mobile Menu */}
             {isMobileMenuOpen && (
-                <div className="border-t border-border shadow-lg lg:hidden bg-background">
+                <div className="border-t border-border bg-background shadow-lg lg:hidden">
                     <div className="space-y-6 px-4 py-6">
                         {/* Mobile Search */}
                         <div className="relative">
@@ -433,7 +422,7 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
                             </div>
                             <input
                                 type="text"
-                                className="block w-full rounded-lg border border-border bg-background py-3 pr-4 pl-10 leading-5 placeholder-muted-foreground text-foreground focus:border-primary focus:ring-2 focus:ring-ring focus:outline-none"
+                                className="block w-full rounded-lg border border-border bg-background py-3 pr-4 pl-10 leading-5 text-foreground placeholder-muted-foreground focus:border-primary focus:ring-2 focus:ring-ring focus:outline-none"
                                 placeholder="Search products..."
                             />
                         </div>
@@ -442,7 +431,10 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
                         <div className="space-y-4">
                             <h3 className="font-semibold text-foreground">Categories</h3>
                             {categories.map((category) => (
-                                <button key={category.id} className="block w-full py-2 text-left text-muted-foreground transition-colors hover:text-primary">
+                                <button
+                                    key={category.id}
+                                    className="block w-full py-2 text-left text-muted-foreground transition-colors hover:text-primary"
+                                >
                                     {category.name}
                                 </button>
                             ))}
@@ -456,7 +448,7 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
                         </div>
 
                         {/* Mobile Icons */}
-                        <div className="flex items-center space-x-4 justify-end">
+                        <div className="flex items-center justify-end space-x-4">
                             {/* Wishlist */}
                             <Button
                                 href={route('wishlist')}
@@ -485,7 +477,7 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
                                     <DropdownMenuTrigger asChild>
                                         <Button className="group relative bg-background p-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-primary">
                                             <User className="h-6 w-6" />
-                                            <div className="absolute bottom-0 left-1/2 mt-2 -translate-x-1/2 translate-y-full transform rounded bg-popover px-2 py-1 text-xs text-popover-foreground opacity-0 transition-opacity group-hover:opacity-100 border border-border">
+                                            <div className="absolute bottom-0 left-1/2 mt-2 -translate-x-1/2 translate-y-full transform rounded border border-border bg-popover px-2 py-1 text-xs text-popover-foreground opacity-0 transition-opacity group-hover:opacity-100">
                                                 Account
                                             </div>
                                         </Button>
@@ -504,7 +496,7 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
                                         </DropdownMenuItem>
                                         <DropdownMenuSeparator />
                                         <DropdownMenuItem asChild>
-                                            <Button className="bg-black w-full text-start" onClick={handleLogout}>
+                                            <Button className="w-full bg-black text-start" onClick={handleLogout}>
                                                 Logout
                                             </Button>
                                         </DropdownMenuItem>
@@ -517,7 +509,6 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
                                     </Button>
                                 </Link>
                             )}
-
 
                             <ToggleThemeButton />
                         </div>

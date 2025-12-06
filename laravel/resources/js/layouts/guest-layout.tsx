@@ -1,9 +1,8 @@
-import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import FloatingContactButton from "@/components/Common/FloatingContactButton";
-import ScrollToTop from "@/components/ScrollToTop";
-import { cn } from "@/shadcn/lib/utils";
+import FloatingContactButton from '@/components/Common/FloatingContactButton';
+import Footer from '@/components/Footer';
+import Header from '@/components/Header';
+import ScrollToTop from '@/components/ScrollToTop';
+import { useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 
 interface GuestLayoutProps {
     children: ReactNode;
@@ -21,22 +20,18 @@ export default function GuestLayout({ children, ...props }: GuestLayoutProps) {
         }
 
         updateHeight();
-        window.addEventListener("resize", updateHeight);
-        return () => window.removeEventListener("resize", updateHeight);
+        window.addEventListener('resize', updateHeight);
+        return () => window.removeEventListener('resize', updateHeight);
     }, []);
 
     return (
         <div {...props}>
             <Header ref={headerRef} />
 
-            <main
-                style={{ marginTop: headerHeight }}
-            >
-                {children}
-            </main>
+            <main style={{ marginTop: headerHeight }}>{children}</main>
 
             <Footer />
-            <FloatingContactButton onContact={() => { }} />
+            <FloatingContactButton onContact={() => {}} />
             <ScrollToTop />
         </div>
     );

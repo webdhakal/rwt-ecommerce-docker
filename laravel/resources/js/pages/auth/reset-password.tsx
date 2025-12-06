@@ -1,14 +1,14 @@
 'use client';
 
-import { useState } from 'react';
 import { useResetPassword } from '@/api/hooks/useAuth';
+import GuestLayout from '@/layouts/guest-layout';
 import { toast } from '@/shadcn/hooks/use-toast';
-import { Button } from "@/shadcn/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shadcn/ui/card";
-import { Input } from "@/shadcn/ui/input";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/shadcn/ui/input-otp";
-import GuestLayout from "@/layouts/guest-layout";
-import { Loader2, Eye, EyeOff } from "lucide-react";
+import { Button } from '@/shadcn/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shadcn/ui/card';
+import { Input } from '@/shadcn/ui/input';
+import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/shadcn/ui/input-otp';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { useState } from 'react';
 // import { useSearchParams } from 'next/navigation';
 
 export default function ResetPasswordPage() {
@@ -28,7 +28,7 @@ export default function ResetPasswordPage() {
             toast({
                 title: 'Error',
                 description: 'Please enter a valid 6-digit OTP',
-                variant: 'destructive'
+                variant: 'destructive',
             });
             return;
         }
@@ -37,7 +37,7 @@ export default function ResetPasswordPage() {
             toast({
                 title: 'Error',
                 description: 'Password must be at least 8 characters long',
-                variant: 'destructive'
+                variant: 'destructive',
             });
             return;
         }
@@ -46,7 +46,7 @@ export default function ResetPasswordPage() {
             toast({
                 title: 'Error',
                 description: 'Passwords do not match',
-                variant: 'destructive'
+                variant: 'destructive',
             });
             return;
         }
@@ -55,13 +55,13 @@ export default function ResetPasswordPage() {
             await resetPasswordMutation.mutateAsync({
                 otp,
                 password,
-                password_confirmation: confirmPassword
+                password_confirmation: confirmPassword,
             });
 
             toast({
                 title: 'Success',
                 description: 'Your password has been reset successfully. Redirecting to login...',
-                variant: 'default'
+                variant: 'default',
             });
 
             // Redirect to login after a short delay
@@ -75,17 +75,17 @@ export default function ResetPasswordPage() {
 
     return (
         <GuestLayout>
-            <section className="px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
-                <div className="max-w-md mx-auto">
+            <section className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+                <div className="mx-auto max-w-md">
                     <Card>
-                        <CardHeader className="text-center space-y-1">
+                        <CardHeader className="space-y-1 text-center">
                             <CardTitle className="text-2xl">Reset Your Password</CardTitle>
                             <CardDescription>Enter the verification code and your new password</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <form onSubmit={handleSubmit} className="space-y-6">
                                 <div className="space-y-2">
-                                    <label htmlFor="otp" className="text-sm font-medium leading-none">
+                                    <label htmlFor="otp" className="text-sm leading-none font-medium">
                                         Verification Code
                                     </label>
                                     <div className="flex justify-center">
@@ -98,22 +98,16 @@ export default function ResetPasswordPage() {
                                         >
                                             <InputOTPGroup className="gap-2">
                                                 {[...Array(6)].map((_, i) => (
-                                                    <InputOTPSlot
-                                                        key={i}
-                                                        index={i}
-                                                        className="w-12 h-12 text-lg border-border"
-                                                    />
+                                                    <InputOTPSlot key={i} index={i} className="h-12 w-12 border-border text-lg" />
                                                 ))}
                                             </InputOTPGroup>
                                         </InputOTP>
                                     </div>
-                                    <p className="text-sm text-muted-foreground text-center">
-                                        Enter the 6-digit code sent to your email.
-                                    </p>
+                                    <p className="text-center text-sm text-muted-foreground">Enter the 6-digit code sent to your email.</p>
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label htmlFor="password" className="text-sm font-medium leading-none">
+                                    <label htmlFor="password" className="text-sm leading-none font-medium">
                                         New Password
                                     </label>
                                     <div className="relative">
@@ -129,24 +123,18 @@ export default function ResetPasswordPage() {
                                         />
                                         <button
                                             type="button"
-                                            className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                            className="absolute top-1/2 right-2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                                             onClick={() => setShowPassword(!showPassword)}
                                             tabIndex={-1}
                                         >
-                                            {showPassword ? (
-                                                <EyeOff className="h-4 w-4" />
-                                            ) : (
-                                                <Eye className="h-4 w-4" />
-                                            )}
+                                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                         </button>
                                     </div>
-                                    <p className="text-xs text-muted-foreground">
-                                        Password must be at least 8 characters long
-                                    </p>
+                                    <p className="text-xs text-muted-foreground">Password must be at least 8 characters long</p>
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label htmlFor="confirmPassword" className="text-sm font-medium leading-none">
+                                    <label htmlFor="confirmPassword" className="text-sm leading-none font-medium">
                                         Confirm New Password
                                     </label>
                                     <div className="relative">
@@ -162,15 +150,11 @@ export default function ResetPasswordPage() {
                                         />
                                         <button
                                             type="button"
-                                            className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                            className="absolute top-1/2 right-2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                                             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                                             tabIndex={-1}
                                         >
-                                            {showConfirmPassword ? (
-                                                <EyeOff className="h-4 w-4" />
-                                            ) : (
-                                                <Eye className="h-4 w-4" />
-                                            )}
+                                            {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                         </button>
                                     </div>
                                 </div>
@@ -178,12 +162,7 @@ export default function ResetPasswordPage() {
                                 <Button
                                     type="submit"
                                     className="w-full"
-                                    disabled={
-                                        resetPasswordMutation.isPending ||
-                                        otp.length !== 6 ||
-                                        !password ||
-                                        password !== confirmPassword
-                                    }
+                                    disabled={resetPasswordMutation.isPending || otp.length !== 6 || !password || password !== confirmPassword}
                                 >
                                     {resetPasswordMutation.isPending ? (
                                         <>

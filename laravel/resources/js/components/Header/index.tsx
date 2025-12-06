@@ -1,4 +1,4 @@
-import { Topbar } from './Topbar'
-import { DefaultHeader } from './DefaultHeader'
+import { DefaultHeader } from './DefaultHeader';
+import { Topbar } from './Topbar';
 
-export { DefaultHeader, Topbar }
+export { DefaultHeader, Topbar };

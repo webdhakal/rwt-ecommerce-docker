@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import Icon from '../../../components/AppIcon';
 import Button from '@/components/Button';
 import { Link } from '@inertiajs/react';
+import { useState } from 'react';
+import Icon from '../../../components/AppIcon';
 
 const ProductListItem = ({ product, onRemoveFromWishlist, onAddToCart, onShareProduct }) => {
     const [isLoading, setIsLoading] = useState(false);
@@ -28,7 +28,7 @@ const ProductListItem = ({ product, onRemoveFromWishlist, onAddToCart, onSharePr
     const formatPrice = (price) => {
         return new Intl.NumberFormat('en-US', {
             style: 'currency',
-            currency: 'USD'
+            currency: 'USD',
         })?.format(price);
     };
 
@@ -40,16 +40,16 @@ const ProductListItem = ({ product, onRemoveFromWishlist, onAddToCart, onSharePr
     };
 
     return (
-        <div className="bg-card border border-border rounded-xl p-6 hover:shadow-lg transition-all duration-300 group">
-            <div className="flex flex-col sm:flex-row gap-6">
+        <div className="group rounded-xl border border-border bg-card p-6 transition-all duration-300 hover:shadow-lg">
+            <div className="flex flex-col gap-6 sm:flex-row">
                 {/* Product Image */}
                 <div className="relative flex-shrink-0">
                     <Link href={`/product/${product?.id}`}>
-                        <div className="w-full sm:w-32 h-48 sm:h-32 rounded-lg overflow-hidden bg-muted group-hover:shadow-md transition-shadow duration-300">
+                        <div className="h-48 w-full overflow-hidden rounded-lg bg-muted transition-shadow duration-300 group-hover:shadow-md sm:h-32 sm:w-32">
                             <img
                                 src={product?.image}
                                 alt={product?.imageAlt}
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                                 loading="lazy"
                             />
                         </div>
@@ -58,62 +58,48 @@ const ProductListItem = ({ product, onRemoveFromWishlist, onAddToCart, onSharePr
                     {/* Badges */}
                     <div className="absolute top-2 left-2 flex flex-col gap-1">
                         {product?.isOnSale && (
-                            <span className="bg-error text-white text-xs px-2 py-1 rounded-md font-medium">
-                                {getDiscountPercentage()}% OFF
-                            </span>
+                            <span className="bg-error rounded-md px-2 py-1 text-xs font-medium text-white">{getDiscountPercentage()}% OFF</span>
                         )}
-                        {product?.isNewArrival && (
-                            <span className="bg-accent text-white text-xs px-2 py-1 rounded-md font-medium">
-                                NEW
-                            </span>
-                        )}
-                        {product?.isLimitedStock && (
-                            <span className="bg-warning text-white text-xs px-2 py-1 rounded-md font-medium">
-                                LIMITED
-                            </span>
-                        )}
+                        {product?.isNewArrival && <span className="rounded-md bg-accent px-2 py-1 text-xs font-medium text-white">NEW</span>}
+                        {product?.isLimitedStock && <span className="bg-warning rounded-md px-2 py-1 text-xs font-medium text-white">LIMITED</span>}
                     </div>
 
                     {/* Stock Status */}
                     {!product?.inStock && (
-                        <div className="absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center">
-                            <span className="bg-error text-white text-sm px-3 py-1 rounded-md font-medium">
-                                Out of Stock
-                            </span>
+                        <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-black/50">
+                            <span className="bg-error rounded-md px-3 py-1 text-sm font-medium text-white">Out of Stock</span>
                         </div>
                     )}
                 </div>
 
                 {/* Product Details */}
-                <div className="flex-1 min-w-0">
-                    <div className="flex flex-col h-full">
+                <div className="min-w-0 flex-1">
+                    <div className="flex h-full flex-col">
                         {/* Header */}
                         <div className="flex-1">
-                            <div className="flex items-start justify-between gap-4 mb-2">
+                            <div className="mb-2 flex items-start justify-between gap-4">
                                 <div className="min-w-0 flex-1">
                                     <Link href={`/product/${product?.id}`}>
-                                        <h3 className="text-lg font-semibold text-text-primary hover:text-primary transition-colors duration-200 line-clamp-2">
+                                        <h3 className="text-text-primary line-clamp-2 text-lg font-semibold transition-colors duration-200 hover:text-primary">
                                             {product?.name}
                                         </h3>
                                     </Link>
-                                    <p className="text-sm text-muted-foreground mb-1">{product?.brand}</p>
+                                    <p className="mb-1 text-sm text-muted-foreground">{product?.brand}</p>
                                 </div>
 
                                 <button
                                     onClick={handleRemoveFromWishlist}
-                                    className="p-2 text-muted-foreground hover:text-error hover:bg-error/10 rounded-lg transition-all duration-200 flex-shrink-0"
+                                    className="hover:text-error hover:bg-error/10 flex-shrink-0 rounded-lg p-2 text-muted-foreground transition-all duration-200"
                                     title="Remove from wishlist"
                                 >
                                     <Icon name="X" size={18} />
                                 </button>
                             </div>
 
-                            <p className="text-sm text-text-secondary line-clamp-2 mb-3">
-                                {product?.description}
-                            </p>
+                            <p className="text-text-secondary mb-3 line-clamp-2 text-sm">{product?.description}</p>
 
                             {/* Product Info */}
-                            <div className="flex flex-wrap gap-3 mb-3">
+                            <div className="mb-3 flex flex-wrap gap-3">
                                 {product?.rating && (
                                     <div className="flex items-center space-x-1">
                                         <div className="flex items-center">
@@ -122,7 +108,9 @@ const ProductListItem = ({ product, onRemoveFromWishlist, onAddToCart, onSharePr
                                                     key={i}
                                                     name="Star"
                                                     size={14}
-                                                    className={i < Math.floor(product?.rating) ? 'text-warning fill-current' : 'text-muted-foreground'}
+                                                    className={
+                                                        i < Math.floor(product?.rating) ? 'text-warning fill-current' : 'text-muted-foreground'
+                                                    }
                                                 />
                                             ))}
                                         </div>
@@ -133,27 +121,23 @@ const ProductListItem = ({ product, onRemoveFromWishlist, onAddToCart, onSharePr
                                 )}
 
                                 {product?.category && (
-                                    <span className="text-xs bg-muted text-muted-foreground px-2 py-1 rounded-md">
-                                        {product?.category}
-                                    </span>
+                                    <span className="rounded-md bg-muted px-2 py-1 text-xs text-muted-foreground">{product?.category}</span>
                                 )}
 
                                 {product?.freeShipping && (
-                                    <span className="text-xs bg-accent/10 text-accent px-2 py-1 rounded-md font-medium">
-                                        Free Shipping
-                                    </span>
+                                    <span className="rounded-md bg-accent/10 px-2 py-1 text-xs font-medium text-accent">Free Shipping</span>
                                 )}
                             </div>
 
                             {/* Size/Color Options */}
                             {(product?.availableSizes?.length > 0 || product?.availableColors?.length > 0) && (
-                                <div className="flex flex-wrap gap-3 mb-3">
+                                <div className="mb-3 flex flex-wrap gap-3">
                                     {product?.availableSizes?.length > 0 && (
                                         <div className="flex items-center space-x-2">
                                             <span className="text-xs text-muted-foreground">Sizes:</span>
                                             <div className="flex gap-1">
                                                 {product?.availableSizes?.slice(0, 3)?.map((size, index) => (
-                                                    <span key={index} className="text-xs bg-muted px-2 py-1 rounded">
+                                                    <span key={index} className="rounded bg-muted px-2 py-1 text-xs">
                                                         {size}
                                                     </span>
                                                 ))}
@@ -171,7 +155,7 @@ const ProductListItem = ({ product, onRemoveFromWishlist, onAddToCart, onSharePr
                                                 {product?.availableColors?.slice(0, 4)?.map((color, index) => (
                                                     <div
                                                         key={index}
-                                                        className="w-4 h-4 rounded-full border border-border"
+                                                        className="h-4 w-4 rounded-full border border-border"
                                                         style={{ backgroundColor: color?.hex }}
                                                         title={color?.name}
                                                     />
@@ -187,23 +171,17 @@ const ProductListItem = ({ product, onRemoveFromWishlist, onAddToCart, onSharePr
                         </div>
 
                         {/* Footer */}
-                        <div className="flex items-center justify-between pt-4 border-t border-border">
+                        <div className="flex items-center justify-between border-t border-border pt-4">
                             {/* Price */}
                             <div className="flex flex-col">
                                 <div className="flex items-center space-x-2">
-                                    <span className="text-xl font-bold text-text-primary">
-                                        {formatPrice(product?.salePrice || product?.price)}
-                                    </span>
+                                    <span className="text-text-primary text-xl font-bold">{formatPrice(product?.salePrice || product?.price)}</span>
                                     {product?.originalPrice && product?.salePrice && (
-                                        <span className="text-sm text-muted-foreground line-through">
-                                            {formatPrice(product?.originalPrice)}
-                                        </span>
+                                        <span className="text-sm text-muted-foreground line-through">{formatPrice(product?.originalPrice)}</span>
                                     )}
                                 </div>
                                 {product?.installmentPrice && (
-                                    <span className="text-xs text-muted-foreground">
-                                        or {formatPrice(product?.installmentPrice)}/month
-                                    </span>
+                                    <span className="text-xs text-muted-foreground">or {formatPrice(product?.installmentPrice)}/month</span>
                                 )}
                             </div>
 
@@ -211,20 +189,20 @@ const ProductListItem = ({ product, onRemoveFromWishlist, onAddToCart, onSharePr
                             <div className="flex items-center space-x-2">
                                 <button
                                     onClick={handleShare}
-                                    className="p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-all duration-200"
+                                    className="rounded-lg p-2 text-muted-foreground transition-all duration-200 hover:bg-primary/10 hover:text-primary"
                                     title="Share product"
                                 >
                                     <Icon name="Share2" size={18} />
                                 </button>
 
                                 <Button
-                                    variant={product?.inStock ? "default" : "secondary"}
+                                    variant={product?.inStock ? 'default' : 'secondary'}
                                     size="sm"
                                     onClick={handleAddToCart}
                                     disabled={!product?.inStock || isLoading}
-                                    iconName={isLoading ? "Loader2" : "ShoppingCart"}
+                                    iconName={isLoading ? 'Loader2' : 'ShoppingCart'}
                                     iconPosition="left"
-                                    className={isLoading ? "animate-spin" : ""}
+                                    className={isLoading ? 'animate-spin' : ''}
                                 >
                                     {!product?.inStock ? 'Out of Stock' : isLoading ? 'Adding...' : 'Add to Cart'}
                                 </Button>

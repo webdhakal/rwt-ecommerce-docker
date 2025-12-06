@@ -6,7 +6,7 @@ import { useState } from 'react';
 const ProductInfo = ({ product, onAddToCart }: { product: ProductDetail; onAddToCart: any }) => {
     const [selectedVariant, setSelectedVariant] = useState(product?.variants?.[0] || null);
     const [quantity, setQuantity] = useState(1);
-    console.log(product)
+    console.log(product);
     const hasvariant = product?.has_variant;
 
     const handleVariantChange = (variant) => {
@@ -50,11 +50,19 @@ const ProductInfo = ({ product, onAddToCart }: { product: ProductDetail; onAddTo
             <div className="flex items-center space-x-3">
                 <span className="text-text-primary text-3xl font-bold">${hasvariant ? selectedVariant?.price : product?.price}</span>
                 {selectedVariant?.originalPrice && (
-                    <span className="text-text-secondary text-xl line-through">${hasvariant ? selectedVariant?.originalPrice : product?.original_price}</span>
+                    <span className="text-text-secondary text-xl line-through">
+                        ${hasvariant ? selectedVariant?.originalPrice : product?.original_price}
+                    </span>
                 )}
                 {selectedVariant?.originalPrice && (
                     <span className="bg-success text-success-foreground rounded-md px-2 py-1 text-sm font-medium">
-                        {Math.round(((hasvariant ? selectedVariant?.originalPrice : product?.originalPrice) - (hasvariant ? selectedVariant?.price : product?.price)) / (hasvariant ? selectedVariant?.originalPrice : product?.originalPrice) * 100)}% OFF
+                        {Math.round(
+                            (((hasvariant ? selectedVariant?.originalPrice : product?.originalPrice) -
+                                (hasvariant ? selectedVariant?.price : product?.price)) /
+                                (hasvariant ? selectedVariant?.originalPrice : product?.originalPrice)) *
+                                100,
+                        )}
+                        % OFF
                     </span>
                 )}
             </div>

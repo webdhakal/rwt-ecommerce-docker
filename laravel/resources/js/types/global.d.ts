@@ -1,8 +1,8 @@
 import { PageProps as InertiaPageProps } from '@inertiajs/core';
 import { AxiosInstance } from 'axios';
+import { ReactNode } from 'react';
 import { route as ziggyRoute } from 'ziggy-js';
 import { PageProps as AppPageProps } from './';
-import { ReactNode } from "react";
 
 declare global {
     type Page<P = {}> = React.FC<P> & {
@@ -18,5 +18,5 @@ declare global {
 }
 
 declare module '@inertiajs/core' {
-    interface PageProps extends InertiaPageProps, AppPageProps { }
+    interface PageProps extends InertiaPageProps, AppPageProps {}
 }

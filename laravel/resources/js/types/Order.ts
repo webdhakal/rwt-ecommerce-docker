@@ -1,6 +1,6 @@
 // src/types/Order.ts
 
-import { CartItem } from "./Cart";
+import { CartItem } from './Cart';
 
 export interface Order {
     id: number;

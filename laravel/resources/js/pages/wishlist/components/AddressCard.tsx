@@ -1,29 +1,42 @@
-import React from 'react';
-import Icon from '../../../components/AppIcon';
 import Button from '@/components/Button';
+import Icon from '../../../components/AppIcon';
 
 const AddressCard = ({ address, onEdit, onDelete, onSetDefault }) => {
     return (
-        <div className="bg-card border border-border rounded-lg p-6 hover:shadow-md transition-all duration-200">
-            <div className="flex items-start justify-between mb-4">
+        <div className="rounded-lg border border-border bg-card p-6 transition-all duration-200 hover:shadow-md">
+            <div className="mb-4 flex items-start justify-between">
                 <div className="flex items-center space-x-3">
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${address?.category === 'home' ? 'bg-accent/10 text-accent' :
-                        address?.category === 'work' ? 'bg-primary/10 text-primary' :
-                            address?.category === 'family' ? 'bg-warning/10 text-warning' : 'bg-secondary/10 text-secondary'
-                        }`}>
+                    <div
+                        className={`flex h-10 w-10 items-center justify-center rounded-lg ${
+                            address?.category === 'home'
+                                ? 'bg-accent/10 text-accent'
+                                : address?.category === 'work'
+                                  ? 'bg-primary/10 text-primary'
+                                  : address?.category === 'family'
+                                    ? 'bg-warning/10 text-warning'
+                                    : 'bg-secondary/10 text-secondary'
+                        }`}
+                    >
                         <Icon
                             name={
-                                address?.category === 'home' ? 'Home' :
-                                    address?.category === 'work' ? 'Building2' :
-                                        address?.category === 'family' ? 'Users' : 'MapPin'
+                                address?.category === 'home'
+                                    ? 'Home'
+                                    : address?.category === 'work'
+                                      ? 'Building2'
+                                      : address?.category === 'family'
+                                        ? 'Users'
+                                        : 'MapPin'
                             }
                             size={20}
                         />
                     </div>
                     <div>
-                        <h3 className="font-semibold text-text-primary">{address?.label}</h3>
-                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${address?.isDefault ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'
-                            }`}>
+                        <h3 className="text-text-primary font-semibold">{address?.label}</h3>
+                        <span
+                            className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
+                                address?.isDefault ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'
+                            }`}
+                        >
                             {address?.isDefault ? 'Default' : address?.category}
                         </span>
                     </div>
@@ -34,17 +47,19 @@ const AddressCard = ({ address, onEdit, onDelete, onSetDefault }) => {
                     <Button variant="ghost" size="sm" iconName="Trash2" onClick={() => onDelete(address?.id)} />
                 </div>
             </div>
-            <div className="space-y-2 mb-4">
-                <p className="text-sm text-text-primary">{address?.street}</p>
-                <p className="text-sm text-text-secondary">{address?.city}, {address?.state} {address?.zipCode}</p>
+            <div className="mb-4 space-y-2">
+                <p className="text-text-primary text-sm">{address?.street}</p>
+                <p className="text-text-secondary text-sm">
+                    {address?.city}, {address?.state} {address?.zipCode}
+                </p>
                 {address?.instructions && (
-                    <div className="flex items-start space-x-2 mt-3 p-3 bg-muted/50 rounded-lg">
-                        <Icon name="MessageSquare" size={16} className="text-muted-foreground mt-0.5" />
-                        <p className="text-sm text-text-secondary">{address?.instructions}</p>
+                    <div className="mt-3 flex items-start space-x-2 rounded-lg bg-muted/50 p-3">
+                        <Icon name="MessageSquare" size={16} className="mt-0.5 text-muted-foreground" />
+                        <p className="text-text-secondary text-sm">{address?.instructions}</p>
                     </div>
                 )}
             </div>
-            <div className="flex items-center justify-between pt-4 border-t border-border">
+            <div className="flex items-center justify-between border-t border-border pt-4">
                 <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                     <span className="flex items-center space-x-1">
                         <Icon name="Package" size={14} />
@@ -57,11 +72,7 @@ const AddressCard = ({ address, onEdit, onDelete, onSetDefault }) => {
                 </div>
 
                 {!address?.isDefault && (
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => onSetDefault(address?.id)}
-                    >
+                    <Button variant="outline" size="sm" onClick={() => onSetDefault(address?.id)}>
                         Set Default
                     </Button>
                 )}

@@ -1,25 +1,19 @@
-import GuestLayout from "@/layouts/guest-layout"
-import { cn } from "@/shadcn/lib/utils"
-import { Button } from "@/shadcn/ui/button"
-import { Card, CardContent } from "@/shadcn/ui/card"
-import {
-    Field,
-    FieldDescription,
-    FieldGroup,
-    FieldLabel,
-    FieldSeparator,
-} from "@/shadcn/ui/field"
-import { Input } from "@/shadcn/ui/input"
+import GuestLayout from '@/layouts/guest-layout';
+import { cn } from '@/shadcn/lib/utils';
+import { Button } from '@/shadcn/ui/button';
+import { Card, CardContent } from '@/shadcn/ui/card';
+import { Field, FieldDescription, FieldGroup, FieldLabel, FieldSeparator } from '@/shadcn/ui/field';
+import { Input } from '@/shadcn/ui/input';
 // 👇 Import the necessary Inertia and React hooks
-import { Link, useForm, usePage } from "@inertiajs/react"
-import { FormEventHandler, useEffect } from "react"
+import { Link, useForm, usePage } from '@inertiajs/react';
+import { FormEventHandler, useEffect } from 'react';
 
 // Import the Eye icons for password visibility (optional but good practice)
-import { Eye, EyeOff } from "lucide-react"
-import { useRegister } from "@/api/hooks/useAuth"
+import { useRegister } from '@/api/hooks/useAuth';
+import { Eye, EyeOff } from 'lucide-react';
 
 // Define the component with the Inertia logic
-export default function RegisterPage() { 
+export default function RegisterPage() {
     // Get appName (assuming you might need it for dynamic text)
     const { appName } = usePage().props as { appName: string };
 
@@ -27,17 +21,18 @@ export default function RegisterPage() {
     const { data, setData, post, processing, errors, reset } = useForm({
         name: '', // Added name field
         email: '',
+        phone: '',
         password: '',
         confirm_password: '', // Added confirmation field for Laravel
         showPassword: false, // For password visibility toggle
-    })
+    });
 
     // Reset password fields on component mount/unmount for security
     useEffect(() => {
         return () => {
-            reset('password', 'confirm_password')
-        }
-    }, [])
+            reset('password', 'confirm_password');
+        };
+    }, []);
 
     const registerMutation = useRegister({
         onSuccess: (response) => {
@@ -56,29 +51,29 @@ export default function RegisterPage() {
             });
         },
     });
-    
 
     // 3. Handle Form Submission
     const handleSubmit: FormEventHandler = (e) => {
         e.preventDefault();
         registerMutation.mutate({
             name: data.name,
+            phone: data.phone,
             email: data.email,
             password: data.password,
             confirm_password: data.confirm_password,
         });
-    }
-    
+    };
+
     // Toggle password visibility function
     const togglePasswordVisibility = () => {
         setData('showPassword', !data.showPassword);
-    }
+    };
 
     return (
         <GuestLayout>
-            <section className="px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+            <section className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
                 <div className="container mx-auto">
-                    <div className={cn("flex flex-col gap-6")}>
+                    <div className={cn('flex flex-col gap-6')}>
                         <Card className="overflow-hidden p-0">
                             <CardContent className="grid p-0 md:grid-cols-2">
                                 {/* 👇 Attach the handleSubmit handler to the form */}
@@ -86,7 +81,7 @@ export default function RegisterPage() {
                                     <FieldGroup>
                                         <div className="flex flex-col items-center gap-2 text-center">
                                             <h1 className="text-2xl font-bold">Create your account</h1>
-                                            <p className="text-muted-foreground text-sm text-balance">
+                                            <p className="text-sm text-balance text-muted-foreground">
                                                 Enter your details below to create your {appName} account
                                             </p>
                                         </div>
@@ -103,7 +98,7 @@ export default function RegisterPage() {
                                                 required
                                                 autoFocus
                                             />
-                                            {errors.name && <p className="text-sm text-destructive mt-1">{errors.name}</p>}
+                                            {errors.name && <p className="mt-1 text-sm text-destructive">{errors.name}</p>}
                                         </Field>
 
                                         {/* Email Field */}
@@ -111,13 +106,25 @@ export default function RegisterPage() {
                                             <FieldLabel htmlFor="email">Email</FieldLabel>
                                             <Input
                                                 id="email"
-                                                type="email"
+                                                type="text"
                                                 placeholder="m@example.com"
                                                 value={data.email}
                                                 onChange={(e) => setData('email', e.target.value)}
                                                 required
                                             />
-                                            {errors.email && <p className="text-sm text-destructive mt-1">{errors.email}</p>}
+                                            {errors.email && <p className="mt-1 text-sm text-destructive">{errors.email}</p>}
+                                        </Field>
+                                        <Field>
+                                            <FieldLabel htmlFor="phone">Phone</FieldLabel>
+                                            <Input
+                                                id="phone"
+                                                type="text"
+                                                placeholder="98XXXXXXXXX"
+                                                value={data.phone}
+                                                onChange={(e) => setData('phone', e.target.value)}
+                                                required
+                                            />
+                                            {errors.email && <p className="mt-1 text-sm text-destructive">{errors.email}</p>}
                                         </Field>
 
                                         {/* Password Fields */}
@@ -127,40 +134,40 @@ export default function RegisterPage() {
                                                 <Field>
                                                     <FieldLabel htmlFor="password">Password</FieldLabel>
                                                     <div className="relative">
-                                                        <Input 
-                                                            id="password" 
-                                                            type={data.showPassword ? "text" : "password"}
+                                                        <Input
+                                                            id="password"
+                                                            type={data.showPassword ? 'text' : 'password'}
                                                             value={data.password}
                                                             onChange={(e) => setData('password', e.target.value)}
-                                                            required 
+                                                            required
                                                             className="pr-10"
                                                         />
                                                         <button
                                                             type="button"
                                                             onClick={togglePasswordVisibility}
-                                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                                                            aria-label={data.showPassword ? "Hide password" : "Show password"}
+                                                            className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
+                                                            aria-label={data.showPassword ? 'Hide password' : 'Show password'}
                                                         >
                                                             {data.showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                                         </button>
                                                     </div>
-                                                    {errors.password && <p className="text-sm text-destructive mt-1 col-span-2">{errors.password}</p>}
+                                                    {errors.password && <p className="col-span-2 mt-1 text-sm text-destructive">{errors.password}</p>}
                                                 </Field>
 
                                                 {/* Confirm Password */}
                                                 <Field>
                                                     <FieldLabel htmlFor="confirm_password">Confirm Password</FieldLabel>
-                                                    <Input 
-                                                        id="confirm_password" 
-                                                        type={data.showPassword ? "text" : "password"}
+                                                    <Input
+                                                        id="confirm_password"
+                                                        type={data.showPassword ? 'text' : 'password'}
                                                         value={data.password_confirmation}
                                                         onChange={(e) => setData('confirm_password', e.target.value)}
-                                                        required 
+                                                        required
                                                     />
                                                 </Field>
                                             </div>
                                         </Field>
-                                        
+
                                         {/* Submit Button */}
                                         <Field>
                                             <Button type="submit" disabled={processing}>
@@ -168,10 +175,8 @@ export default function RegisterPage() {
                                             </Button>
                                         </Field>
 
-                                        <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
-                                            Or continue with
-                                        </FieldSeparator>
-                                        
+                                        <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">Or continue with</FieldSeparator>
+
                                         {/* Social Login Buttons */}
                                         <Field className="grid grid-cols-3 gap-4">
                                             <Button variant="outline" type="button">
@@ -202,18 +207,17 @@ export default function RegisterPage() {
                                                 <span className="sr-only">Sign up with Meta</span>
                                             </Button>
                                         </Field>
-                                        
+
                                         {/* Sign In Link */}
-                                        <p className="text-center text-sm mt-4">
-                                            Already have an account?{" "}
+                                        <p className="mt-4 text-center text-sm">
+                                            Already have an account?{' '}
                                             <Link href={route('login')} className="underline underline-offset-4 hover:text-primary">
                                                 Sign in
                                             </Link>
                                         </p>
-
                                     </FieldGroup>
                                 </form>
-                                <div className="bg-muted relative hidden md:block">
+                                <div className="relative hidden bg-muted md:block">
                                     <img
                                         src="/placeholder.svg"
                                         alt="Image"
@@ -223,12 +227,11 @@ export default function RegisterPage() {
                             </CardContent>
                         </Card>
                         <FieldDescription className="px-6 text-center">
-                            By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
-                            and <a href="#">Privacy Policy</a>.
+                            By clicking continue, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
                         </FieldDescription>
                     </div>
                 </div>
             </section>
         </GuestLayout>
-    )
+    );
 }

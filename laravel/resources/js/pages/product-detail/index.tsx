@@ -1,4 +1,5 @@
 import { useProductDetail } from '@/api/hooks/useProductDetail';
+import { useStoreCart } from '@/api/hooks/useShoppingCart';
 import GuestLayout from '@/layouts/guest-layout';
 import { ProductDetail } from '@/types/Product';
 import { usePage } from '@inertiajs/react';
@@ -10,7 +11,6 @@ import ProductTabs from './components/ProductTabs';
 import RelatedProducts from './components/RelatedProducts';
 import SocialShare from './components/SocialShare';
 import VendorInfoPanel from './components/VendorInfoPanel';
-import { useStoreCart } from '@/api/hooks/useShoppingCart';
 
 export function slugParser(url: string) {
     return url.split('/')[url.split('/').length - 1];
@@ -25,16 +25,16 @@ function mapProductDetailToUI(product: ProductDetail) {
         price: parseFloat(product.price),
         originalPrice: parseFloat(product.base_price),
         description: product.description,
-        images: product?.files?.length > 0 
-            ? product.files.map((file) => file.url)
-            : ['https://via.placeholder.com/800x800?text=No+Image'],
-        variants: product.variants ? product.variants.map((v) => ({
-            id: v.id,
-            name: `${v.size?.size_code ?? ''} ${v.color?.name ?? ''}`.trim(),
-            price: parseFloat(v.price),
-            originalPrice: parseFloat(v.base_price),
-            stock: v.stock,
-        })) : null,
+        images: product?.files?.length > 0 ? product.files.map((file) => file.url) : ['https://via.placeholder.com/800x800?text=No+Image'],
+        variants: product.variants
+            ? product.variants.map((v) => ({
+                id: v.id,
+                name: `${v.size?.size_code ?? ''} ${v.color?.name ?? ''}`.trim(),
+                price: parseFloat(v.price),
+                originalPrice: parseFloat(v.base_price),
+                stock: v.stock,
+            }))
+            : null,
         variantType: 'Size & Color', // since backend supports both
         keyFeatures: product.features,
         vendor: {
@@ -70,18 +70,17 @@ const ProductDetailPage = () => {
     const slug = slugParser(url);
 
     const { data } = useProductDetail(slug);
-    console.log(data)
+    console.log(data);
     // Map API payload → UI product
     const product = data?.payload ? mapProductDetailToUI(data.payload as ProductDetail) : null; // send data in payload.data
 
-
-        // Mock related products (keep as is)
+    // Mock related products (keep as is)
     const relatedProducts = [
         {
             id: 'rel-001',
             name: 'iPhone 15 Pro - 128GB Blue Titanium',
             vendor: 'TechStore Pro',
-            slug: "random",
+            slug: 'random',
             price: 999,
             originalPrice: 1099,
             discount: 9,
@@ -92,7 +91,7 @@ const ProductDetailPage = () => {
         {
             id: 'rel-002',
             name: 'Samsung Galaxy S24 Ultra - 256GB',
-            slug: "et-ipsum-omnis-MdIrB",
+            slug: 'et-ipsum-omnis-MdIrB',
             vendor: 'Electronics Hub',
             price: 1199,
             originalPrice: 1299,
@@ -103,7 +102,7 @@ const ProductDetailPage = () => {
         },
         {
             id: 'rel-003',
-            slug: "et-ipsum-omnis-MdIrB",
+            slug: 'et-ipsum-omnis-MdIrB',
             name: 'Google Pixel 8 Pro - 256GB',
             vendor: 'Mobile World',
             price: 899,
@@ -116,7 +115,7 @@ const ProductDetailPage = () => {
         {
             id: 'rel-004',
             name: 'OnePlus 12 - 256GB',
-            slug: "et-ipsum-omnis-MdIrB",
+            slug: 'et-ipsum-omnis-MdIrB',
             vendor: 'Phone Paradise',
             price: 799,
             originalPrice: 899,
@@ -128,7 +127,7 @@ const ProductDetailPage = () => {
         {
             id: 'rel-005',
             name: 'iPhone 14 Pro Max - 256GB',
-            slug: "et-ipsum-omnis-MdIrB",
+            slug: 'et-ipsum-omnis-MdIrB',
             vendor: 'Apple Store',
             price: 1099,
             originalPrice: 1199,
@@ -154,15 +153,15 @@ const ProductDetailPage = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    const {mutate:addtoCart} = useStoreCart()
+    const { mutate: addtoCart } = useStoreCart();
 
     const handleAddToCart = (cartItem) => {
         console.log('Adding to cart:', cartItem);
         addtoCart({
             variant: cartItem.variant.id,
             quantity: cartItem.quantity,
-            cartId: localStorage.getItem('guest_id') || undefined
-        })
+            cartId: localStorage.getItem('guest_id') || undefined,
+        });
         setAddToCartSuccess(true);
         setTimeout(() => setAddToCartSuccess(false), 3000);
     };
@@ -170,7 +169,7 @@ const ProductDetailPage = () => {
     if (!product) return <div>Loading...</div>;
     return (
         <GuestLayout>
-            <div className="container mx-auto px-4 py-6 sm:px-6 lg:px-8 mt-2 border">
+            <div className="container mx-auto mt-2 border px-4 py-6 sm:px-6 lg:px-8">
                 {/* Product Section */}
                 <div className="mb-12 grid grid-cols-1 gap-8 lg:grid-cols-2">
                     {/* Product Images */}

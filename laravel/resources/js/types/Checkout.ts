@@ -1,6 +1,6 @@
 // src/types/Checkout.ts
 
-import { Cart } from "./Cart";
+import { Cart } from './Cart';
 
 export interface CheckoutForm {
     name: string;

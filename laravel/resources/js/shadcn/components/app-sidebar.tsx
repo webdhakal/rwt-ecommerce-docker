@@ -1,8 +1,8 @@
+import { dashboard } from '@/routes';
 import { NavFooter } from '@/shadcn/components/nav-footer';
 import { NavMain } from '@/shadcn/components/nav-main';
 import { NavUser } from '@/shadcn/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/shadcn/ui/sidebar';
-import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { BookOpen, Folder, LayoutGrid } from 'lucide-react';

@@ -1,63 +1,54 @@
-import { useEffect, useState, useCallback } from 'react'
-import { FaAngleDoubleUp } from 'react-icons/fa'
+import { useCallback, useEffect, useState } from 'react';
+import { FaAngleDoubleUp } from 'react-icons/fa';
 
 const ScrollToTop = () => {
-  const [isScrollToTopVisible, setIsScrollToTopVisible] = useState(false)
-  const [scrollProgress, setScrollProgress] = useState(0)
+    const [isScrollToTopVisible, setIsScrollToTopVisible] = useState(false);
+    const [scrollProgress, setScrollProgress] = useState(0);
 
-  const scrollTop = () => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
-  }
+    const scrollTop = () => {
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    };
 
-  const handleScroll = useCallback(() => {
-    const currentScroll = document.documentElement.scrollTop || document.body.scrollTop
-    const totalScrollableHeight =
-      document.documentElement.scrollHeight - document.documentElement.clientHeight
-    const progress = (currentScroll / totalScrollableHeight) * 100
-    setScrollProgress(progress)
-    setIsScrollToTopVisible(currentScroll > 250)
-  }, [])
+    const handleScroll = useCallback(() => {
+        const currentScroll = document.documentElement.scrollTop || document.body.scrollTop;
+        const totalScrollableHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const progress = (currentScroll / totalScrollableHeight) * 100;
+        setScrollProgress(progress);
+        setIsScrollToTopVisible(currentScroll > 250);
+    }, []);
 
-  useEffect(() => {
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [handleScroll])
+    useEffect(() => {
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [handleScroll]);
 
-  return (
-    <div className="fixed bottom-6 right-6 z-50">
-      {isScrollToTopVisible && (
-        <div className="relative h-14 w-14">
-          <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100">
-            <circle
-              cx="50"
-              cy="50"
-              r="40"
-              stroke="white"
-              strokeWidth="6"
-              fill="none"
-              opacity="0.2"
-            />
-            <circle
-              cx="50"
-              cy="50"
-              r="40"
-              stroke="white"
-              strokeWidth="6"
-              fill="none"
-              strokeDasharray="251.2"
-              strokeDashoffset={251.2 - (251.2 * scrollProgress) / 100}
-              strokeLinecap="round"
-              className="transition-all duration-200 ease-linear stroke-primary"
-            />
-          </svg>
-          <FaAngleDoubleUp
-            className="absolute left-1/2 top-1/2 size-10 -translate-x-1/2 -translate-y-1/2 cursor-pointer rounded-full bg-primary p-2 text-background"
-            onClick={scrollTop}
-          />
+    return (
+        <div className="fixed right-6 bottom-6 z-50">
+            {isScrollToTopVisible && (
+                <div className="relative h-14 w-14">
+                    <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="40" stroke="white" strokeWidth="6" fill="none" opacity="0.2" />
+                        <circle
+                            cx="50"
+                            cy="50"
+                            r="40"
+                            stroke="white"
+                            strokeWidth="6"
+                            fill="none"
+                            strokeDasharray="251.2"
+                            strokeDashoffset={251.2 - (251.2 * scrollProgress) / 100}
+                            strokeLinecap="round"
+                            className="stroke-primary transition-all duration-200 ease-linear"
+                        />
+                    </svg>
+                    <FaAngleDoubleUp
+                        className="absolute top-1/2 left-1/2 size-10 -translate-x-1/2 -translate-y-1/2 cursor-pointer rounded-full bg-primary p-2 text-background"
+                        onClick={scrollTop}
+                    />
+                </div>
+            )}
         </div>
-      )}
-    </div>
-  )
-}
+    );
+};
 
-export default ScrollToTop
+export default ScrollToTop;

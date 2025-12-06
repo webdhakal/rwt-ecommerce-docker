@@ -61,42 +61,42 @@
 
 :root {
     /* Light Mode - Clean and Professional */
-    --background: oklch(1 0 0);                      /* Pure white */
-    --foreground: oklch(0.145 0 0);                  /* Almost black */
-    
-    --card: oklch(1 0 0);                            /* White cards */
+    --background: oklch(1 0 0); /* Pure white */
+    --foreground: oklch(0.145 0 0); /* Almost black */
+
+    --card: oklch(1 0 0); /* White cards */
     --card-foreground: oklch(0.145 0 0);
-    
-    --popover: oklch(1 0 0);                         /* White popover */
+
+    --popover: oklch(1 0 0); /* White popover */
     --popover-foreground: oklch(0.145 0 0);
-    
-    --primary: oklch(0.51 0.0878 213.84);            /* Blue primary */
-    --primary-foreground: oklch(0.99 0 0);           /* White text on primary */
-    
-    --secondary: oklch(0.97 0 0);                    /* Light gray */
-    --secondary-foreground: oklch(0.205 0 0);        /* Dark text on secondary */
-    
-    --muted: oklch(0.97 0 0);                        /* Muted gray */
-    --muted-foreground: oklch(0.556 0 0);            /* Medium gray text */
-    
-    --accent: oklch(0.58 0.15 280);                  /* Purple accent */
-    --accent-foreground: oklch(0.99 0 0);            /* White on accent */
-    
-    --destructive: oklch(0.58 0.2387 28.48);         /* Red for errors */
-    --destructive-foreground: oklch(0.99 0 0);       /* White on red */
-    
-    --border: oklch(0.922 0 0);                      /* Light border */
-    --input: oklch(0.97 0 0);                        /* Input background */
-    --ring: oklch(0.51 0.0878 213.84);               /* Focus ring matches primary */
-    
+
+    --primary: oklch(0.51 0.0878 213.84); /* Blue primary */
+    --primary-foreground: oklch(0.99 0 0); /* White text on primary */
+
+    --secondary: oklch(0.97 0 0); /* Light gray */
+    --secondary-foreground: oklch(0.205 0 0); /* Dark text on secondary */
+
+    --muted: oklch(0.97 0 0); /* Muted gray */
+    --muted-foreground: oklch(0.556 0 0); /* Medium gray text */
+
+    --accent: oklch(0.58 0.15 280); /* Purple accent */
+    --accent-foreground: oklch(0.99 0 0); /* White on accent */
+
+    --destructive: oklch(0.58 0.2387 28.48); /* Red for errors */
+    --destructive-foreground: oklch(0.99 0 0); /* White on red */
+
+    --border: oklch(0.922 0 0); /* Light border */
+    --input: oklch(0.97 0 0); /* Input background */
+    --ring: oklch(0.51 0.0878 213.84); /* Focus ring matches primary */
+
     --chart-1: oklch(0.646 0.222 41.116);
     --chart-2: oklch(0.6 0.118 184.704);
     --chart-3: oklch(0.398 0.07 227.392);
     --chart-4: oklch(0.828 0.189 84.429);
     --chart-5: oklch(0.769 0.188 70.08);
-    
+
     --radius: 0.625rem;
-    
+
     --sidebar: oklch(0.985 0 0);
     --sidebar-foreground: oklch(0.145 0 0);
     --sidebar-primary: oklch(0.205 0 0);
@@ -109,48 +109,48 @@
 
 .dark {
     /* Dark Mode - Eye-friendly and Modern */
-    --background: oklch(0.15 0 0);                   /* Dark background, not pure black */
-    --foreground: oklch(0.95 0 0);                   /* Soft white text */
-    
-    --card: oklch(0.18 0 0);                         /* Slightly elevated from background */
+    --background: oklch(0.15 0 0); /* Dark background, not pure black */
+    --foreground: oklch(0.95 0 0); /* Soft white text */
+
+    --card: oklch(0.18 0 0); /* Slightly elevated from background */
     --card-foreground: oklch(0.95 0 0);
-    
-    --popover: oklch(0.20 0 0);                      /* Elevated popover */
+
+    --popover: oklch(0.2 0 0); /* Elevated popover */
     --popover-foreground: oklch(0.95 0 0);
-    
-    --primary: oklch(0.65 0.15 220);                 /* Brighter blue for dark mode */
-    --primary-foreground: oklch(0.98 0 0);           /* White text on primary */
-    
-    --secondary: oklch(0.25 0 0);                    /* Subtle gray */
+
+    --primary: oklch(0.65 0.15 220); /* Brighter blue for dark mode */
+    --primary-foreground: oklch(0.98 0 0); /* White text on primary */
+
+    --secondary: oklch(0.25 0 0); /* Subtle gray */
     --secondary-foreground: oklch(0.95 0 0);
-    
-    --muted: oklch(0.25 0 0);                        /* Muted background */
-    --muted-foreground: oklch(0.65 0 0);             /* Readable gray text */
-    
-    --accent: oklch(0.65 0.18 280);                  /* Vibrant purple accent */
+
+    --muted: oklch(0.25 0 0); /* Muted background */
+    --muted-foreground: oklch(0.65 0 0); /* Readable gray text */
+
+    --accent: oklch(0.65 0.18 280); /* Vibrant purple accent */
     --accent-foreground: oklch(0.98 0 0);
-    
-    --destructive: oklch(0.55 0.22 25);              /* Red for errors */
+
+    --destructive: oklch(0.55 0.22 25); /* Red for errors */
     --destructive-foreground: oklch(0.98 0 0);
-    
-    --border: oklch(0.30 0 0);                       /* Visible but subtle borders */
-    --input: oklch(0.22 0 0);                        /* Input background */
-    --ring: oklch(0.65 0.15 220);                    /* Focus ring matches primary */
-    
+
+    --border: oklch(0.3 0 0); /* Visible but subtle borders */
+    --input: oklch(0.22 0 0); /* Input background */
+    --ring: oklch(0.65 0.15 220); /* Focus ring matches primary */
+
     --chart-1: oklch(0.55 0.24 264);
-    --chart-2: oklch(0.70 0.17 162);
+    --chart-2: oklch(0.7 0.17 162);
     --chart-3: oklch(0.77 0.19 70);
     --chart-4: oklch(0.63 0.27 304);
     --chart-5: oklch(0.65 0.25 16);
-    
+
     --sidebar: oklch(0.18 0 0);
     --sidebar-foreground: oklch(0.95 0 0);
     --sidebar-primary: oklch(0.65 0.15 220);
     --sidebar-primary-foreground: oklch(0.98 0 0);
     --sidebar-accent: oklch(0.25 0 0);
     --sidebar-accent-foreground: oklch(0.95 0 0);
-    --sidebar-border: oklch(0.30 0 0);
-    --sidebar-ring: oklch(0.50 0.10 220);
+    --sidebar-border: oklch(0.3 0 0);
+    --sidebar-ring: oklch(0.5 0.1 220);
 }
 
 @layer base {

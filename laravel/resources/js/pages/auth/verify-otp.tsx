@@ -1,29 +1,14 @@
-import { Button } from "@/shadcn/ui/button"
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@/shadcn/ui/card"
-import {
-    Field,
-    FieldDescription,
-    FieldGroup,
-    FieldLabel,
-} from "@/shadcn/ui/field"
-import {
-    InputOTP,
-    InputOTPGroup,
-    InputOTPSlot,
-} from "@/shadcn/ui/input-otp"
-import GuestLayout from "@/layouts/guest-layout"
+import GuestLayout from '@/layouts/guest-layout';
+import { Button } from '@/shadcn/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shadcn/ui/card';
+import { Field, FieldDescription, FieldGroup, FieldLabel } from '@/shadcn/ui/field';
+import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/shadcn/ui/input-otp';
 
 export default function OTPForm({ ...props }: React.ComponentProps<typeof Card>) {
     return (
         <GuestLayout>
-            <section className="px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
-                <div className="max-w-sm mx-auto">
+            <section className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+                <div className="mx-auto max-w-sm">
                     <Card {...props}>
                         <CardHeader className="text-center">
                             <CardTitle className="text-xl">Enter verification code</CardTitle>
@@ -46,9 +31,7 @@ export default function OTPForm({ ...props }: React.ComponentProps<typeof Card>)
                                                 <InputOTPSlot index={5} />
                                             </InputOTPGroup>
                                         </InputOTP>
-                                        <FieldDescription className="text-center">
-                                            Enter the 6-digit code sent to your email.
-                                        </FieldDescription>
+                                        <FieldDescription className="text-center">Enter the 6-digit code sent to your email.</FieldDescription>
                                     </Field>
                                     <Button type="submit">Verify</Button>
                                     <FieldDescription className="text-center">
@@ -61,5 +44,5 @@ export default function OTPForm({ ...props }: React.ComponentProps<typeof Card>)
                 </div>
             </section>
         </GuestLayout>
-    )
+    );
 }

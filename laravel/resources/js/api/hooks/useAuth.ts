@@ -1,9 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 // import { useNavigate } from '@inertiajs/react';
-import { toast } from '@/shadcn/hooks/use-toast';
+// import { toast } from '@/shadcn/hooks/use-toast';
 import * as authApi from '@/api/endpoints/auth.api';
 import { User } from '@/interfaces/user.interface';
 import { AxiosResponse } from 'axios';
+import { toast } from 'sonner';
 
 // Query Keys
 export const authKeys = {
@@ -12,85 +13,73 @@ export const authKeys = {
 };
 
 // ---- useLogin Hook ----
+// In useAuth.ts
 export const useLogin = () => {
     const queryClient = useQueryClient();
-    
+
     return useMutation({
         mutationFn: authApi.login,
         onSuccess: (data: AxiosResponse) => {
-            // Store tokens in localStorage (note: consider more secure alternatives)
             if (data.payload) {
                 localStorage.setItem('authToken', data.payload.access_token);
-                localStorage.setItem('refreshToken', data.payload.refreshToken);
+                localStorage.setItem('refreshToken', data.payload.refresh_token);
+                localStorage.setItem('expiresAt', data.payload.expire_at); // <── ADD THIS
             }
-            
-            // Invalidate and refetch user data
+
             queryClient.invalidateQueries({ queryKey: authKeys.me() });
-            
-            toast({
-                title: data.data?.message || 'Login successful',
-                description: 'Redirecting to dashboard...'
+
+            toast.success(data.data?.message || 'Login successful', {
+                description: 'Redirecting to dashboard...',
             });
-            
-            // Redirect after short delay
+
             setTimeout(() => {
-                window.location.href = "/dashboard";
-            }, 500);
+                console.log('Redirecting to dashboard...'); // Debug log
+                window.location.href = '/dashboard';
+            }, 1500);
         },
         onError: (error: any) => {
-            toast({
-                title: 'Failed to login',
+            console.error('Login error:', error); // Debug log
+            toast.error('Failed to login', {
                 description: error.response?.data?.message || error.message,
-                variant: 'destructive'
             });
-        }
+        },
     });
 };
-
 // ---- useRegister Hook ----
 export const useRegister = () => {
     const queryClient = useQueryClient();
-    
+
     return useMutation({
         mutationFn: authApi.register,
-        onSuccess: (data: AxiosResponse<{ payload: { access_token: string, refreshToken: string, auth: User } }>) => {
-            // Update tokens in localStorage
-            if (data.data?.payload) {
-                localStorage.setItem('authToken', data.data.payload.access_token);
-                localStorage.setItem('refreshToken', data.data.payload.refreshToken);
-            }
-            
+        onSuccess: (data: AxiosResponse<{ payload: { access_token: string; refreshToken: string; auth: User } }>) => {
             queryClient.invalidateQueries({ queryKey: authKeys.me() });
-            
-            toast({
-                title: data.data?.message || 'Registration successful',
-                description: 'Redirecting to dashboard...'
+
+            toast.success(data.data?.message || 'Registration successful', {
+                description: 'Redirecting to login page...',
             });
-            
+
             setTimeout(() => {
-                window.location.href = "/login";
-            }, 500);
+                window.location.href = '/login';
+            }, 1500);
         },
         onError: (error: any) => {
-            toast({
-                title: 'Failed to register',
+            toast.error('Registration failed', {
                 description: error.response?.data?.message || error.message,
-                variant: 'destructive'
             });
-        }
+        },
     });
 };
 
 // ---- useMe Hook (Get Current User) ----
 export const useMe = (enabled: boolean = true) => {
     const hasToken = !!localStorage.getItem('authToken');
-    
+
     return useQuery({
         queryKey: authKeys.me(),
         queryFn: authApi.me,
         enabled: enabled && hasToken,
         retry: false,
-        select: (data) => data.payload
+        select: (data) => data.payload,
     });
 };
 
@@ -101,7 +90,7 @@ export const useForgotPassword = () => {
         onSuccess: (data: AxiosResponse<{ message: string }>) => {
             toast({
                 title: data.data?.message || 'OTP sent',
-                description: 'Please check your email for the OTP code.'
+                description: 'Please check your email for the OTP code.',
             });
             window.location.href = route('reset-password');
         },
@@ -109,9 +98,9 @@ export const useForgotPassword = () => {
             toast({
                 title: 'Failed to send OTP',
                 description: error.response?.data?.message || error.message,
-                variant: 'destructive'
+                variant: 'destructive',
             });
-        }
+        },
     });
 };
 
@@ -119,10 +108,10 @@ export const useForgotPassword = () => {
 export const useVerifyOtp = () => {
     return useMutation({
         mutationFn: authApi.verifyOtp,
-        onSuccess: (data: AxiosResponse<{ message: string, payload: { token: string } }>) => {
+        onSuccess: (data: AxiosResponse<{ message: string; payload: { token: string } }>) => {
             toast({
                 title: data.data?.message || 'OTP verified',
-                description: 'Please set your new password.'
+                description: 'Please set your new password.',
             });
             // Store the reset token in localStorage for the reset password page
             if (data.data?.payload?.token) {
@@ -134,9 +123,9 @@ export const useVerifyOtp = () => {
             toast({
                 title: 'Failed to verify OTP',
                 description: error.response?.data?.message || error.message,
-                variant: 'destructive'
+                variant: 'destructive',
             });
-        }
+        },
     });
 };
 
@@ -148,9 +137,9 @@ export const useVerifyPasswordToken = () => {
             toast({
                 title: 'Invalid or expired token',
                 description: error.response?.data?.message || error.message,
-                variant: 'destructive'
+                variant: 'destructive',
             });
-        }
+        },
     });
 };
 
@@ -161,27 +150,27 @@ export const useResetPassword = () => {
         onSuccess: (data: AxiosResponse<{ message: string }>) => {
             toast({
                 title: data.data?.message || 'Password reset successful',
-                description: 'You can now login with your new password.'
+                description: 'You can now login with your new password.',
             });
-            
+
             setTimeout(() => {
-                window.location.href = "/login";
+                window.location.href = '/login';
             }, 1500);
         },
         onError: (error: any) => {
             toast({
                 title: 'Failed to reset password',
                 description: error.response?.data?.message || error.message,
-                variant: 'destructive'
+                variant: 'destructive',
             });
-        }
+        },
     });
 };
 
 // ---- useRefreshToken Hook ----
 export const useRefreshToken = () => {
     const queryClient = useQueryClient();
-    
+
     return useMutation({
         mutationFn: authApi.refreshToken,
         onSuccess: (data: AxiosResponse) => {
@@ -189,15 +178,15 @@ export const useRefreshToken = () => {
                 localStorage.setItem('authToken', data.payload.access_token);
                 localStorage.setItem('refreshToken', data.payload.refreshToken);
             }
-            
+
             queryClient.invalidateQueries({ queryKey: authKeys.me() });
         },
         onError: (error: any) => {
             // Clear tokens and redirect to login
             localStorage.removeItem('authToken');
             localStorage.removeItem('refreshToken');
-            window.location.href = "/login";
-        }
+            window.location.href = '/login';
+        },
     });
 };
 
@@ -219,9 +208,8 @@ export const useUpdateProfile = () => {
 
                     // Update the cache
                     queryClient.setQueryData(authKeys.me(), payload);
-
                 } catch (error) {
-                    console.error("Failed to fetch updated user:", error);
+                    console.error('Failed to fetch updated user:', error);
                 }
             } else {
                 // Backend *did* return payload → update cache normally
@@ -231,86 +219,90 @@ export const useUpdateProfile = () => {
                 }));
             }
 
+            toast.success(data.message || 'Profile updated successfully');
             return;
         },
 
         onError: (error: any) => {
             toast({
-                title: "Failed to update profile",
+                title: 'Failed to update profile',
                 description: error.response?.data?.message || error.message,
-                variant: "destructive",
+                variant: 'destructive',
             });
             throw error;
         },
     });
 };
-
 
 // ---- useChangePassword Hook ----
 export const useChangePassword = () => {
     return useMutation({
         mutationFn: authApi.changePassword,
         onSuccess: (data: AxiosResponse) => {
-            toast({
-                title: data.message || 'Password changed successfully',
+            toast.success(data.message || 'Password changed successfully', {
                 description: 'Please login again with your new password.',
-                variant: 'default'
             });
-            
+
             localStorage.removeItem('authToken');
             localStorage.removeItem('refreshToken');
-            
+
             setTimeout(() => {
                 window.location.href = route('login');
             }, 2000);
         },
         onError: (error: any) => {
-            toast({
-                title: 'Failed to change password',
+            toast.error('Failed to change password', {
                 description: error.response?.data?.message || error.message,
-                variant: 'destructive'
+                variant: 'destructive',
             });
             throw error;
-        }
+        },
     });
 };
 
 // ---- useLogout Hook ----
 export const useLogout = () => {
     const queryClient = useQueryClient();
-    // const navigate = useNavigate();
-    
+
     return useMutation({
         mutationFn: authApi.logout,
         onSuccess: (data: AxiosResponse) => {
             // Clear all auth-related data from localStorage
             localStorage.removeItem('authToken');
             localStorage.removeItem('refreshToken');
-            
+            localStorage.removeItem('auth');
+            localStorage.removeItem('expiresAt');
+
             // Invalidate all queries
             queryClient.clear();
-            
-            toast({
-                title: data.message || 'Logged out successfully',
-                description: 'You have been logged out.'
+
+            // Show success toast
+            toast.success(data.message || 'Logged out successfully', {
+                description: 'You have been logged out.',
             });
-            
-            // Navigate to login page
-            window.location.href = (route('login'));
+
+            // Navigate to login page after a short delay
+            setTimeout(() => {
+                window.location.href = route('login');
+            }, 1000);
         },
         onError: (error: any) => {
             // Even if there's an error, we'll still clear local storage and redirect
             localStorage.removeItem('authToken');
             localStorage.removeItem('refreshToken');
             localStorage.removeItem('auth');
+            localStorage.removeItem('expiresAt');
             queryClient.clear();
-            
-            toast({
-                title: 'Logged out',
-                description: 'You have been logged out.'
+
+            // Show error toast
+            toast.error('Logout Error', {
+                description: error.response?.data?.message || 'An error occurred during logout',
             });
-            
-            window.location.href = (route('login'));
-        }
+
+            // Still redirect to login page
+            setTimeout(() => {
+                window.location.href = route('login');
+            }, 1000);
+        },
     });
 };

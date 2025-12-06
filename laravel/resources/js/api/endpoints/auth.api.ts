@@ -1,7 +1,6 @@
-import api from "../clients/axiosClient";
-import { ROUTES } from "../routes";
-import { AlternateApiResponse } from "@/interfaces/api.interface";
-import { User } from "@/interfaces/user.interface";
+import { AlternateApiResponse } from '@/interfaces/api.interface';
+import api from '../clients/axiosClient';
+import { ROUTES } from '../routes';
 
 // ---- Types ----
 export interface LoginPayload {
@@ -119,8 +118,11 @@ export const logout = async (): Promise<AlternateApiResponse<any>> => {
 };
 
 // ---- UPDATE PROFILE ----
-export const updateProfile = async (payload: UpdateProfilePayload): Promise<AlternateApiResponse<User>> => {
-    const res = await api.post(ROUTES.AUTH.UPDATE_PROFILE, payload);
+export const updateProfile = async (payload: UpdateProfilePayload | FormData) => {
+    const isFormData = payload instanceof FormData;
+
+    const res = await api.post(ROUTES.AUTH.UPDATE_PROFILE, payload, isFormData ? { headers: { 'Content-Type': 'multipart/form-data' } } : undefined);
+
     return res.data;
 };
 

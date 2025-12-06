@@ -1,6 +1,6 @@
 import { AlternateApiResponse } from '@/interfaces/api.interface';
 import { ParamsI } from '@/store/interface';
-import { Product, ProductDetail } from '@/types/Product';
+import { ProductDetail } from '@/types/Product';
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
 import { getProductDetail } from '../endpoints/product-details.api';
 

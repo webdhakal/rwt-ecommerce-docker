@@ -1,5 +1,5 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/shadcn/ui/avatar';
 import { useInitials } from '@/shadcn/hooks/use-initials';
+import { Avatar, AvatarFallback, AvatarImage } from '@/shadcn/ui/avatar';
 import { type User } from '@/types';
 
 export function UserInfo({ user, showEmail = false }: { user: User; showEmail?: boolean }) {

@@ -1,22 +1,19 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import {
-    Heart, Package, User, MapPin, CreditCard, Star, Store,
-    ArrowRight, Menu
-} from 'lucide-react';
+import { ArrowRight, CreditCard, Heart, MapPin, Menu, Package, Star, Store, User } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
-import { Card, CardContent } from '@/shadcn/ui/card';
 import GuestLayout from '@/layouts/guest-layout';
+import { Card, CardContent } from '@/shadcn/ui/card';
 import { Head } from '@inertiajs/react';
 
 // Change from named imports to default imports
-import ProfileTab from '@/components/UserDashboard/tabs/ProfileTab';
+import AddressesTab from '@/components/UserDashboard/tabs/AddressesTab'; // Fixed the extra 's' here
 import OrdersTab from '@/components/UserDashboard/tabs/OrdersTab';
-import WishlistTab from '@/components/UserDashboard/tabs/WishlistTab';
-import ReviewsTab from '@/components/UserDashboard/tabs/ReviewsTab';
-import AddressesTab from '@/components/UserDashboard/tabs/AddressesTab';  // Fixed the extra 's' here
 import PaymentsTab from '@/components/UserDashboard/tabs/PaymentsTab';
+import ProfileTab from '@/components/UserDashboard/tabs/ProfileTab';
+import ReviewsTab from '@/components/UserDashboard/tabs/ReviewsTab';
+import WishlistTab from '@/components/UserDashboard/tabs/WishlistTab';
 
 const DEFAULT_TAB = 'profile';
 
@@ -52,11 +49,7 @@ export default function UserDashboard() {
         } else {
             params.set('tab', activeTab);
         }
-        window.history.replaceState(
-            null,
-            '',
-            `${window.location.pathname}${params.toString() ? '?' + params.toString() : ''}`
-        );
+        window.history.replaceState(null, '', `${window.location.pathname}${params.toString() ? '?' + params.toString() : ''}`);
     }, [activeTab]);
 
     const renderTabContent = () => {
@@ -82,19 +75,17 @@ export default function UserDashboard() {
         <GuestLayout>
             <Head title="User Dashboard" />
             <div className="min-h-screen bg-background">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+                    <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
                         {/* Mobile Sidebar Toggle */}
-                        <div className="lg:hidden mb-4 relative">
+                        <div className="relative mb-4 lg:hidden">
                             <button
-                                className="w-full flex items-center justify-between gap-2 px-4 py-3 rounded-lg border shadow-sm bg-card hover:bg-accent transition-colors"
+                                className="flex w-full items-center justify-between gap-2 rounded-lg border bg-card px-4 py-3 shadow-sm transition-colors hover:bg-accent"
                                 onClick={() => setSidebarOpen(!sidebarOpen)}
                             >
                                 <div className="flex items-center gap-2">
                                     <Menu className="h-5 w-5" />
-                                    <span className="font-medium">
-                                        {MENU_ITEMS.find(item => item.tab === activeTab)?.label}
-                                    </span>
+                                    <span className="font-medium">{MENU_ITEMS.find((item) => item.tab === activeTab)?.label}</span>
                                 </div>
                                 <svg
                                     className={`h-5 w-5 transition-transform ${sidebarOpen ? 'rotate-180' : ''}`}
@@ -107,7 +98,7 @@ export default function UserDashboard() {
                             </button>
 
                             {sidebarOpen && (
-                                <Card className="absolute top-full mt-2 w-full z-50 shadow-xl border-2">
+                                <Card className="absolute top-full z-50 mt-2 w-full border-2 shadow-xl">
                                     <CardContent className="p-2">
                                         <nav className="space-y-1">
                                             {MENU_ITEMS.map((item) => (
@@ -117,10 +108,11 @@ export default function UserDashboard() {
                                                         setActiveTab(item.tab);
                                                         setSidebarOpen(false);
                                                     }}
-                                                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === item.tab
-                                                        ? 'bg-primary/10 text-primary font-medium'
-                                                        : 'hover:bg-secondary text-foreground'
-                                                        }`}
+                                                    className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 text-left transition-all ${
+                                                        activeTab === item.tab
+                                                            ? 'bg-primary/10 font-medium text-primary'
+                                                            : 'text-foreground hover:bg-secondary'
+                                                    }`}
                                                 >
                                                     <item.icon className="h-5 w-5" />
                                                     <span>{item.label}</span>
@@ -134,19 +126,20 @@ export default function UserDashboard() {
                         </div>
 
                         {/* Desktop Sidebar */}
-                        <aside className="hidden lg:block lg:col-span-1">
-                            <Card className="shadow-lg border">
+                        <aside className="hidden lg:col-span-1 lg:block">
+                            <Card className="border shadow-lg">
                                 <CardContent className="pt-6">
-                                    <h2 className="text-lg font-semibold mb-4">My Account</h2>
+                                    <h2 className="mb-4 text-lg font-semibold">My Account</h2>
                                     <nav className="space-y-2">
                                         {MENU_ITEMS.map((item) => (
                                             <button
                                                 key={item.label}
                                                 onClick={() => setActiveTab(item.tab)}
-                                                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === item.tab
-                                                    ? 'bg-primary/10 text-primary font-medium shadow-sm'
-                                                    : 'hover:bg-secondary text-foreground'
-                                                    }`}
+                                                className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 text-left transition-all ${
+                                                    activeTab === item.tab
+                                                        ? 'bg-primary/10 font-medium text-primary shadow-sm'
+                                                        : 'text-foreground hover:bg-secondary'
+                                                }`}
                                             >
                                                 <item.icon className="h-5 w-5" />
                                                 <span>{item.label}</span>
@@ -159,9 +152,7 @@ export default function UserDashboard() {
                         </aside>
 
                         {/* Main Content */}
-                        <main className="lg:col-span-3">
-                            {renderTabContent()}
-                        </main>
+                        <main className="lg:col-span-3">{renderTabContent()}</main>
                     </div>
                 </div>
             </div>

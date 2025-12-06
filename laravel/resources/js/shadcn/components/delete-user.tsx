@@ -1,7 +1,8 @@
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
 import HeadingSmall from '@/shadcn/components/heading-small';
 import InputError from '@/shadcn/components/input-error';
-import { Button } from '@/shadcn/ui/button'; import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from '@/shadcn/ui/dialog';
+import { Button } from '@/shadcn/ui/button';
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from '@/shadcn/ui/dialog';
 import { Input } from '@/shadcn/ui/input';
 import { Label } from '@/shadcn/ui/label';
 import { Form } from '@inertiajs/react';
