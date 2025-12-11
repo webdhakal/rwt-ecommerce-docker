@@ -321,7 +321,7 @@ const Header = forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(({ ...
                                 >
                                     <Heart className="h-6 w-6" />
                                     <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-xs text-destructive-foreground">
-                                        {wishlistData?.payload?.items?.length}
+                                        {wishlistData?.payload?.items?.length || 0}   
                                     </span>
                                     <div className="absolute bottom-0 left-1/2 mt-2 -translate-x-1/2 translate-y-full transform rounded bg-popover px-2 py-1 text-xs text-popover-foreground opacity-0 transition-opacity group-hover:opacity-100 border border-border">
                                         Wishlist
