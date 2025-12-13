@@ -12,6 +12,7 @@ export interface LoginPayload {
 export interface RegisterPayload {
     name: string;
     email: string;
+    phone: string;
     password: string;
     confirm_password: string;
 }
@@ -42,7 +43,10 @@ export interface UpdateProfilePayload {
     name?: string;
     email?: string;
     phone?: string;
-    address?: string;
+    address_line1?: string;
+    address_line2?: string;
+    country?: string;
+    state?: string;
     files?: File[];
     // Add other profile fields as needed
 }

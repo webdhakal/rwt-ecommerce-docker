@@ -25,6 +25,7 @@ export const ROUTES = {
         RESET_PASSWORD: withAuthPrefix('reset-password'),
         UPDATE_PROFILE: withAuthPrefix('update-profile'),
         CHANGE_PASSWORD: withAuthPrefix('change-password'),
+        VendorDocumentUpload: withAuthPrefix('vendor-doc'),
     },
     GUEST: {
         LOGIN: withGuestPrefix('login'),

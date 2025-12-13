@@ -8,7 +8,6 @@ const ProductsTab = ({ products, categories }) => {
     const [sortBy, setSortBy] = useState('newest');
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [viewMode, setViewMode] = useState('grid');
-    console.log(viewMode);
 
     const sortOptions = [
         { value: 'newest', label: 'Newest First' },
@@ -22,10 +21,14 @@ const ProductsTab = ({ products, categories }) => {
 
     const filteredProducts = products?.filter((product) => selectedCategory === 'all' || product?.categoryId === selectedCategory);
 
-    const ProductCard = ({ product }) => (
-        <div className="group overflow-hidden rounded-lg border border-border bg-card transition-shadow duration-200 hover:shadow-lg">
-            <Link href={route('product-detail', product?.id)} className="block">
-                <div className="relative aspect-square overflow-hidden">
+    const ProductCard = ({ product, viewMode = 'grid' }) => (
+        <div className={`group overflow-hidden rounded-lg border border-border bg-card transition-shadow duration-200 hover:shadow-lg ${viewMode === 'list' ? 'flex h-48' : 'block'
+            }`}>
+            <Link
+                href={route('product-detail', product?.id)}
+                className={`${viewMode === 'list' ? 'flex flex-1' : 'block'}`}
+            >
+                <div className={`relative ${viewMode === 'list' ? 'h-full w-48 flex-shrink-0' : 'aspect-square'}`}>
                     <img
                         src={product?.image}
                         alt={product?.name}
@@ -37,23 +40,31 @@ const ProductsTab = ({ products, categories }) => {
                     {product?.isNew && <div className="bg-success absolute top-2 right-2 rounded px-2 py-1 text-xs font-medium text-white">New</div>}
                 </div>
 
-                <div className="p-4">
-                    <h3 className="text-text-primary mb-2 line-clamp-2 font-medium transition-colors duration-200 group-hover:text-primary">
-                        {product?.name}
-                    </h3>
+                <div className={`p-4 ${viewMode === 'list' ? 'flex flex-1 flex-col justify-between' : ''}`}>
+                    <div>
+                        <h3 className="text-text-primary mb-2 line-clamp-2 font-medium transition-colors duration-200 group-hover:text-primary">
+                            {product?.name}
+                        </h3>
 
-                    <div className="mb-2 flex items-center gap-1">
-                        <div className="flex items-center">
-                            {[...Array(5)]?.map((_, i) => (
-                                <Icon
-                                    key={i}
-                                    name="Star"
-                                    size={14}
-                                    className={`${i < Math.floor(product?.rating) ? 'fill-current text-yellow-400' : 'text-gray-300'}`}
-                                />
-                            ))}
+                        <div className="mb-2 flex items-center gap-1">
+                            <div className="flex items-center">
+                                {[...Array(5)]?.map((_, i) => (
+                                    <Icon
+                                        key={i}
+                                        name="Star"
+                                        size={14}
+                                        className={`${i < Math.floor(product?.rating) ? 'fill-current text-yellow-400' : 'text-gray-300'}`}
+                                    />
+                                ))}
+                            </div>
+                            <span className="text-text-secondary text-sm">({product?.reviewCount})</span>
                         </div>
-                        <span className="text-text-secondary text-sm">({product?.reviewCount})</span>
+
+                        {viewMode === 'list' && (
+                            <p className="text-text-secondary mb-3 line-clamp-2 text-sm">
+                                {product?.description || 'No description available'}
+                            </p>
+                        )}
                     </div>
 
                     <div className="flex items-center justify-between">
@@ -92,28 +103,26 @@ const ProductsTab = ({ products, categories }) => {
                     <div className="flex items-center rounded-lg border border-border">
                         <button
                             onClick={() => setViewMode('grid')}
-                            className={`p-2 ${
-                                viewMode === 'grid' ? 'rounded-tl-lg rounded-bl-lg bg-secondary text-primary' : 'text-secondary hover:text-primary'
-                            } transition-colors duration-200`}
+                            className={`p-2 ${viewMode === 'grid' ? 'rounded-tl-lg rounded-bl-lg bg-secondary text-primary' : 'text-secondary hover:text-primary'
+                                } transition-colors duration-200`}
                         >
                             <Icon name="Grid3X3" size={16} />
                         </button>
                         <button
                             onClick={() => setViewMode('list')}
-                            className={`p-2 ${
-                                viewMode === 'list' ? 'rounded-tr-lg rounded-br-lg bg-secondary text-primary' : 'text-secondary hover:text-primary'
-                            } transition-colors duration-200`}
+                            className={`p-2 ${viewMode === 'list' ? 'rounded-tr-lg rounded-br-lg bg-secondary text-primary' : 'text-secondary hover:text-primary'
+                                } transition-colors duration-200`}
                         >
                             <Icon name="List" size={16} />
                         </button>
                     </div>
                 </div>
             </div>
-            {/* Products Grid */}
+            {/* Products Grid/List */}
             {filteredProducts?.length > 0 ? (
                 <div className={`grid gap-6 ${viewMode === 'grid' ? 'grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' : 'grid-cols-1'}`}>
                     {filteredProducts?.map((product) => (
-                        <ProductCard key={product?.id} product={product} />
+                        <ProductCard key={product?.id} product={product} viewMode={viewMode} />
                     ))}
                 </div>
             ) : (

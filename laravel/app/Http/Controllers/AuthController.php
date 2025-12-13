@@ -36,4 +36,14 @@ class AuthController extends Controller
     {
         return Inertia::render('auth/reset-password');
     }
+    
+    public function vendorRegister(Request $request)
+    {
+        return Inertia::render('auth/vendor-register');
+    }
+
+    public function vendorDoc(Request $request)
+    {
+        return Inertia::render('auth/vendor-doc');
+    }
 }

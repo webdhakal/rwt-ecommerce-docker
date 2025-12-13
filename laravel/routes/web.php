@@ -51,7 +51,8 @@ Route::get('/checkout-process', [FrontController::class, 'checkoutProcess'])->na
 |||||||||||||||||||||||||||||||||||||||||||||||| VENDOR STORE ||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 --------------------------------------------------------------------------------------------------------------------*/
 Route::get('/vendor-store', [FrontController::class, 'vendorStore'])->name('vendor-store');
-
+Route::get('/vendor-register', [AuthController::class, 'vendorRegister'])->name('vendor-register');
+Route::get('/vendor-doc', [AuthController::class, 'vendorDoc'])->name('vendor-doc');
 
 
 

@@ -40,7 +40,7 @@ const EmptyCart = () => {
     ];
 
     return (
-        <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
+        <div className="mx-auto mt-36 max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
             {/* Empty Cart Illustration */}
             <div className="mb-12 text-center">
                 <div className="mx-auto mb-6 flex h-32 w-32 items-center justify-center rounded-full bg-muted">

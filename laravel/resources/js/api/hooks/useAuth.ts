@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 // import { useNavigate } from '@inertiajs/react';
 // import { toast } from '@/shadcn/hooks/use-toast';
 import * as authApi from '@/api/endpoints/auth.api';
-import { User } from '@/interfaces/user.interface';
+import { RegisterVendorData, User } from '@/interfaces/user.interface';
 import { AxiosResponse } from 'axios';
 import { toast } from 'sonner';
 
@@ -33,12 +33,12 @@ export const useLogin = () => {
             });
 
             setTimeout(() => {
-                console.log('Redirecting to dashboard...'); // Debug log
+                console.log('Redirecting to dashboard...');
                 window.location.href = '/dashboard';
             }, 1500);
         },
         onError: (error: any) => {
-            console.error('Login error:', error); // Debug log
+            console.error('Login error:', error);
             toast.error('Failed to login', {
                 description: error.response?.data?.message || error.message,
             });
@@ -303,6 +303,15 @@ export const useLogout = () => {
             setTimeout(() => {
                 window.location.href = route('login');
             }, 1000);
+        },
+    });
+};
+
+export const useRegisterVendor = () => {
+    return useMutation({
+        mutationFn: async (data: RegisterVendorData) => {
+            const response = await api.post('/api/vendor/register', data);
+            return response.data;
         },
     });
 };

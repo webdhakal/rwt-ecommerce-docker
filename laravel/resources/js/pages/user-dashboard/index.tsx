@@ -2,6 +2,7 @@
 
 import { ArrowRight, CreditCard, Heart, MapPin, Menu, Package, Star, Store, User } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { router } from '@inertiajs/react';
 
 import GuestLayout from '@/layouts/guest-layout';
 import { Card, CardContent } from '@/shadcn/ui/card';
@@ -14,6 +15,7 @@ import PaymentsTab from '@/components/UserDashboard/tabs/PaymentsTab';
 import ProfileTab from '@/components/UserDashboard/tabs/ProfileTab';
 import ReviewsTab from '@/components/UserDashboard/tabs/ReviewsTab';
 import WishlistTab from '@/components/UserDashboard/tabs/WishlistTab';
+import { useMe } from '@/api/hooks/useAuth';
 
 const DEFAULT_TAB = 'profile';
 
@@ -29,21 +31,25 @@ const MENU_ITEMS = [
 
 export default function UserDashboard() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
-
-    const getInitialTab = () => {
+    const { data: user, isLoading } = useMe();
+    const [activeTab, setActiveTab] = useState(() => {
         if (typeof window !== 'undefined') {
             const params = new URLSearchParams(window.location.search);
             const urlTab = params.get('tab');
             return urlTab || DEFAULT_TAB;
         }
         return DEFAULT_TAB;
-    };
-
-    const [activeTab, setActiveTab] = useState(getInitialTab);
+    });
 
     useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
+        if (!isLoading && !user) {
+            router.visit('/login');
+        }
+    }, [user, isLoading]);
 
+    // Handle tab changes in URL
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
         if (activeTab === DEFAULT_TAB) {
             params.delete('tab');
         } else {
@@ -51,6 +57,21 @@ export default function UserDashboard() {
         }
         window.history.replaceState(null, '', `${window.location.pathname}${params.toString() ? '?' + params.toString() : ''}`);
     }, [activeTab]);
+
+    if (isLoading) {
+        return (
+            <GuestLayout>
+                <div className="flex min-h-screen items-center justify-center">
+                    <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary"></div>
+                </div>
+            </GuestLayout>
+        );
+    }
+
+    if (!user) {
+        return null; // Will redirect from the useEffect
+    }
+
 
     const renderTabContent = () => {
         switch (activeTab) {
@@ -108,11 +129,10 @@ export default function UserDashboard() {
                                                         setActiveTab(item.tab);
                                                         setSidebarOpen(false);
                                                     }}
-                                                    className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 text-left transition-all ${
-                                                        activeTab === item.tab
-                                                            ? 'bg-primary/10 font-medium text-primary'
-                                                            : 'text-foreground hover:bg-secondary'
-                                                    }`}
+                                                    className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 text-left transition-all ${activeTab === item.tab
+                                                        ? 'bg-primary/10 font-medium text-primary'
+                                                        : 'text-foreground hover:bg-secondary'
+                                                        }`}
                                                 >
                                                     <item.icon className="h-5 w-5" />
                                                     <span>{item.label}</span>
@@ -135,11 +155,10 @@ export default function UserDashboard() {
                                             <button
                                                 key={item.label}
                                                 onClick={() => setActiveTab(item.tab)}
-                                                className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 text-left transition-all ${
-                                                    activeTab === item.tab
-                                                        ? 'bg-primary/10 font-medium text-primary shadow-sm'
-                                                        : 'text-foreground hover:bg-secondary'
-                                                }`}
+                                                className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 text-left transition-all ${activeTab === item.tab
+                                                    ? 'bg-primary/10 font-medium text-primary shadow-sm'
+                                                    : 'text-foreground hover:bg-secondary'
+                                                    }`}
                                             >
                                                 <item.icon className="h-5 w-5" />
                                                 <span>{item.label}</span>

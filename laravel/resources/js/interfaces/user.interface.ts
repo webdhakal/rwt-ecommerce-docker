@@ -9,3 +9,13 @@ export interface User {
     updated_at?: string;
     // Add other user fields as needed
 }
+export interface RegisterVendorData {
+    first_name: string;
+    last_name: string;
+    email: string;
+    phone: string;
+    company_name: string;
+    address: string;
+    password: string;
+    password_confirmation: string;
+}

@@ -153,7 +153,6 @@ axiosInstance.interceptors.response.use(
             return Promise.reject(apiError);
         }
 
-        // Fallback for any unhandled error case
         errorHandlers.showServerError('An unexpected error occurred');
         return Promise.reject({
             message: 'An unexpected error occurred',
@@ -163,7 +162,6 @@ axiosInstance.interceptors.response.use(
     },
 );
 
-// Helper function for default error messages
 function getDefaultErrorMessage(status: number): string {
     switch (status) {
         case 400:
@@ -189,7 +187,6 @@ function getDefaultErrorMessage(status: number): string {
     }
 }
 
-// API methods with proper typing
 const api = {
     get: <T>(url: string, config?: CustomAxiosConfig) => axiosInstance.get<T>(url, config),
     post: <T>(url: string, data?: unknown, config?: CustomAxiosConfig) => axiosInstance.post<T>(url, data, config),

@@ -286,8 +286,8 @@ const VendorStoreProfile = () => {
 
     const breadcrumbs = [
         { label: 'Home', path: '/homepage' },
-        { label: 'Vendors', path: '/vendor-store-profile' },
-        { label: vendor?.name, path: '/vendor-store-profile' },
+        { label: 'Vendors', path: '/vendors' },
+        { label: vendor?.name, path: `/vendor-store-profile/${vendor?.id || ''}` },
     ];
 
     const handleFollow = () => {

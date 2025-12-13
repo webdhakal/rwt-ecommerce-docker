@@ -22,22 +22,7 @@ export default function ForgotPassword() {
     const [email, setEmail] = useState('');
     const [success, setSuccess] = useState(false);
 
-    const forgotPasswordMutation = useForgotPassword({
-        onSuccess: (data) => {
-            toast({
-                title: data.message || 'Success',
-                description: 'Please check your email for the OTP code.',
-            });
-            window.location.href = route('reset-password');
-        },
-        onError: (error: any) => {
-            toast({
-                title: 'Failed to send OTP',
-                description: error.response?.data?.message || error.message,
-                variant: 'destructive',
-            });
-        },
-    });
+    const forgotPasswordMutation = useForgotPassword();
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -66,9 +51,6 @@ export default function ForgotPassword() {
                     </CardHeader>
 
                     <CardContent>
-                        {/* -------------------- 
-                            Status Message (Success) 
-                        -------------------- */}
                         {success ? (
                             <Alert className="border-green-400 bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400">
                                 <CheckCircle className="h-4 w-4" />

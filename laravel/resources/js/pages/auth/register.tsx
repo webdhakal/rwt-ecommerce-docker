@@ -34,23 +34,7 @@ export default function RegisterPage() {
         };
     }, []);
 
-    const registerMutation = useRegister({
-        onSuccess: (response) => {
-            localStorage.setItem('authToken', response.payload?.access_token);
-            localStorage.setItem('refreshToken', response.payload?.refreshToken);
-            localStorage.setItem('auth', JSON.stringify(response.payload?.auth));
-
-            toast({ title: response.message, description: 'Redirecting to dashboard...' });
-
-            window.location.href = '/dashboard';
-        },
-        onError: (err: any) => {
-            toast({
-                title: 'Signup failed',
-                description: err.response?.data?.message || err.message,
-            });
-        },
-    });
+    const registerMutation = useRegister();
 
     // 3. Handle Form Submission
     const handleSubmit: FormEventHandler = (e) => {
@@ -72,7 +56,7 @@ export default function RegisterPage() {
     return (
         <GuestLayout>
             <section className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-                <div className="container mx-auto">
+                <div className="max-w-7xl mx-auto">
                     <div className={cn('flex flex-col gap-6')}>
                         <Card className="overflow-hidden p-0">
                             <CardContent className="grid p-0 md:grid-cols-2">
@@ -157,13 +141,24 @@ export default function RegisterPage() {
                                                 {/* Confirm Password */}
                                                 <Field>
                                                     <FieldLabel htmlFor="confirm_password">Confirm Password</FieldLabel>
-                                                    <Input
-                                                        id="confirm_password"
-                                                        type={data.showPassword ? 'text' : 'password'}
-                                                        value={data.password_confirmation}
-                                                        onChange={(e) => setData('confirm_password', e.target.value)}
-                                                        required
-                                                    />
+                                                    <div className="relative">
+                                                        <Input
+                                                            id="confirm_password"
+                                                            type={data.showPassword ? 'text' : 'password'}
+                                                            value={data.confirm_password}
+                                                            onChange={(e) => setData('confirm_password', e.target.value)}
+                                                            className="pr-10"
+                                                            required
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            onClick={togglePasswordVisibility}
+                                                            className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
+                                                            aria-label={data.showPassword ? 'Hide password' : 'Show password'}
+                                                        >
+                                                            {data.showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                                        </button>
+                                                    </div>
                                                 </Field>
                                             </div>
                                         </Field>

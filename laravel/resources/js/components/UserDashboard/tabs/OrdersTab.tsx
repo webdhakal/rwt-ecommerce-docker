@@ -1,7 +1,9 @@
 import { Badge } from '@/shadcn/ui/badge';
 import { Button } from '@/shadcn/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shadcn/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shadcn/ui/table';
 import { CheckCircle, Clock, Package, Truck, XCircle } from 'lucide-react';
+// import { cn } from '@/lib/utils';
 
 const orders = [
     { id: 'ORD001', date: 'Nov 15, 2025', status: 'Delivered', total: 899, items: 2 },
@@ -23,6 +25,19 @@ const getStatusIcon = (status: string) => {
     }
 };
 
+const getStatusVariant = (status: string) => {
+    switch (status) {
+        case 'Delivered':
+            return 'default';
+        case 'Shipped':
+            return 'outline';
+        case 'Cancelled':
+            return 'destructive';
+        default:
+            return 'secondary';
+    }
+};
+
 export default function OrdersTab() {
     return (
         <Card className="border shadow-xl">
@@ -31,63 +46,106 @@ export default function OrdersTab() {
                     <CardTitle className="text-xl sm:text-2xl">My Orders</CardTitle>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <Package className="h-4 w-4 flex-shrink-0" />
-                        <span>4 orders in the last 30 days</span>
+                        <span>{orders.length} orders in the last 30 days</span>
                     </div>
                 </div>
             </CardHeader>
-            <CardContent className="p-0 sm:p-6 sm:pt-0">
-                <div className="divide-y">
-                    {orders.map((order) => (
-                        <div key={order.id} className="p-4 transition-colors hover:bg-muted/50 sm:rounded-lg sm:p-6">
-                            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                                <div className="flex items-start gap-4">
-                                    <div className="mt-0.5 flex-shrink-0">
-                                        {getStatusIcon(order.status)}
-                                    </div>
-                                    <div className="space-y-1.5">
-                                        <div className="flex flex-wrap items-center gap-2">
-                                            <p className="text-base font-medium sm:text-base">Order #{order.id}</p>
-                                            <Badge
-                                                variant={
-                                                    order.status === 'Delivered'
-                                                        ? 'default'
-                                                        : order.status === 'Shipped'
-                                                            ? 'outline'
-                                                            : 'destructive'
-                                                }
-                                                className="h-6 text-xs md:h-8 md:text-sm"
-                                            >
-                                                {order.status}
-                                            </Badge>
+            <CardContent className="p-2 rounded-lg">
+                <div className="relative overflow-x-auto rounded-md border">
+                    <Table className="w-full">
+                        <TableHeader className="bg-muted/50 sm:table-header-group">
+                            <TableRow>
+                                <TableHead className="text-center">#</TableHead>
+                                <TableHead className="text-center">Order</TableHead>
+                                <TableHead className="text-center">Status</TableHead>
+                                <TableHead className="text-center">Date</TableHead>
+                                <TableHead className="text-center">Items</TableHead>
+                                <TableHead className="text-center">Total</TableHead>
+                                <TableHead className="text-center">Actions</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {orders.map((order, index) => (
+                                <TableRow key={order.id} className="group border-b hover:bg-muted/50 text-center">
+                                    {/* mobile view */}
+                                    {/* <TableCell className="block py-4 px-4 sm:hidden">
+                                        <div className="flex items-start gap-3">
+                                            <div className="flex-shrink-0">{getStatusIcon(order.status)}</div>
+
+                                            <div className="flex flex-col gap-1 flex-1">
+                                                <div className="font-medium">Order #{order.id}</div>
+
+                                                <div className="flex items-center gap-2 text-xs">
+                                                    <Badge variant={getStatusVariant(order.status)} className="h-5 text-[10px]">
+                                                        {order.status}
+                                                    </Badge>
+                                                    <span className="text-muted-foreground">
+                                                        {order.items} {order.items > 1 ? "items" : "item"}
+                                                    </span>
+                                                </div>
+
+                                                <div className="flex items-center justify-between mt-1">
+                                                    <span className="font-semibold">Rs. {order.total}</span>
+
+                                                    <div className="flex gap-2">
+                                                        <Button variant="outline" size="sm" className="h-8 px-2 text-xs">
+                                                            Details
+                                                        </Button>
+                                                        <Button size="sm" className="h-8 px-2 text-xs">
+                                                            Buy Again
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <p className="text-sm text-muted-foreground">
-                                            {order.date} • {order.items} {order.items > 1 ? 'items' : 'item'}
-                                        </p>
-                                    </div>
-                                </div>
-                                <div className="mt-4 flex flex-col-reverse items-start gap-3 sm:mt-0 sm:flex-row sm:items-center sm:gap-4">
-                                    <p className="text-lg font-semibold sm:text-right">Rs. {order.total}</p>
-                                    <div className="flex w-full gap-2 sm:w-auto">
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            className="h-8 flex-1 sm:flex-none sm:px-4"
-                                        >
-                                            <span className="sm:hidden">Details</span>
-                                            <span className="hidden sm:inline">View Details</span>
-                                        </Button>
-                                        <Button
-                                            size="sm"
-                                            className="h-8 flex-1 sm:flex-none sm:px-4"
-                                        >
-                                            <span className="sm:hidden">Buy</span>
-                                            <span className="hidden sm:inline">Buy Again</span>
-                                        </Button>
-                                    </div>
-                                </div>
-                            </div>
+                                    </TableCell> */}
+
+
+                                    {/* Desktop View */}
+                                    <TableCell className=" py-4 sm:table-cell">
+                                        {index + 1}
+                                    </TableCell>
+                                    <TableCell className=" py-4 pl-6 pr-4 font-medium sm:table-cell">
+                                        <div className="flex items-center gap-3">
+                                            <div className="flex-shrink-0">
+                                                {getStatusIcon(order.status)}
+                                            </div>
+                                            <span>#{order.id}</span>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className=" py-4 sm:table-cell text-center">
+                                        <Badge variant={getStatusVariant(order.status)} className="h-6">
+                                            {order.status}
+                                        </Badge>
+                                    </TableCell>
+                                    <TableCell className="text-sm text-muted-foreground sm:table-cell">
+                                        {order.date}
+                                    </TableCell>
+                                    <TableCell className="text-sm text-muted-foreground sm:table-cell">
+                                        {order.items} {order.items > 1 ? 'items' : 'item'}
+                                    </TableCell>
+                                    <TableCell className=" py-4 font-medium sm:table-cell sm:text-right">
+                                        Rs. {order.total}
+                                    </TableCell>
+                                    <TableCell>
+                                        <div className="flex justify-center items-center gap-2">
+                                            <Button variant="outline" size="sm" className="h-8">
+                                                Details
+                                            </Button>
+                                            <Button size="sm" className="h-8">
+                                                Buy Again
+                                            </Button>
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                    {orders.length === 0 && (
+                        <div className="flex h-32 items-center justify-center text-muted-foreground">
+                            No orders found
                         </div>
-                    ))}
+                    )}
                 </div>
             </CardContent>
         </Card>

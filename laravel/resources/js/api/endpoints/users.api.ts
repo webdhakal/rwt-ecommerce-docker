@@ -1,5 +1,6 @@
 import { AlternateApiResponse } from '@/interfaces/api.interface';
 import { ParamsI } from '@/store/interface';
+import { User } from '@/types';
 import api from '../clients/axiosClient';
 
 export const getUsers = async ({ params }: { params?: ParamsI }): Promise<AlternateApiResponse<User>> => {

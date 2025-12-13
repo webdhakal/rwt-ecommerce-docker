@@ -1,4 +1,6 @@
 import { useChangePassword, useMe, useUpdateProfile } from '@/api/hooks/useAuth';
+import { useLocation } from '@/api/hooks/useLocation';
+import { Country, State } from '@/api/endpoints/location.api';
 import { useToast } from '@/shadcn/hooks/use-toast';
 import { Button } from '@/shadcn/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/shadcn/ui/card';
@@ -9,6 +11,20 @@ import { Calendar, Edit, Eye, EyeOff, Key, Loader2, Lock, Mail, MapPin, Phone, U
 import { useCallback, useEffect, useState } from 'react';
 import { AvatarUploadModal } from './AvatarUploadModal';
 import { UpdateProfilePayload } from '@/api/endpoints/auth.api';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shadcn/ui/select';
+import api from '@/api/clients/axiosClient';
+
+interface Country {
+    id: number;
+    name: string;
+    iso2: string;
+}
+
+interface State {
+    id: number;
+    name: string;
+    state_code: string;
+}
 
 export default function ProfileTab() {
     const { toast } = useToast();
@@ -24,8 +40,14 @@ export default function ProfileTab() {
     const [qrCodeUrl, setQrCodeUrl] = useState('');
     const [twoFASecret, setTwoFASecret] = useState('');
     const [verificationCode, setVerificationCode] = useState('');
-    const [verificationError, setVerificationError] = useState('');
+    const [verificationError, setVerificationError] = useState<string>('');
     const [backupCodes, setBackupCodes] = useState<string[]>([]);
+    const [countries, setCountries] = useState<Country[]>([]);
+    const [states, setStates] = useState<State[]>([]);
+    const [isLoadingCountries, setIsLoadingCountries] = useState(false);
+    const [isLoadingStates, setIsLoadingStates] = useState(false);
+    const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
+    // const [selectedState, setSelectedState] = useState<State | null>(null);
 
     // Fetch 2FA status on component mount
     useEffect(() => {
@@ -129,18 +151,22 @@ export default function ProfileTab() {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
     }, [backupCodes]);
+
     const { data: user, refetch } = useMe();
 
     const [formData, setFormData] = useState({
         name: user?.name || '',
         email: user?.email || '',
         phone: user?.phone || '',
-        address: '',
+        address1: '',
+        address2: '',
         dob: '',
         files: user?.avatar || '',
         currentPassword: '',
         newPassword: '',
         confirmPassword: '',
+        country: '',
+        state: '',
     });
 
     useEffect(() => {
@@ -170,6 +196,10 @@ export default function ProfileTab() {
             name: formData.name,
             email: formData.email,
             phone: formData.phone,
+            address_line1: formData.address1,
+            address_line2: formData.address2,
+            country: formData.country,
+            state: formData.state,
         };
 
         await updateProfileMutation.mutateAsync(payload);
@@ -238,6 +268,32 @@ export default function ProfileTab() {
             setIsLoading(false);
         }
     };
+
+    const { country, states: locationStates, isLoading: isLoadingLocation } = useLocation();
+    const [selectedState, setSelectedState] = useState<State | null>(null);
+
+    // Set the country and states when data is loaded
+    useEffect(() => {
+        if (country) {
+            setCountries([country]);
+            setSelectedCountry(country);
+        }
+    }, [country]);
+
+    // Update states when they change
+    useEffect(() => {
+        if (locationStates && locationStates.length > 0) {
+            setStates(locationStates);
+        }
+    }, [locationStates]);
+
+    const handleCountryChange = (value: string) => {
+        if (country && country.id.toString() === value) {
+            setSelectedCountry(country);
+        }
+    }
+
+
     return (
         <Card className="border shadow-xl">
             <CardHeader>
@@ -359,19 +415,95 @@ export default function ProfileTab() {
                                                     />
                                                 </div>
                                             </div>
-                                        </div>
-
-                                        <div className="space-y-2">
-                                            <Label htmlFor="address">Address</Label>
-                                            <div className="relative">
-                                                <MapPin className="absolute top-3 left-3 h-4 w-4 text-muted-foreground" />
-                                                <textarea
-                                                    id="address"
-                                                    className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 pl-10 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
-                                                    value={formData.address}
-                                                    onChange={handleInputChange}
-                                                    disabled={isLoading}
-                                                />
+                                            <div className="space-y-2">
+                                                <Label htmlFor="address1">Address-1 </Label>
+                                                <div className="relative">
+                                                    <MapPin className="absolute top-3 left-3 h-4 w-4 text-muted-foreground" />
+                                                    <Input
+                                                        id="address1"
+                                                        className="pl-10"
+                                                        value={formData.address1}
+                                                        onChange={handleInputChange}
+                                                        disabled={isLoading}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="address2">Address-2</Label>
+                                                <div className="relative">
+                                                    <MapPin className="absolute top-3 left-3 h-4 w-4 text-muted-foreground" />
+                                                    <Input
+                                                        id="address2"
+                                                        className="pl-10"
+                                                        value={formData.address2}
+                                                        onChange={handleInputChange}
+                                                        disabled={isLoading}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="country">Country</Label>
+                                                <Select
+                                                    value={country?.id.toString() || ''}
+                                                    onValueChange={handleCountryChange}
+                                                    disabled={isLoading || isLoadingLocation}
+                                                >
+                                                    <SelectTrigger className="w-full">
+                                                        <SelectValue placeholder={
+                                                            isLoadingLocation
+                                                                ? 'Loading...'
+                                                                : 'Select a country'
+                                                        } />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {country && (
+                                                            <SelectItem key={country.id} value={country.id.toString()}>
+                                                                {country.name}
+                                                            </SelectItem>
+                                                        )}
+                                                        {!isLoadingLocation && !country && (
+                                                            <div className="px-2 py-1.5 text-sm text-muted-foreground">
+                                                                No countries available
+                                                            </div>
+                                                        )}
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="state">State/Province</Label>
+                                                <Select
+                                                    value={selectedState?.id.toString() || ''}
+                                                    onValueChange={(value) => {
+                                                        const state = states.find(s => s.id.toString() === value);
+                                                        setSelectedState(state || null);
+                                                    }}
+                                                    disabled={isLoading || isLoadingLocation || states.length === 0}
+                                                >
+                                                    <SelectTrigger className="w-full">
+                                                        <SelectValue
+                                                            placeholder={
+                                                                isLoadingLocation
+                                                                    ? 'Loading states...'
+                                                                    : states.length === 0
+                                                                        ? 'No states available'
+                                                                        : 'Select a state'
+                                                            }
+                                                        />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {states.map((state) => (
+                                                            <SelectItem key={state.id} value={state.id.toString()}>
+                                                                {state.name}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                                {isLoadingStates && (
+                                                    <div className="flex items-center text-sm text-muted-foreground">
+                                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                        Loading states...
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     </CardContent>
