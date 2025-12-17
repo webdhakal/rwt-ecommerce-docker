@@ -8,7 +8,6 @@ const ProductInfo = ({ product, onAddToCart, onAddToWishlist }: { product: Produ
     const [quantity, setQuantity] = useState(1);
     const hasvariant = product?.has_variant;
 
-    
 
     const handleVariantChange = (variant) => {
         setSelectedVariant(variant);
@@ -81,9 +80,9 @@ const ProductInfo = ({ product, onAddToCart, onAddToWishlist }: { product: Produ
             {/* Variant Selection */}
             {product?.variants?.length > 1 && (
                 <div>
-                    <h3 className="text-text-primary mb-3 text-sm font-medium">
+                    {/* <h3 className="text-text-primary mb-3 text-sm font-medium">
                         {product?.variantType}: {selectedVariant?.name}
-                    </h3>
+                    </h3> */}
                     <div className="flex flex-wrap gap-2">
                         {product?.variants?.map((variant) => (
                             <button
@@ -98,7 +97,7 @@ const ProductInfo = ({ product, onAddToCart, onAddToWishlist }: { product: Produ
                                           : 'text-text-primary border-border bg-background hover:border-accent'
                                 }`}
                             >
-                                {variant?.name}
+                                {variant?.initials}
                                 {variant?.stock === 0 && <span className="ml-1 text-xs">(Out of Stock)</span>}
                             </button>
                         ))}

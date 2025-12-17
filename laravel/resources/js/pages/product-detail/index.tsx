@@ -31,9 +31,11 @@ function mapProductDetailToUI(product: ProductDetail) {
             : ['https://via.placeholder.com/800x800?text=No+Image'],
         variants: product.variants ? product.variants.map((v) => ({
             id: v.id,
-            name: `${v.size?.size_code ?? ''} ${v.color?.name ?? ''}`.trim(),
+            name: v.name,
+            initials: v.initials,
             price: parseFloat(v.price),
             originalPrice: parseFloat(v.base_price),
+            previousPrice: parseFloat(v.previous_price),
             stock: v.stock,
         })) : null,
         variantType: 'Size & Color', // since backend supports both
@@ -74,7 +76,7 @@ const ProductDetailPage = () => {
     // Map API payload → UI product
     const product = data?.payload ? mapProductDetailToUI(data.payload as ProductDetail) : null; // send data in payload.data
 
-        // Mock related products (keep as is)
+    // Mock related products (keep as is)
     const relatedProducts = [
         {
             id: 'rel-001',
@@ -138,7 +140,6 @@ const ProductDetailPage = () => {
         },
     ];
 
-    // const relatedProducts = data?.payload?.related_products; // how is the data being sent from the backend ?
 
     const breadcrumbs = [
         { label: 'Home', path: '/homepage' },

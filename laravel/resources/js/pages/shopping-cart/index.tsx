@@ -11,6 +11,7 @@ import { Button } from '@/shadcn/ui/button';
 import { Head } from '@inertiajs/react';
 import GuestLayout from '@/layouts/guest-layout';
 import { useShoppingCart,useDeleteCartItem, useUpdateCartItem } from '@/api/hooks/useShoppingCart';
+import { useSiteSetting } from '@/api/hooks/useSite-Setting';
 
 const ShoppingCart = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -18,6 +19,7 @@ const ShoppingCart = () => {
   const [discount, setDiscount] = useState(0);
   const [appliedPromoCode, setAppliedPromoCode] = useState('');
   const [showUndoRemove, setShowUndoRemove] = useState(null);
+  const { data: siteSetting } = useSiteSetting();
 
   const guestCartId= localStorage.getItem('guest_id');
 
@@ -25,7 +27,7 @@ const ShoppingCart = () => {
       refetchOnMount: true,
       cartId: guestCartId || undefined
     });
-  
+  const taxrate=siteSetting?.data[0]?.tax_rate;
 
 
 useEffect(() => {
@@ -42,7 +44,7 @@ useEffect(() => {
 
   // Calculate totals
   const subtotal = cartItems?.reduce((sum, item) => sum + (item?.price * item?.quantity), 0);
-  const tax = subtotal * 0.08; // 8% tax
+  const tax = subtotal * (taxrate/100);
   const shipping = subtotal > 50 ? 0 : 9.99; // Free shipping over $50
   const total = subtotal + tax + shipping - discount;
   const itemCount = cartItems?.reduce((sum, item) => sum + item?.quantity, 0);

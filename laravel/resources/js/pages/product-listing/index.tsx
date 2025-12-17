@@ -13,20 +13,69 @@ import ProductGrid from './components/ProductGrid';
 import SkeletonProductListingBrowse from './components/Skeleton';
 
 // Create initial filter state as a constant to avoid circular dependency
-const createInitialFilters = (): FilterState => ({
-    brands: [],
-    vendors: [],
-    categories: [],
-    ratings: [],
-    colors: [],
-    sizes: [],
-});
+const createInitialFilters = (): FilterState => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const filters: FilterState = {
+        brands: [],
+        vendors: [],
+        categories: [],
+        ratings: [],
+        colors: [],
+        sizes: [],
+    };
+
+    // Helper function to parse comma-separated values
+    const parseArray = (value: string | null): string[] => {
+        return value ? value.split(',').filter(Boolean) : [];
+    };
+
+    // Helper function to parse number array
+    const parseNumberArray = (value: string | null): number[] => {
+        return value ? value.split(',').map(Number).filter(n => !isNaN(n)) : [];
+    };
+
+    // Populate filters from URL params
+    if (urlParams.has('category')) {
+        filters.categories = parseArray(urlParams.get('category'));
+    }
+
+    if (urlParams.has('brands')) {
+        filters.brands = parseArray(urlParams.get('brands'));
+    }
+
+    if (urlParams.has('vendors')) {
+        filters.vendors = parseArray(urlParams.get('vendors'));
+    }
+
+    if (urlParams.has('ratings')) {
+        filters.ratings = parseNumberArray(urlParams.get('ratings'));
+    }
+
+    if (urlParams.has('colors')) {
+        filters.colors = parseArray(urlParams.get('colors'));
+    }
+
+    if (urlParams.has('sizes')) {
+        filters.sizes = parseArray(urlParams.get('sizes'));
+    }
+
+    if (urlParams.has('sort_by')) {
+        filters.sort_by = urlParams.get('sort_by') || undefined;
+    }
+
+    if (urlParams.has('min_price') || urlParams.has('max_price')) {
+        filters.price_range = {
+            min: urlParams.get('min_price') || '',
+            max: urlParams.get('max_price') || '',
+        };
+    }
+
+    return filters;
+};
 
 const ProductListingCategoryBrowse = () => {
     const searchQuery: string = '';
-    const categoryParam: string = '';
-
-    // Use useMemo to create stable initial filters
+    const categoryParam: string = '';    // Use useMemo to create stable initial filters
     const initialFilters = useMemo(() => createInitialFilters(), []);
 
     // State management
@@ -36,9 +85,12 @@ const ProductListingCategoryBrowse = () => {
     const [filters, setFilters] = useState<FilterState>(initialFilters);
     const [filtersTemp, setFiltersTemp] = useState<FilterState>(initialFilters);
 
+
+    console.log("filters", filters)
     // API hooks
     const { data, isLoading } = useProducts(undefined, filters);
     const { data: sidebarData, isLoading: isSidebarLoading } = useSidebar();
+    console.log("sidebarData", sidebarData);
     // Derived state
     const products = data?.payload?.data || [];
     const [sidebar, setSidebar] = useState<SidebarData>(sidebarData?.payload?.data as SidebarData);
@@ -151,7 +203,7 @@ const ProductListingCategoryBrowse = () => {
                     {sidebar && (
                         <FilterSidebar
                             isOpen={true}
-                            onClose={() => {}}
+                            onClose={() => { }}
                             filters={filtersTemp}
                             onFilterChange={handleFilterChange}
                             onClearFilters={handleClearFilter}

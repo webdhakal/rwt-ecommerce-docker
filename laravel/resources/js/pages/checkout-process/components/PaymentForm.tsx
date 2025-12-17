@@ -282,15 +282,7 @@ const PaymentForm = ({ onNext, onBack, paymentData, setPaymentData }) => {
           )}
         </div>
 
-        {/* Billing Address */}
-        {/* <div className="bg-card border border-border rounded-lg p-6">
-          
-          <Checkbox
-            label="Billing address same as shipping address"
-            checked={paymentData?.sameAsShipping || false}
-            onChange={(e) => handleInputChange('sameAsShipping', e?.target?.checked)}
-          />
-        </div> */}
+
 
         {/* Navigation Buttons */}
         <div className="flex justify-between pt-6">

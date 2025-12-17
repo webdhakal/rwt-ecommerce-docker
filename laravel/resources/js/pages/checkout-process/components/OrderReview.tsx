@@ -5,13 +5,12 @@ import Icon from '@/components/AppIcon';
 import { OrderSend } from '@/types/Order';
 import { useOrder } from '@/api/hooks/userOrders';
 
-const OrderReview = ({ onBack, onPlaceOrder, shippingData, paymentData,cartItems }: { onBack: () => void; onPlaceOrder: () => void; shippingData: any; paymentData: any; cartItems: any }) => {
+const OrderReview = ({ onBack, onPlaceOrder, shippingData, paymentData, cartItems }: { onBack: () => void; onPlaceOrder: () => void; shippingData: any; paymentData: any; cartItems: any }) => {
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderData, setOrderData] = useState<OrderSend | null>(null);
 
   const { createOrder, isCreating, isSuccess, error } = useOrder();
-console.log("cartitems", cartItems)
 
   const subtotal = cartItems?.reduce((sum: number, item: any) => sum + (item?.price * item?.quantity), 0);
   const shippingCost = shippingData?.shippingMethod === 'standard' ? 5.99 :
@@ -25,44 +24,44 @@ console.log("cartitems", cartItems)
       alert('Please agree to the terms and conditions');
       return;
     }
-    
+
     const datatosend: OrderSend = {
       grand_total: total,
       payment_method: paymentData?.paymentMethod || '',
       discount_amount: discount,
       payment_status: "pending",
       notes: paymentData?.notes || 'nothing',
-      user:{
-        first_name: shippingData?.firstName || '',
-        last_name: shippingData?.lastName || '',
-        email: shippingData?.email || '',
-        phone: shippingData?.phone || ''
+      user: {
+        first_name: shippingData?.user?.firstName || '',
+        last_name: shippingData?.user?.lastName || '',
+        email: shippingData?.user?.email || '',
+        phone: shippingData?.user?.phone || ''
       },
-      relation:{
+      relation: {
         orderItems: cartItems?.map((item: any) => ({
           variant: item?.product?.variant?.id,
           total_amount: total,
           unit_amount: item?.price,
           quantity: item?.quantity,
         })),
-        fromAddress:[],
+        fromAddress: [],
         addresses: [{
-          phone: shippingData?.phone || '',
-          email: shippingData?.email || '',
+          phone: shippingData?.user?.phone || '',
+          email: shippingData?.user?.email || '',
           custom_fields: {
             is_shipping: true,
             default: true
           },
-          country: shippingData?.country || '',
-          state: shippingData?.state || '',
-          city: shippingData?.city || '',
+          country: shippingData?.shipping_address?.country || '',
+          state: shippingData?.shipping_address?.state || '',
+          city: shippingData?.shipping_address?.city || '',
         }]
       }
-      
+
     };
 
 
-    setOrderData(datatosend); 
+    setOrderData(datatosend);
     console.log("Data to send:", datatosend);
 
     setIsProcessing(true);
@@ -70,7 +69,7 @@ console.log("cartitems", cartItems)
     // Call the API to create the order
     createOrder(datatosend);
 
-    
+
     // Simulate order processing
     setTimeout(() => {
       onPlaceOrder();

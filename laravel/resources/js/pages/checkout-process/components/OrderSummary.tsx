@@ -1,16 +1,19 @@
 import React from 'react';
 import Icon from '@/components/AppIcon';
-import { useShoppingCart } from '@/api/hooks/useShoppingCart';
+import { useSiteSetting } from '@/api/hooks/useSite-Setting';
+import useSearch from '@/api/hooks/useSearch';
 
 const OrderSummary = ({ shippingData, paymentData, cartData }) => {
-    
-    
-    const cartItems = cartData?.payload?.items || [];
+
+  const { data } = useSiteSetting();
+  const taxrate = data?.data[0]?.tax_rate;
+
+  const cartItems = cartData?.payload?.items || [];
   const subtotal = cartItems?.reduce((sum: number, item: any) => sum + (item?.price * item?.quantity), 0);
   const shippingCost = shippingData?.shippingMethod === 'standard' ? 5.99 :
     shippingData?.shippingMethod === 'express' ? 12.99 :
       shippingData?.shippingMethod === 'overnight' ? 24.99 : 0;
-  const tax = subtotal * 0.08; // 8% tax
+  const tax = subtotal * (taxrate / 100);
   const discount = paymentData?.discount || 0;
   const total = subtotal + shippingCost + tax - discount;
 

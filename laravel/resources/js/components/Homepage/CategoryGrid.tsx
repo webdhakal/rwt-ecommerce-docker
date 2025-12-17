@@ -1,7 +1,8 @@
 import { Link } from "@inertiajs/react";
 import React from "react";
 import Icon from "@/components/Common/AppIcon";
-
+import { Category } from "@/MOCK_DATA";
+import { useCategories } from "@/api/hooks/useCategories";
 interface CategoryItem {
   id: number;
   name: string;
@@ -75,7 +76,6 @@ const CategoryGrid: React.FC = () => {
       color: "from-teal-500 to-cyan-500",
     },
   ];
-
   return (
     <section className="py-8 lg:py-12">
       <div className="mb-8">

@@ -1,9 +1,13 @@
 import { Link } from '@inertiajs/react';
 import React from 'react';
 import Icon from '@/components/AppIcon';
+import {useSiteSetting} from '@/api/hooks/useSite-Setting';
 
 const Footer = () => {
   const currentYear = new Date()?.getFullYear();
+  const {data} = useSiteSetting();
+  const siteSetting= data?.data[0];
+
 
   const footerSections = [
     {
@@ -77,11 +81,13 @@ const Footer = () => {
                 <div className="w-8 h-8 bg-background rounded-lg flex items-center justify-center">
                   <Icon name="ShoppingBag" size={20} color="#1e293b" />
                 </div>
-                <span className="text-xl font-bold">EcommerceHub</span>
+                <span className="text-xl font-bold">{siteSetting?.site_name}</span>
               </Link>
               <p className="text-foreground/80 text-sm mb-6 max-w-sm">
                 Your trusted marketplace connecting shoppers with quality vendors worldwide. Discover, compare, and shop with confidence.
               </p>
+
+              <p className="text-foreground/80 text-sm mb-6 max-w-sm">Email: {siteSetting?.email?.primary}</p>
 
               {/* Social Links */}
               <div className="flex space-x-4 max-w-sm justify-around md:justify-center">

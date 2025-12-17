@@ -17,7 +17,6 @@ import { useProducts } from '@/api/hooks/useProducts';
 import { Product } from '@/types/Product';
 import SlidingCarasoul from './components/SlidingCarasoul';
 
-
 const Homepage = () => {
 
 
@@ -201,7 +200,7 @@ const Homepage = () => {
       {/* Hero Banner Section */}
       <section className="px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
         <div className="max-w-7xl mx-auto">
-          <HeroBanner />
+          <HeroBanner  />
         </div>
       </section>
 

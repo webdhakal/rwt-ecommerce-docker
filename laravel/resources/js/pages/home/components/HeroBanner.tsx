@@ -2,43 +2,21 @@ import Icon from '@/components/AppIcon';
 import { Button } from '@/shadcn/ui/button';
 import { Link } from '@inertiajs/react';
 import React, { useState, useEffect } from 'react';
+import { useBanner }  from '@/api/hooks/useSite-Setting';
 
 const HeroBanner = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [bannerData, setBannerData] = useState([]);
 
-  const bannerData = [
-    {
-      id: 1,
-      title: "Summer Sale Extravaganza",
-      subtitle: "Up to 70% off on electronics and gadgets",
-      description: "Discover amazing deals on smartphones, laptops, and smart home devices from top brands.",
-      image: "https://images.pexels.com/photos/230544/pexels-photo-230544.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-      ctaText: "Shop Now",
-      ctaLink: "/product-listing-category-browse?category=Electronics",
-      bgColor: "from-blue-600 to-purple-700"
-    },
-    {
-      id: 2,
-      title: "Fashion Forward",
-      subtitle: "New arrivals from premium brands",
-      description: "Explore the latest trends in clothing, accessories, and footwear for every style.",
-      image: "https://images.pexels.com/photos/996329/pexels-photo-996329.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-      ctaText: "Explore Collection",
-      ctaLink: "/product-listing-category-browse?category=Fashion",
-      bgColor: "from-pink-500 to-rose-600"
-    },
-    {
-      id: 3,
-      title: "Home & Living",
-      subtitle: "Transform your space with style",
-      description: "Find furniture, decor, and home essentials to create your perfect living environment.",
-      image: "https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-      ctaText: "Shop Home",
-      ctaLink: "/product-listing-category-browse?category=Home",
-      bgColor: "from-green-500 to-teal-600"
+  const {data: bannersData} = useBanner(); 
+  
+
+  useEffect(() => {
+    if (bannersData?.banners) {
+      setBannerData(bannersData?.banners);
     }
-  ];
+  }, [bannersData]);
 
   useEffect(() => {
     if (!isAutoPlaying) return;
@@ -80,8 +58,8 @@ const HeroBanner = () => {
           >
             <div className={`absolute inset-0 bg-gradient-to-r ${banner?.bgColor} opacity-90`}></div>
             <img
-              src={banner?.image}
-              alt={banner?.title}
+              src={banner?.files?.url}
+              alt={banner?.name}
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-black/30"></div>
@@ -90,21 +68,21 @@ const HeroBanner = () => {
             <div className="absolute inset-0 flex items-center justify-center text-center text-white px-4">
               <div className="max-w-4xl mx-auto">
                 <h1 className="text-2xl sm:text-3xl lg:text-5xl xl:text-6xl font-bold mb-2 sm:mb-4">
-                  {banner?.title}
+                  {banner?.name}
                 </h1>
                 <p className="text-lg sm:text-xl lg:text-2xl mb-2 sm:mb-4 opacity-90">
-                  {banner?.subtitle}
+                  {banner?.sub_title}
                 </p>
                 <p className="text-sm sm:text-base lg:text-lg mb-6 sm:mb-8 opacity-80 max-w-2xl mx-auto">
                   {banner?.description}
                 </p>
-                <Link href={banner?.ctaLink} className='block'>
+                <Link href={banner?.link} className='block'>
                   <Button
                     variant="default"
                     size="lg"
                     className="bg-background cursor-pointer text-primary hover:bg-secondary/90 font-semibold px-8 py-3"
                   >
-                    {banner?.ctaText}
+                    Shop Now
                   </Button>
                 </Link>
               </div>

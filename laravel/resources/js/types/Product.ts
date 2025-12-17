@@ -166,6 +166,7 @@ export type ProductCategories ={
     type:string;
 }
 export type ProductVariant = {
+    initials: string | null;
     id: string;
     name: string | null;
     color: {

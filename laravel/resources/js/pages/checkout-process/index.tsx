@@ -14,26 +14,40 @@ const CheckoutProcess = () => {
   // const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
   const [isOrderComplete, setIsOrderComplete] = useState(false);
-  const guestCartId= localStorage.getItem('guest_id');
+  const guestCartId = localStorage.getItem('guest_id');
   const { data: cartData } = useShoppingCart({ cartId: guestCartId || undefined });
- 
-  
+
+
   const [total, setTotal] = useState(0);
 
   const [shippingData, setShippingData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    address: '',
-    city: '',
-    state: '',
-    zipCode: '',
-    country: '',
-    shippingMethod: ''
+    user: {
+      first_name: '',
+      last_name: '',
+      email: '',
+      phone: '',
+    },
+    shipping_address: {
+      country: '',
+      state: '',
+      city: '',
+      address: '',
+      zipCode: ''
+    },
+    billing_address: {
+      country: '',
+      state: '',
+      city: '',
+      address: '',
+      zipCode: '',
+    },
+    shipping_method: '',
+    sameAsShipping: true
   });
 
-const {data: shippingCharge} = useShippingCharge(shippingData.state ? shippingData.state : undefined);
+
+
+  const { data: shippingCharge } = useShippingCharge(shippingData.state ? shippingData.state : undefined);
 
   const [paymentData, setPaymentData] = useState({
     paymentMethod: '',
@@ -42,7 +56,6 @@ const {data: shippingCharge} = useShippingCharge(shippingData.state ? shippingDa
     expiryMonth: '',
     expiryYear: '',
     cvv: '',
-    sameAsShipping: true,
     promoCode: '',
     discount: 0,
     promoCodeApplied: false
